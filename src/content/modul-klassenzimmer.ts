@@ -35,6 +35,8 @@ export const modulKlassenzimmer: Modul = {
   jahrgang: 'Klasse 3/4',
   dauerMinuten: 25,
 
+  szene: { art: 'svg', komponente: 'klassenzimmer' },
+
   // -------------------------------------------------------------------------
   // Wortschatz - 7 Lernwoerter (neu: true) + 8 Stuetzwoerter (neu: false)
   // Genusverteilung ueber alle 15: der 6 / die 5 / das 4
@@ -49,9 +51,9 @@ export const modulKlassenzimmer: Modul = {
       nomen: 'Tafel',
       plural: 'die Tafeln',
       beispiel: 'Frau Berger schreibt ein Wort an die Tafel.',
-      erklaerung: 'Die grosse dunkle Flaeche vorne in der Klasse. Man schreibt mit Kreide darauf.',
+      erklaerung: 'Die große dunkle Fläche vorne in der Klasse. Man schreibt mit Kreide darauf.',
       neu: true,
-      punkt: { x: 46, y: 21 },
+      punkt: { x: 46, y: 22 },
       labelSeite: 'oben',
     },
     {
@@ -62,7 +64,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Mit dem Lineal male ich eine gerade Linie.',
       erklaerung: 'Ein flaches, langes Ding. Damit malst du gerade Linien.',
       neu: true,
-      punkt: { x: 44, y: 57 },
+      punkt: { x: 40, y: 60 },
       labelSeite: 'oben',
     },
     {
@@ -73,7 +75,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Mit dem Radiergummi mache ich den Fehler weg.',
       erklaerung: 'Damit machst du etwas weg, das du mit Bleistift geschrieben hast.',
       neu: true,
-      punkt: { x: 61, y: 58 },
+      punkt: { x: 57, y: 60 },
       labelSeite: 'oben',
     },
     {
@@ -84,7 +86,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Mein Stift ist stumpf. Ich brauche den Spitzer.',
       erklaerung: 'Damit machst du deinen Stift wieder spitz.',
       neu: true,
-      punkt: { x: 68, y: 66 },
+      punkt: { x: 66, y: 70 },
       labelSeite: 'unten',
     },
     {
@@ -95,7 +97,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Ich schneide das Papier mit der Schere.',
       erklaerung: 'Damit schneidest du Papier.',
       neu: true,
-      punkt: { x: 76, y: 57 },
+      punkt: { x: 76, y: 60 },
       labelSeite: 'oben',
     },
     {
@@ -106,18 +108,18 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Ich klebe das Bild mit dem Kleber in mein Heft.',
       erklaerung: 'Damit machst du zwei Dinge fest zusammen.',
       neu: true,
-      punkt: { x: 84, y: 65 },
+      punkt: { x: 84, y: 70 },
       labelSeite: 'unten',
     },
     {
       id: 'papierkorb',
       genus: 'der',
       nomen: 'Papierkorb',
-      plural: 'die Papierkoerbe',
+      plural: 'die Papierkörbe',
       beispiel: 'Das alte Blatt kommt in den Papierkorb.',
       erklaerung: 'Da wirfst du Papier hinein, das du nicht mehr brauchst.',
       neu: true,
-      punkt: { x: 91, y: 66 },
+      punkt: { x: 94, y: 88 },
       labelSeite: 'links',
     },
 
@@ -128,7 +130,7 @@ export const modulKlassenzimmer: Modul = {
       nomen: 'Fenster',
       plural: 'die Fenster',
       beispiel: 'Die Sonne scheint durch das Fenster.',
-      erklaerung: 'Dadurch siehst du nach draussen.',
+      erklaerung: 'Dadurch siehst du nach draußen.',
       neu: false,
       punkt: { x: 10, y: 20 },
       labelSeite: 'unten',
@@ -139,20 +141,20 @@ export const modulKlassenzimmer: Modul = {
       nomen: 'Uhr',
       plural: 'die Uhren',
       beispiel: 'Die Uhr zeigt zehn Uhr.',
-      erklaerung: 'Sie zeigt dir, wie spaet es ist.',
+      erklaerung: 'Sie zeigt dir, wie spät es ist.',
       neu: false,
-      punkt: { x: 86, y: 13 },
+      punkt: { x: 87, y: 13 },
       labelSeite: 'unten',
     },
     {
       id: 'stuhl',
       genus: 'der',
       nomen: 'Stuhl',
-      plural: 'die Stuehle',
+      plural: 'die Stühle',
       beispiel: 'Ich setze mich auf den Stuhl.',
       erklaerung: 'Darauf sitzt du.',
       neu: false,
-      punkt: { x: 7, y: 60 },
+      punkt: { x: 8, y: 57 },
       labelSeite: 'unten',
     },
     {
@@ -161,20 +163,20 @@ export const modulKlassenzimmer: Modul = {
       nomen: 'Schultasche',
       plural: 'die Schultaschen',
       beispiel: 'Meine Schultasche ist heute schwer.',
-      erklaerung: 'Darin traegst du deine Sachen zur Schule.',
+      erklaerung: 'Darin trägst du deine Sachen zur Schule.',
       neu: false,
-      punkt: { x: 15, y: 77 },
+      punkt: { x: 13, y: 76 },
       labelSeite: 'unten',
     },
     {
       id: 'buch',
       genus: 'das',
       nomen: 'Buch',
-      plural: 'die Buecher',
+      plural: 'die Bücher',
       beispiel: 'Wir lesen zusammen ein Buch.',
       erklaerung: 'Darin stehen Texte und Bilder zum Lesen.',
       neu: false,
-      punkt: { x: 24, y: 60 },
+      punkt: { x: 21, y: 60 },
       labelSeite: 'oben',
     },
     {
@@ -183,9 +185,9 @@ export const modulKlassenzimmer: Modul = {
       nomen: 'Heft',
       plural: 'die Hefte',
       beispiel: 'Ich schreibe den Satz in mein Heft.',
-      erklaerung: 'Ein duennes Buch mit leeren Seiten zum Schreiben.',
+      erklaerung: 'Ein dünnes Buch mit leeren Seiten zum Schreiben.',
       neu: false,
-      punkt: { x: 34, y: 64 },
+      punkt: { x: 30, y: 70 },
       labelSeite: 'unten',
     },
     {
@@ -196,7 +198,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Mein Stift schreibt blau.',
       erklaerung: 'Damit schreibst und malst du.',
       neu: false,
-      punkt: { x: 52, y: 65 },
+      punkt: { x: 49, y: 70 },
       labelSeite: 'unten',
     },
     {
@@ -207,7 +209,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Meine Sachen liegen auf dem Tisch.',
       erklaerung: 'Darauf legst du deine Sachen und schreibst.',
       neu: false,
-      punkt: { x: 30, y: 88 },
+      punkt: { x: 20, y: 88 },
       labelSeite: 'unten',
     },
   ],
@@ -231,7 +233,7 @@ export const modulKlassenzimmer: Modul = {
         saetze: [
           'Frau Berger zeigt auf die Tafel.',
           'Dort steht ein Wort: Willkommen.',
-          'Mala liest das Wort ganz langsam und laechelt.',
+          'Mala liest das Wort ganz langsam und lächelt.',
         ],
       },
       {
@@ -265,10 +267,10 @@ export const modulKlassenzimmer: Modul = {
       {
         id: 'a6',
         saetze: [
-          'Am Ende haengt Malas Bild an der Tafel.',
-          'Es ist ein Baum mit vielen bunten Voegeln.',
+          'Am Ende hängt Malas Bild an der Tafel.',
+          'Es ist ein Baum mit vielen bunten Vögeln.',
           'Mala sagt jetzt wieder etwas.',
-          'Sie erzaehlt Nuri von den Voegeln.',
+          'Sie erzählt Nuri von den Vögeln.',
         ],
       },
     ],
@@ -293,7 +295,7 @@ export const modulKlassenzimmer: Modul = {
       abStufe: 'einfach',
       belegAbsatz: 'a1',
       optionen: [
-        { id: 'o1', text: 'Aus der Tuerkei' },
+        { id: 'o1', text: 'Aus der Türkei' },
         { id: 'o2', text: 'Aus Syrien' },
         { id: 'o3', text: 'Aus Deutschland' },
         { id: 'o4', text: 'Aus Italien' },
@@ -310,7 +312,7 @@ export const modulKlassenzimmer: Modul = {
     {
       id: 'f2',
       typ: 'wahrheit',
-      frage: 'Stimmt das? Waehle: richtig, falsch oder steht nicht im Text.',
+      frage: 'Stimmt das? Wähle: richtig, falsch oder steht nicht im Text.',
       ebene: 'literal',
       abStufe: 'einfach',
       aussagen: [
@@ -331,7 +333,7 @@ export const modulKlassenzimmer: Modul = {
           text: 'Mala hat einen kleinen Bruder.',
           richtig: 'unbekannt',
           begruendung:
-            'Ueber Malas Familie steht nichts im Text. Vielleicht hat sie einen Bruder, vielleicht nicht – wir wissen es nicht.',
+            'Über Malas Familie steht nichts im Text. Vielleicht hat sie einen Bruder, vielleicht nicht – wir wissen es nicht.',
         },
       ],
       hilfen: [
@@ -345,7 +347,7 @@ export const modulKlassenzimmer: Modul = {
     {
       id: 'f3',
       typ: 'luecken',
-      frage: 'Setze die richtigen Woerter ein.',
+      frage: 'Setze die richtigen Wörter ein.',
       ebene: 'literal',
       abStufe: 'einfach',
       belegAbsatz: 'a3',
@@ -353,11 +355,11 @@ export const modulKlassenzimmer: Modul = {
       loesungen: ['Kleber', 'Schere'],
       wortbank: ['Kleber', 'Schere', 'Spitzer', 'Tafel', 'Lineal'],
       hilfen: [
-        'Achte auf „keinen“ und „keine“ – das verraet dir den Artikel.',
+        'Achte auf „keinen“ und „keine“ – das verrät dir den Artikel.',
         '„keinen“ passt zu einem der-Wort, „keine“ zu einem die-Wort.',
       ],
       loesungserklaerung:
-        '„keinen“ gehoert zu „der Kleber“, „keine“ zu „die Schere“. Die kleinen Woerter vor dem Nomen verraten dir das Genus.',
+        '„keinen“ gehört zu „der Kleber“, „keine“ zu „die Schere“. Die kleinen Wörter vor dem Nomen verraten dir das Genus.',
     },
 
     {
@@ -371,11 +373,11 @@ export const modulKlassenzimmer: Modul = {
       artikelPflicht: true,
       platzhalter: 'zum Beispiel: der Stift',
       hilfen: [
-        'Lies den fuenften Absatz noch einmal.',
+        'Lies den fünften Absatz noch einmal.',
         'Das Wort beginnt mit „Radier…“',
       ],
       loesungserklaerung:
-        'Die Loesung ist „der Radiergummi“. Das Wort ist maskulin – darum heisst es „der“ und im Text „den Radiergummi“ (Akkusativ).',
+        'Die Lösung ist „der Radiergummi“. Das Wort ist maskulin – darum heißt es „der“ und im Text „den Radiergummi“ (Akkusativ).',
     },
 
     {
@@ -388,15 +390,15 @@ export const modulKlassenzimmer: Modul = {
         { id: 's1', text: 'Mala kommt neu in die Klasse 4b.' },
         { id: 's2', text: 'Mala merkt, dass ihre Schultasche fast leer ist.' },
         { id: 's3', text: 'Nuri legt seine Sachen auf Malas Tisch.' },
-        { id: 's4', text: 'Mala malt einen Baum mit Voegeln.' },
-        { id: 's5', text: 'Malas Bild haengt an der Tafel.' },
+        { id: 's4', text: 'Mala malt einen Baum mit Vögeln.' },
+        { id: 's5', text: 'Malas Bild hängt an der Tafel.' },
       ],
       hilfen: [
         'Welches Ereignis passiert ganz am Anfang der Geschichte?',
-        'Geh die Absaetze der Reihe nach durch – die Geschichte wird der Reihe nach erzaehlt.',
+        'Geh die Absätze der Reihe nach durch – die Geschichte wird der Reihe nach erzählt.',
       ],
       loesungserklaerung:
-        'Die Geschichte wird von vorne nach hinten erzaehlt: Mala kommt an, ihr fehlen Sachen, Nuri hilft, sie malt, am Ende haengt ihr Bild an der Tafel.',
+        'Die Geschichte wird von vorne nach hinten erzählt: Mala kommt an, ihr fehlen Sachen, Nuri hilft, sie malt, am Ende hängt ihr Bild an der Tafel.',
     },
 
     {
@@ -408,10 +410,10 @@ export const modulKlassenzimmer: Modul = {
       woerter: ['tafel', 'lineal', 'radiergummi', 'spitzer', 'schere', 'kleber', 'papierkorb'],
       hilfen: [
         'Schau dir das Bild oben noch einmal an – dort steht jeder Artikel dabei.',
-        'Merkhilfe: Woerter auf -er sind oft maskulin (der Spitzer, der Kleber).',
+        'Merkhilfe: Wörter auf -er sind oft maskulin (der Spitzer, der Kleber).',
       ],
       loesungserklaerung:
-        'Im Deutschen gehoert der Artikel fest zum Nomen. Man lernt ihn am besten zusammen mit dem Wort – nie das Wort allein.',
+        'Im Deutschen gehört der Artikel fest zum Nomen. Man lernt ihn am besten zusammen mit dem Wort – nie das Wort allein.',
     },
 
     {
@@ -422,18 +424,18 @@ export const modulKlassenzimmer: Modul = {
       abStufe: 'anspruchsvoll',
       belegAbsatz: 'a3',
       optionen: [
-        { id: 'p1', text: 'Weil sie muede ist.' },
+        { id: 'p1', text: 'Weil sie müde ist.' },
         { id: 'p2', text: 'Weil sie traurig ist. Sie hat fast nichts zum Malen.' },
         { id: 'p3', text: 'Weil Frau Berger es so gesagt hat.' },
         { id: 'p4', text: 'Weil sie kein Deutsch versteht.' },
       ],
       richtig: 'p2',
       hilfen: [
-        'Was passiert direkt vorher? Lies die zwei Saetze davor.',
-        'Im Text steht nicht „Mala ist traurig“. Du musst es selbst erschliessen.',
+        'Was passiert direkt vorher? Lies die zwei Sätze davor.',
+        'Im Text steht nicht „Mala ist traurig“. Du musst es selbst erschließen.',
       ],
       loesungserklaerung:
-        'Diese Antwort steht nicht woertlich im Text. Vorher steht: Alle sollen malen, aber Mala hat fast nichts. Daraus kannst du schliessen, warum sie still wird. Das nennt man „zwischen den Zeilen lesen“.',
+        'Diese Antwort steht nicht wörtlich im Text. Vorher steht: Alle sollen malen, aber Mala hat fast nichts. Daraus kannst du schließen, warum sie still wird. Das nennt man „zwischen den Zeilen lesen“.',
     },
   ],
 
@@ -441,11 +443,11 @@ export const modulKlassenzimmer: Modul = {
   // Lehrkraft-Ebene
   // -------------------------------------------------------------------------
   lernziele: [
-    'Die Schuelerinnen und Schueler benennen sieben Gegenstaende aus dem Klassenzimmer mit dem korrekten bestimmten Artikel.',
+    'Die Schülerinnen und Schüler benennen sieben Gegenstände aus dem Klassenzimmer mit dem korrekten bestimmten Artikel.',
     'Sie bilden zu diesen Nomen die Pluralform.',
-    'Sie entnehmen einem kurzen erzaehlenden Text gezielt Einzelinformationen (literales Verstehen).',
+    'Sie entnehmen einem kurzen erzählenden Text gezielt Einzelinformationen (literales Verstehen).',
     'Sie unterscheiden zwischen einer im Text belegten und einer nicht belegten Aussage.',
-    'Sie erschliessen eine nicht ausgesprochene Ursache aus dem Textzusammenhang (inferentielles Verstehen).',
+    'Sie erschließen eine nicht ausgesprochene Ursache aus dem Textzusammenhang (inferentielles Verstehen).',
     'Sie ordnen die Ereignisse der Geschichte in der richtigen Reihenfolge.',
   ],
 
@@ -460,16 +462,16 @@ export const modulKlassenzimmer: Modul = {
       quelle: 'LehrplanPLUS Bayern, Deutsch 3/4',
       bereich: 'Lesen – mit Texten und weiteren Medien umgehen',
       formulierung:
-        'Die Schuelerinnen und Schueler verstehen kurze, altersgemaesse und bildgestuetzte Texte, erkennen bekannte Woerter wieder und erschliessen wesentliche Inhalte.',
+        'Die Schülerinnen und Schüler verstehen kurze, altersgemäße und bildgestützte Texte, erkennen bekannte Wörter wieder und erschließen wesentliche Inhalte.',
     },
     {
       quelle: 'LehrplanPLUS Bayern, Deutsch 3/4',
       bereich: 'Sprachgebrauch untersuchen und reflektieren',
       formulierung:
-        'Die Schuelerinnen und Schueler verwenden Nomen mit dem passenden Begleiter und bilden Singular- und Pluralformen.',
+        'Die Schülerinnen und Schüler verwenden Nomen mit dem passenden Begleiter und bilden Singular- und Pluralformen.',
     },
     {
-      quelle: 'Gemeinsamer Europaeischer Referenzrahmen (GER)',
+      quelle: 'Gemeinsamer Europäischer Referenzrahmen (GER)',
       bereich: 'Lesen, Niveau A2',
       formulierung:
         'Kann kurze, einfache Texte zu vertrauten konkreten Themen lesen und darin bestimmte Informationen auffinden.',
@@ -483,8 +485,8 @@ export const modulKlassenzimmer: Modul = {
       massnahmen: [
         'Nur die drei Aufgaben mit Auswahlantworten – kein freies Schreiben.',
         'Bild-Wort-Teil im Modus „Entdecken“: alle Beschriftungen bleiben sichtbar.',
-        'Vorlesefunktion aktiv lassen; Text zuerst Satz fuer Satz anhoeren.',
-        'Vorentlastung im Unterricht: die sieben Gegenstaende real auf den Tisch legen und benennen lassen.',
+        'Vorlesefunktion aktiv lassen; Text zuerst Satz für Satz anhören.',
+        'Vorentlastung im Unterricht: die sieben Gegenstände real auf den Tisch legen und benennen lassen.',
       ],
     },
     {
@@ -492,7 +494,7 @@ export const modulKlassenzimmer: Modul = {
       fuerWen: 'Zielgruppe des Moduls: A2, ein bis drei Jahre Deutschkontakt',
       massnahmen: [
         'Sechs Aufgaben inklusive Freitext und Artikelzuordnung.',
-        'Bild-Wort-Teil zuerst im Modus „Entdecken“, danach „Ueben“.',
+        'Bild-Wort-Teil zuerst im Modus „Entdecken“, danach „Üben“.',
         'Hilfen erst nach dem ersten eigenen Versuch anbieten.',
       ],
     },
@@ -501,17 +503,17 @@ export const modulKlassenzimmer: Modul = {
       fuerWen: 'Kinder, die den Wortschatz sicher beherrschen, Niveau A2+ bis B1',
       massnahmen: [
         'Alle sieben Aufgaben inklusive der Inferenzfrage.',
-        'Bild-Wort-Teil direkt im Modus „Ueben“ ohne Beschriftungen.',
-        'Anschlussauftrag muendlich: Die Geschichte aus Nuris Sicht nacherzaehlen.',
+        'Bild-Wort-Teil direkt im Modus „Üben“ ohne Beschriftungen.',
+        'Anschlussauftrag mündlich: Die Geschichte aus Nuris Sicht nacherzählen.',
       ],
     },
   ],
 
   unterrichtshinweise: [
-    'Vorentlastung (5 Min.): Legen Sie die sieben Gegenstaende real auf einen Tisch. Jedes Kind nimmt einen und sagt „Das ist …“. Erst danach an den Bildschirm.',
-    'Die Artikelfarben (blau/rot/gruen) entsprechen der in DaZ-Materialien ueblichen Konvention. Wenn Sie im Unterricht andere Farben nutzen, weisen Sie einmal kurz darauf hin.',
-    'Aufgabe 2 (richtig / falsch / steht nicht im Text) ist erfahrungsgemaess die schwerste. Die dritte Option verhindert Raten, irritiert aber zunaechst. Ein gemeinsames Beispiel an der Tafel lohnt sich.',
-    'Der Text hat einen sozialen Kern. Er eignet sich als Gespraechsanlass ueber das Ankommen in einer neuen Klasse – gerade wenn selbst neu zugewanderte Kinder in der Gruppe sind.',
+    'Vorentlastung (5 Min.): Legen Sie die sieben Gegenstände real auf einen Tisch. Jedes Kind nimmt einen und sagt „Das ist …“. Erst danach an den Bildschirm.',
+    'Die Artikelfarben (blau/rot/grün) entsprechen der in DaZ-Materialien üblichen Konvention. Wenn Sie im Unterricht andere Farben nutzen, weisen Sie einmal kurz darauf hin.',
+    'Aufgabe 2 (richtig / falsch / steht nicht im Text) ist erfahrungsgemäß die schwerste. Die dritte Option verhindert Raten, irritiert aber zunächst. Ein gemeinsames Beispiel an der Tafel lohnt sich.',
+    'Der Text hat einen sozialen Kern. Er eignet sich als Gesprächsanlass über das Ankommen in einer neuen Klasse – gerade wenn selbst neu zugewanderte Kinder in der Gruppe sind.',
     'Nacharbeit: Die Wortkarten aus dem Lehrkraft-Bereich ausdrucken und als Partnerspiel „Ich sehe was, was du nicht siehst“ einsetzen.',
   ],
 }

@@ -1,0 +1,517 @@
+/**
+ * Stile der Leseaufgabe.
+ *
+ * Ausschliesslich Tokens aus tokens.css, kein hartkodierter Wert. Basisformen
+ * (Knopf, Karte, Melde, Chip, Marke, Reihe, Stapel) kommen aus komponenten.css
+ * und werden hier nur ergaenzt, nie dupliziert. Wo eine Regel eine
+ * Basiskomponente ueberschreibt (Groesse/Abstand), ist der Selektor bewusst
+ * aus beiden Klassen zusammengesetzt (z. B. .chip.lesen__fortschritt-text) -
+ * das gewinnt unabhaengig von der Ladereihenfolge der Stylesheets.
+ */
+
+/* ---------------------------------------------------------------------
+ * Layout: Text und Aufgaben nebeneinander ab 1100px
+ * --------------------------------------------------------------------- */
+.lesen {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--r-6);
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .lesen {
+    grid-template-columns: minmax(0, var(--breite-lesen)) minmax(0, 1fr);
+  }
+
+  .lesen__text-spalte {
+    position: sticky;
+    top: var(--r-5);
+    max-height: calc(100vh - var(--r-6));
+    overflow-y: auto;
+    padding-right: var(--r-3);
+  }
+}
+
+.lesen__aufgaben-spalte {
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------------
+ * Werkzeugleiste
+ * --------------------------------------------------------------------- */
+.lesen__werkzeugleiste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+  align-items: center;
+}
+
+.knopf.lesen__werkzeug-knopf {
+  padding-inline: var(--r-4);
+  font-size: var(--s-sm);
+}
+
+.lesen__werkzeug-knopf[aria-pressed='true'] {
+  background-color: var(--m-petrol-hell);
+  border-color: var(--m-petrol);
+  color: var(--m-petrol-tief);
+}
+
+.chip.lesen__werkzeug-hinweis {
+  color: var(--t-leise);
+}
+
+/* ---------------------------------------------------------------------
+ * Silben-Panel
+ * --------------------------------------------------------------------- */
+.lesen__silben-titel {
+  font-weight: 700;
+  color: var(--t-stark);
+}
+
+.lesen__silben-liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-4);
+  padding: 0;
+  margin-block-start: var(--r-3);
+  list-style: none;
+}
+
+.lesen__silben-liste li {
+  display: flex;
+  align-items: center;
+  gap: var(--r-2);
+}
+
+.lesen__silben-wort {
+  font-family: var(--schrift-lesen);
+  font-size: var(--s-lg);
+  font-weight: 700;
+}
+
+.ist-silbe-a {
+  color: var(--t-stark);
+}
+
+.ist-silbe-b {
+  color: var(--m-petrol);
+}
+
+/* ---------------------------------------------------------------------
+ * Zeilenlineal
+ * --------------------------------------------------------------------- */
+.lesen__lineal-regler {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-2);
+  padding: var(--r-3) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border: 2px solid var(--f-rand-stark);
+  border-radius: var(--e-md);
+}
+
+.lesen__lineal-label {
+  color: var(--t-normal);
+  font-size: var(--s-sm);
+  font-weight: 700;
+}
+
+.lesen__lineal-eingabe {
+  width: 100%;
+  min-height: var(--ziel-min);
+  accent-color: var(--m-petrol);
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------
+ * Lesetext
+ * --------------------------------------------------------------------- */
+.lesen__text {
+  max-width: var(--breite-lesen);
+  font-family: var(--schrift-lesen);
+  font-size: var(--s-lesen);
+  line-height: var(--zeile-lesen);
+  color: var(--t-stark);
+  text-align: left; /* niemals Blocksatz - siehe Aufgabenstellung */
+}
+
+.lesen__text--gross {
+  font-size: var(--s-h1);
+}
+
+.lesen__absatz {
+  position: relative;
+}
+
+.lesen__absatz.ist-beleg {
+  padding: var(--r-3);
+  margin-inline: calc(var(--r-3) * -1);
+  background-color: var(--m-ocker-hell);
+  border-radius: var(--e-md);
+}
+
+.lesen__beleg-marke {
+  display: inline-block;
+  margin-bottom: var(--r-2);
+  padding: var(--r-1) var(--r-3);
+  background-color: var(--m-ocker);
+  border-radius: var(--e-rund);
+  color: var(--t-invers);
+  font-family: var(--schrift-text);
+  font-size: var(--s-xs);
+  font-weight: 700;
+}
+
+.lesen__satz {
+  border-radius: var(--e-sm);
+  transition:
+    background-color var(--tempo) var(--kurve),
+    box-shadow var(--tempo) var(--kurve),
+    opacity var(--tempo) var(--kurve);
+}
+
+.lesen__satz.ist-vorgelesen {
+  background-color: var(--m-petrol-hell);
+}
+
+.lesen__satz.ist-lineal-aktiv {
+  background-color: var(--f-karte-tief);
+  box-shadow: 0 0 0 2px var(--f-rand-stark);
+}
+
+.lesen__satz.ist-abgedunkelt {
+  opacity: 0.35;
+}
+
+/* Wortschatz-Markierung: unterpunktet statt farbig hinterlegt - Farbe bleibt
+   den Artikelmarken vorbehalten (siehe Aufgabenstellung). */
+.lesen__wort {
+  position: relative;
+  display: inline;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--t-leise);
+  text-underline-offset: 3px;
+}
+
+.lesen__wort-tooltip {
+  position: absolute;
+  bottom: calc(100% + var(--r-2));
+  left: 50%;
+  z-index: 10;
+  padding: var(--r-1) var(--r-3);
+  background-color: var(--f-dunkel);
+  border-radius: var(--e-sm);
+  box-shadow: var(--schatten-md);
+  color: var(--t-invers);
+  font-family: var(--schrift-text);
+  font-size: var(--s-xs);
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%);
+  transition: opacity var(--tempo) var(--kurve);
+  pointer-events: none;
+}
+
+.lesen__wort:hover .lesen__wort-tooltip,
+.lesen__wort:focus-visible .lesen__wort-tooltip,
+.lesen__wort.ist-offen .lesen__wort-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ---------------------------------------------------------------------
+ * Aufgaben-Karte
+ * --------------------------------------------------------------------- */
+.lesen__aufgabe {
+  max-width: var(--breite-schmal);
+}
+
+.chip.lesen__fortschritt-text {
+  align-self: flex-start;
+}
+
+.lesen__hilfen {
+  padding: var(--r-3) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-md);
+}
+
+.lesen__hilfen-titel {
+  margin-bottom: var(--r-2);
+  color: var(--t-normal);
+  font-weight: 700;
+}
+
+.lesen__hilfen ul {
+  padding-inline-start: var(--r-5);
+}
+
+.lesen__hilfen li + li {
+  margin-block-start: var(--r-2);
+}
+
+/* Musterloesung innerhalb der Melde-Box */
+.lesen__loesung {
+  padding-top: var(--r-3);
+  border-top: 1px solid currentColor;
+}
+
+.lesen__loesung-titel {
+  font-weight: 700;
+}
+
+.lesen__loesung-liste {
+  padding-inline-start: var(--r-5);
+}
+
+.lesen__loesung-liste li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+}
+
+.lesen__loesung-liste li + li {
+  margin-block-start: var(--r-1);
+}
+
+.lesen__loesung-erwartet {
+  font-weight: 700;
+}
+
+.lesen__beleg-hinweis {
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------------
+ * Abschlussansicht
+ * --------------------------------------------------------------------- */
+.lesen__abschluss-zwischentitel {
+  color: var(--t-stark);
+  font-weight: 700;
+}
+
+.lesen__abschluss ul {
+  padding-inline-start: var(--r-5);
+}
+
+.lesen__abschluss li + li {
+  margin-block-start: var(--r-2);
+}
+
+/* ---------------------------------------------------------------------
+ * Eingabekomponenten (aufgabentypen.tsx)
+ * --------------------------------------------------------------------- */
+.lesen__eingabe-feld {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lesen__feld-label {
+  display: block;
+  margin-bottom: var(--r-2);
+  color: var(--t-normal);
+  font-weight: 700;
+}
+
+/* Ganze Zeile klickbar: das <label> umschliesst das <input> (auswahl,
+   wahrheit, artikel). Der native Fokusring auf dem <input> selbst greift
+   bereits ueber die globale :focus-visible-Regel in base.css. */
+.lesen__option {
+  display: flex;
+  align-items: center;
+  gap: var(--r-3);
+  min-height: var(--ziel-min);
+  padding: var(--r-3) var(--r-4);
+  background-color: var(--f-karte);
+  border: 2px solid var(--f-rand-stark);
+  border-radius: var(--e-md);
+  cursor: pointer;
+  transition:
+    border-color var(--tempo) var(--kurve),
+    background-color var(--tempo) var(--kurve);
+}
+
+.lesen__option:hover {
+  border-color: var(--m-petrol);
+}
+
+.lesen__option:has(input:checked) {
+  background-color: var(--m-petrol-hell);
+  border-color: var(--m-petrol);
+}
+
+.lesen__option:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.lesen__option input[type='radio'] {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  accent-color: var(--m-petrol);
+}
+
+/* Artikel-Variante: der farbige Marken-Chip trägt die Artikelfarbe schon
+   selbst - die Auswahl bekommt bewusst einen neutralen, kräftigen Rahmen statt
+   einer zweiten Hintergrundfarbe, damit sich beides nicht überlagert. */
+.lesen__option.lesen__option--artikel {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.lesen__option.lesen__option--artikel:has(input:checked) {
+  background-color: var(--f-karte);
+  border-color: var(--t-stark);
+  border-width: 3px;
+}
+
+.lesen__aussage {
+  padding: var(--r-4);
+  border: 1px solid var(--f-rand);
+  border-radius: var(--e-md);
+}
+
+.lesen__aussage legend {
+  padding-bottom: var(--r-2);
+  color: var(--t-stark);
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .lesen__optionsreihe {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Wortbank + Luecken */
+.lesen__wortbank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+  padding: var(--r-3);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-md);
+}
+
+.chip.lesen__wortbank-chip {
+  min-height: var(--ziel-min);
+  padding-inline: var(--r-4);
+  border: 2px solid transparent;
+  font-size: var(--s-md);
+  cursor: pointer;
+  transition: border-color var(--tempo) var(--kurve);
+}
+
+.chip.lesen__wortbank-chip:hover:not(:disabled) {
+  border-color: var(--m-petrol);
+}
+
+.chip.lesen__wortbank-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.lesen__luecken-satz {
+  font-size: var(--s-lg);
+  line-height: var(--zeile-normal);
+}
+
+.lesen__luecke {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  min-height: var(--ziel-min);
+  margin-inline: var(--r-1);
+  padding: var(--r-1) var(--r-3);
+  background-color: var(--f-karte);
+  border: 2px dashed var(--f-rand-stark);
+  border-radius: var(--e-md);
+  color: var(--t-normal);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  vertical-align: middle;
+  transition:
+    border-color var(--tempo) var(--kurve),
+    background-color var(--tempo) var(--kurve),
+    box-shadow var(--tempo) var(--kurve);
+}
+
+.lesen__luecke.ist-gefuellt {
+  background-color: var(--m-petrol-hell);
+  border-style: solid;
+  color: var(--m-petrol-tief);
+}
+
+.lesen__luecke.ist-aktiv {
+  border-color: var(--m-petrol);
+  box-shadow: 0 0 0 2px var(--m-petrol-hell);
+}
+
+.lesen__luecke:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Reihenfolge */
+.lesen__reihenfolge-liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-3);
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+.lesen__reihenfolge-eintrag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r-3);
+  padding: var(--r-3) var(--r-4);
+  background-color: var(--f-karte);
+  border: 1px solid var(--f-rand);
+  border-radius: var(--e-md);
+}
+
+.lesen__reihenfolge-text {
+  flex: 1 1 auto;
+}
+
+.lesen__reihenfolge-knoepfe {
+  flex-wrap: nowrap;
+}
+
+.knopf.lesen__pfeil-knopf {
+  padding-inline: var(--r-3);
+  font-size: var(--s-sm);
+}
+
+@media (max-width: 640px) {
+  .lesen__reihenfolge-eintrag {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lesen__reihenfolge-knoepfe {
+    justify-content: stretch;
+  }
+
+  .lesen__reihenfolge-knoepfe > .knopf {
+    flex: 1 1 0;
+  }
+}

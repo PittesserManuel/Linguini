@@ -1,0 +1,401 @@
+/**
+ * Stile des Lehrkraft- und Elternbereichs.
+ *
+ * Ausschliesslich Tokens aus tokens.css, kein hartkodierter Wert. Basisformen
+ * (Karte, Knopf, Chip, Marke, Reiter, Fortschritt, Reihe, Stapel) kommen aus
+ * komponenten.css und werden hier nur ergaenzt, nie dupliziert. Wo eine Regel
+ * eine Basiskomponente ueberschreibt, ist der Selektor bewusst aus beiden
+ * Klassen zusammengesetzt (z. B. .fortschritt__balken.lehrkraft__fehler-balken) -
+ * das gewinnt unabhaengig von der Ladereihenfolge der Stylesheets.
+ */
+
+/* ---------------------------------------------------------------------
+ * Rahmen und Reiter
+ * --------------------------------------------------------------------- */
+.lehrkraft__titel {
+  margin-bottom: var(--r-4);
+}
+
+.lehrkraft__reiter {
+  margin-bottom: var(--r-5);
+}
+
+.lehrkraft__panel {
+  padding-top: var(--r-2);
+}
+
+.lehrkraft__panel > * + * {
+  margin-block-start: var(--r-6);
+}
+
+/* ---------------------------------------------------------------------
+ * Wiederverwendbarer "ehrlicher Hinweis" - Einordnung von Kennzahlen in
+ * Klartext, kein Alarm, nur Kontext.
+ * --------------------------------------------------------------------- */
+.lehrkraft__einordnung {
+  padding: var(--r-4);
+  background-color: var(--f-karte-tief);
+  border-left: 4px solid var(--m-petrol);
+  border-radius: var(--e-md);
+  color: var(--t-normal);
+  font-size: var(--s-sm);
+  line-height: var(--zeile-normal);
+}
+
+/* ---------------------------------------------------------------------
+ * Reiter 1: Lernziele & Lehrplan
+ * --------------------------------------------------------------------- */
+.lehrkraft__lernziele-liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-3);
+  padding: 0;
+  list-style: none;
+}
+
+.lehrkraft__lernziel-eintrag {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r-3);
+  color: var(--t-stark);
+  line-height: var(--zeile-normal);
+}
+
+.lehrkraft__lernziel-eintrag svg {
+  flex-shrink: 0;
+  margin-top: 0.2em;
+  color: var(--m-petrol);
+}
+
+.lehrkraft__tabelle-rahmen {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.lehrkraft__tabelle {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  font-size: var(--s-sm);
+}
+
+.lehrkraft__tabelle th,
+.lehrkraft__tabelle td {
+  padding: var(--r-3) var(--r-3);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--f-rand);
+}
+
+.lehrkraft__tabelle th {
+  color: var(--t-leise);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lehrkraft__tabelle tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.lehrkraft__kennzahlen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--r-4);
+}
+
+.lehrkraft__kennzahl {
+  padding: var(--r-3) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-md);
+}
+
+.lehrkraft__kennzahl dt {
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+  font-weight: 700;
+}
+
+.lehrkraft__kennzahl dd {
+  margin: 0;
+  color: var(--t-stark);
+  font-family: var(--schrift-anzeige);
+  font-size: var(--s-h3);
+  font-weight: 600;
+}
+
+.lehrkraft__hinweise-liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-3);
+  padding-inline-start: var(--r-5);
+  color: var(--t-stark);
+  line-height: var(--zeile-normal);
+}
+
+/* ---------------------------------------------------------------------
+ * Reiter 2: Differenzierung
+ * --------------------------------------------------------------------- */
+.lehrkraft__stufen-raster {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--r-4);
+}
+
+.lehrkraft__stufen-fuerwen {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.lehrkraft__stufen-karte ul {
+  padding-inline-start: var(--r-5);
+}
+
+.lehrkraft__stufen-karte li + li {
+  margin-block-start: var(--r-2);
+}
+
+/* ---------------------------------------------------------------------
+ * Reiter 3: Auswertung
+ * --------------------------------------------------------------------- */
+.lehrkraft__leerzustand {
+  text-align: center;
+}
+
+.lehrkraft__fortschritt-text {
+  color: var(--t-normal);
+}
+
+.lehrkraft__kennzahlen-reihe {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--r-4);
+}
+
+.lehrkraft__kennzahl-karte {
+  text-align: center;
+}
+
+.lehrkraft__kennzahl-wert {
+  color: var(--m-petrol-tief);
+  font-family: var(--schrift-anzeige);
+  font-size: var(--s-h2);
+  font-weight: 600;
+  line-height: var(--zeile-eng);
+}
+
+.lehrkraft__kennzahl-label {
+  margin-top: var(--r-1);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.lehrkraft__balken-liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-3);
+  padding: 0;
+  list-style: none;
+}
+
+.lehrkraft__balken-zeile {
+  display: grid;
+  grid-template-columns: 11rem 1fr 3rem;
+  align-items: center;
+  gap: var(--r-3);
+}
+
+.lehrkraft__balken-label {
+  color: var(--t-normal);
+  font-size: var(--s-sm);
+  font-weight: 700;
+}
+
+.fortschritt.lehrkraft__fehler-spur {
+  height: var(--r-3);
+}
+
+.fortschritt__balken.lehrkraft__fehler-balken {
+  background-color: var(--r-fast);
+}
+
+.lehrkraft__balken-wert {
+  color: var(--t-stark);
+  font-weight: 700;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .lehrkraft__balken-zeile {
+    grid-template-columns: 1fr;
+    row-gap: var(--r-1);
+  }
+
+  .lehrkraft__balken-wert {
+    text-align: left;
+  }
+}
+
+.lehrkraft__wort-liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-3);
+  padding: 0;
+  list-style: none;
+}
+
+.lehrkraft__wort-zeile {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-2);
+  padding: var(--r-2) var(--r-3);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-md);
+  font-weight: 700;
+}
+
+.lehrkraft__prinzip {
+  padding: var(--r-5);
+  background-color: var(--m-petrol-hell);
+  border: 2px solid var(--m-petrol);
+  border-radius: var(--e-lg);
+  color: var(--t-stark);
+}
+
+.lehrkraft__prinzip-kopf {
+  display: flex;
+  align-items: center;
+  gap: var(--r-2);
+  margin-bottom: var(--r-2);
+  color: var(--m-petrol-tief);
+  font-family: var(--schrift-anzeige);
+  font-size: var(--s-h3);
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------
+ * Reiter 4: Für Eltern
+ * --------------------------------------------------------------------- */
+.lehrkraft__drucken-knopf {
+  flex-shrink: 0;
+}
+
+.lehrkraft__brief {
+  max-width: var(--breite-schmal);
+  font-size: var(--s-md);
+  line-height: var(--zeile-normal);
+}
+
+.lehrkraft__brief h3 {
+  font-size: var(--s-h3);
+}
+
+.lehrkraft__brief ul {
+  padding-inline-start: var(--r-5);
+}
+
+.lehrkraft__brief li + li {
+  margin-block-start: var(--r-2);
+}
+
+.lehrkraft__unterschrift-linie {
+  width: 100%;
+  max-width: 14rem;
+  height: var(--r-6);
+  border-bottom: 1px solid var(--f-rand-stark);
+}
+
+.lehrkraft__brief-signatur-label {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.lehrkraft__datenschutz-kopf {
+  display: flex;
+  align-items: center;
+  gap: var(--r-2);
+  color: var(--t-stark);
+  font-family: var(--schrift-anzeige);
+  font-size: var(--s-h3);
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------
+ * Wortkarten-Bogen (Wortkarten.tsx)
+ * --------------------------------------------------------------------- */
+.wortkarten-bogen__raster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--r-4);
+  padding: 0;
+  margin-top: var(--r-4);
+  list-style: none;
+}
+
+.wortkarten-bogen__karte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-2);
+  padding: var(--r-4);
+  background-color: var(--f-karte);
+  border: 1px dashed var(--f-rand-stark);
+  border-radius: var(--e-md);
+}
+
+.wortkarten-bogen__marke {
+  align-self: flex-start;
+}
+
+.wortkarten-bogen__nomen {
+  color: var(--t-stark);
+  font-family: var(--schrift-anzeige);
+  font-size: var(--s-h3);
+  font-weight: 600;
+}
+
+.wortkarten-bogen__plural {
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+}
+
+.wortkarten-bogen__beispiel {
+  color: var(--t-normal);
+  font-size: var(--s-sm);
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------------
+ * Druck
+ *
+ * Lehrkraefte drucken diesen Bereich aus - Navigation, Reiter und Knoepfe
+ * sind auf Papier nutzlos und fallen weg. Wortkarten duerfen nicht mitten
+ * durch eine Karte umbrechen; der Elternbrief bricht sauber zwischen den
+ * Abschnitten um.
+ * --------------------------------------------------------------------- */
+@media print {
+  .lehrkraft__reiter,
+  .lehrkraft__drucken-knopf {
+    display: none;
+  }
+
+  .lehrkraft__panel {
+    padding-top: 0;
+  }
+
+  .lehrkraft .karte {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .lehrkraft__brief-abschnitt {
+    break-inside: avoid;
+  }
+
+  .wortkarten-bogen__karte {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .wortkarten-bogen__raster {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

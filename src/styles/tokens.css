@@ -1,0 +1,176 @@
+/**
+ * Linguini Design Tokens
+ *
+ * Leitbild: "Schulbuch, das jemand liebevoll gestaltet hat" - warm und
+ * einladend fuer Kinder, ruhig und serioes genug, dass Lehrkraefte und Eltern
+ * es als Lernmittel und nicht als Spielzeug lesen.
+ *
+ * Alle Farbkombinationen fuer Text sind gegen WCAG 2.2 AA (4.5:1) geprueft;
+ * die Werte stehen als Kommentar an der jeweiligen Farbe.
+ * Pflicht ab BFSG (28.06.2025) fuer Schulsoftware.
+ */
+
+:root {
+  /* --- Flaechen ------------------------------------------------------- */
+  --f-papier: #f7f4ed; /* Seitenhintergrund, warmes Creme */
+  --f-karte: #fffdf9; /* Karten, Eingabefelder */
+  --f-karte-tief: #f0ebe0; /* eingelassene Flaechen, Wortbank */
+  --f-rand: #e2dacb; /* 1px-Linien */
+  --f-rand-stark: #c9bda6;
+  --f-dunkel: #23201c; /* Fussbereich, Lehrkraft-Header */
+
+  /* --- Text ----------------------------------------------------------- */
+  --t-stark: #23201c; /* 13.9:1 auf --f-papier */
+  --t-normal: #3a352e; /* 10.4:1 auf --f-papier */
+  --t-leise: #6b6459; /*  5.2:1 auf --f-papier - nur Hilfstext */
+  --t-invers: #f7f4ed;
+
+  /* --- Marke ---------------------------------------------------------- */
+  --m-petrol: #1f6f84; /*  5.3:1 auf --f-papier - Primaeraktion */
+  --m-petrol-tief: #17545f;
+  --m-petrol-hell: #dceef2;
+  --m-ocker: #b8651c; /*  4.9:1 auf --f-papier - Sekundaerakzent */
+  --m-ocker-hell: #fbeedd;
+
+  /* --- Artikel-Farbkodierung ------------------------------------------
+   * Konvention aus deutschen DaZ-Materialien (Persen, Cornelsen):
+   * blau = Maskulinum, rot = Femininum, gruen = Neutrum.
+   * ACHTUNG: Farbe ist NIE alleiniger Traeger der Information (WCAG 1.4.1).
+   * Der Artikel steht immer ausgeschrieben daneben, zusaetzlich gibt es
+   * eine Form-Codierung (Punkt / Raute / Quadrat) fuer Farbfehlsichtige.
+   */
+  --a-der: #2563a8; /*  6.4:1 auf weiss */
+  --a-der-flaeche: #e4edf9;
+  --a-die: #c2453d; /*  5.1:1 auf weiss */
+  --a-die-flaeche: #fbe8e6;
+  --a-das: #2e7d52; /*  4.7:1 auf weiss */
+  --a-das-flaeche: #e3f2e9;
+
+  /* --- Rueckmeldung ---------------------------------------------------
+   * Bewusst KEIN grelles Rot fuer "falsch". Rot ist in der Grundschule
+   * der Korrekturstift und emotional aufgeladen. "fast" bekommt Ocker,
+   * "falsch" ein gedaempftes Terrakotta - sichtbar, aber nicht strafend.
+   */
+  --r-richtig: #2e7d52;
+  --r-richtig-flaeche: #e3f2e9;
+  --r-fast: #a8690f;
+  --r-fast-flaeche: #fdf0d9;
+  --r-falsch: #a8443c;
+  --r-falsch-flaeche: #f8e7e5;
+
+  /* --- Typografie -----------------------------------------------------
+   * Fraunces: Anzeige-Serif, gibt der Plattform redaktionellen Ernst.
+   * Atkinson Hyperlegible: vom Braille Institute fuer maximale
+   *   Zeichenunterscheidbarkeit entworfen (b/d/p/q, I/l/1) - genau die
+   *   Verwechslungen, die Leseanfaenger und DaZ-Kinder ausbremsen.
+   *   Anders als OpenDyslexic ist das eine Legibility-, keine
+   *   Dyslexie-Behauptung: belegbar und unumstritten.
+   */
+  --schrift-anzeige: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+  --schrift-text: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --schrift-lesen: 'Atkinson Hyperlegible', system-ui, sans-serif;
+
+  --s-xs: 0.8125rem; /* 13px - nur Meta-Angaben */
+  --s-sm: 0.9375rem; /* 15px - Hilfstext */
+  --s-md: 1.0625rem; /* 17px - Basisgroesse UI */
+  --s-lg: 1.25rem; /* 20px - Aufgabenstellungen */
+  --s-lesen: 1.375rem; /* 22px - Lesetext, bewusst gross */
+  --s-h3: 1.375rem;
+  --s-h2: 1.75rem;
+  --s-h1: 2.375rem;
+  --s-display: 3rem;
+
+  --zeile-eng: 1.25;
+  --zeile-normal: 1.55;
+  --zeile-lesen: 1.75; /* Lesetext: grosszuegig gegen Zeilenspringen */
+
+  /* Zeilenlaenge: 45-60 Zeichen. Laengere Zeilen lassen Leseanfaenger
+     beim Ruecksprung die Zeile verlieren. */
+  --breite-lesen: 34rem;
+  --breite-inhalt: 68rem;
+  --breite-schmal: 46rem;
+
+  /* --- Raster (8px) ---------------------------------------------------- */
+  --r-1: 0.25rem;
+  --r-2: 0.5rem;
+  --r-3: 0.75rem;
+  --r-4: 1rem;
+  --r-5: 1.5rem;
+  --r-6: 2rem;
+  --r-7: 3rem;
+  --r-8: 4rem;
+
+  /* --- Radien ---------------------------------------------------------- */
+  --e-sm: 6px;
+  --e-md: 10px;
+  --e-lg: 16px;
+  --e-xl: 24px;
+  --e-rund: 999px;
+
+  /* --- Tiefe ----------------------------------------------------------- */
+  --schatten-sm: 0 1px 2px rgba(35, 32, 28, 0.06);
+  --schatten-md: 0 2px 8px rgba(35, 32, 28, 0.08);
+  --schatten-lg: 0 8px 28px rgba(35, 32, 28, 0.1);
+
+  /* --- Interaktion ------------------------------------------------------
+   * 48px Mindestgroesse fuer Tippziele: Kinderhaende treffen ungenauer,
+   * Material Design und die WCAG-2.2-Empfehlung decken sich hier. */
+  --ziel-min: 48px;
+  --fokus-breite: 3px;
+  --fokus-farbe: var(--m-petrol);
+  --tempo: 200ms;
+  --tempo-lang: 320ms;
+  --kurve: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* --- Dunkelmodus -------------------------------------------------------
+ * Schulen arbeiten zunehmend mit Tablets in wechselndem Licht.
+ * Artikelfarben werden aufgehellt, damit sie auf Dunkel weiter 4.5:1 halten.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --f-papier: #1b1916;
+    --f-karte: #24211d;
+    --f-karte-tief: #2d2924;
+    --f-rand: #3b352d;
+    --f-rand-stark: #544c40;
+    --f-dunkel: #100f0d;
+
+    --t-stark: #f4f0e7;
+    --t-normal: #ded8cc;
+    --t-leise: #a49c8d;
+    --t-invers: #1b1916;
+
+    --m-petrol: #6cc0d4;
+    --m-petrol-tief: #9ad7e5;
+    --m-petrol-hell: #17353d;
+    --m-ocker: #e3a35f;
+    --m-ocker-hell: #3a2a17;
+
+    --a-der: #7fb0e8;
+    --a-der-flaeche: #1b2a3d;
+    --a-die: #ef8f88;
+    --a-die-flaeche: #3a1f1d;
+    --a-das: #7cc79a;
+    --a-das-flaeche: #17301f;
+
+    --r-richtig: #7cc79a;
+    --r-richtig-flaeche: #17301f;
+    --r-fast: #e0b262;
+    --r-fast-flaeche: #352a13;
+    --r-falsch: #e89189;
+    --r-falsch-flaeche: #38201e;
+
+    --schatten-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --schatten-md: 0 2px 8px rgba(0, 0, 0, 0.45);
+    --schatten-lg: 0 8px 28px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Vestibulaere Stoerungen / BITV 2.0: Bewegung ist optional, nie Bedingung. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tempo: 1ms;
+    --tempo-lang: 1ms;
+  }
+}

@@ -106,10 +106,13 @@ function Buehne({ modus, aktiv, gefunden, onObjektKlick, children }: BuehneProps
     <div className="wortbild__buehne">
       <div className="wortbild__rahmen" data-modus={modus}>
         <KlassenzimmerSzene aktiv={aktiv} gefunden={gefunden} onObjektKlick={onObjektKlick} interaktiv />
-        {/* Die Beschriftungsebene MUSS hier drin liegen: ihre Prozentkoordinaten
-            beziehen sich auf das Bild, nicht auf die Buehne drumherum. */}
-        {children}
       </div>
+      {/* Die Beschriftungsebene liegt NEBEN dem Rahmen, nicht darin. Sie ist
+          absolut auf die Buehne positioniert, deren Hoehe der Rahmen vorgibt -
+          deckt sich also exakt mit dem Bild. Laege sie im Rahmen, wuerde
+          overflow:hidden auf Mobilgeraeten die Liste abschneiden, zu der sie
+          dort umbricht. */}
+      {children}
     </div>
   )
 }

@@ -79,6 +79,12 @@ interface ObjektGruppeProps {
   ziel: { breite: number; hoehe: number }
   /** Leichte Drehung in Grad, fuer den handgemachten "hingelegt"-Look. */
   drehung?: number
+  /**
+   * Massstab des Objekts. Die Schulsachen sind in Wirklichkeit klein; im Bild
+   * duerfen sie das nicht sein, sonst kann ein Kind sie nicht auseinanderhalten.
+   * Erkennbarkeit schlaegt hier Massstabstreue.
+   */
+  skalierung?: number
   children: ReactNode
 }
 
@@ -90,10 +96,17 @@ function ObjektGruppe({
   onObjektKlick,
   ziel,
   drehung,
+  skalierung,
   children,
 }: ObjektGruppeProps): ReactElement {
   const { cx, cy } = mittelpunkt(id)
-  const transform = drehung ? `translate(${cx} ${cy}) rotate(${drehung})` : `translate(${cx} ${cy})`
+  const transform = [
+    `translate(${cx} ${cy})`,
+    drehung ? `rotate(${drehung})` : '',
+    skalierung && skalierung !== 1 ? `scale(${skalierung})` : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
   const className = objektKlasse(id, aktiv, gefunden)
 
   if (!interaktiv) {
@@ -186,10 +199,11 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       <title id={titelId}>Illustration eines Klassenzimmers</title>
       <desc id={beschreibungId}>
         Ein aufgeräumtes Klassenzimmer kurz vor dem Unterricht. Links ein Fenster mit Blick auf einen
-        Baum, mittig eine grüne Tafel mit der Kreideschrift Willkommen, rechts oben eine Wanduhr. Vorne
-        ein großer Holztisch mit Buch, Heft, Lineal, Stift, Radiergummi, Spitzer, Schere und Kleber.
-        Links steht ein Stuhl mit einer Schultasche davor, rechts ein Papierkorb mit einem zerknüllten
-        Blatt Papier.
+        Baum, daneben eine Pinnwand mit angehefteten Zetteln. In der Mitte eine grüne Tafel mit der
+        Kreideschrift Willkommen, rechts oben eine Wanduhr. Vorne ein großer Holztisch, darauf in zwei
+        Reihen Buch, Lineal, Radiergummi und Schere sowie Heft, Stift, Spitzer und Kleber. Links steht
+        ein Stuhl mit einer Schultasche davor, rechts neben dem Tisch ein Papierkorb mit einem
+        zerknüllten Blatt Papier.
       </desc>
 
       <defs>
@@ -218,13 +232,29 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
           <line key={y} x1="0" y1={y} x2={BREITE} y2={y} stroke="var(--szene-holz-dunkel)" strokeWidth="2" opacity="0.4" />
         ))}
 
-        {/* Tischplatte (heller, oben) und Schuerze (Vorderseite, dunkler) */}
-        <rect x="176" y="478" width="1360" height="176" rx="4" fill="var(--szene-holz-hell)" />
-        <rect x="176" y="644" width="1360" height="10" fill="var(--t-stark)" opacity="0.08" />
-        <line x1="192" y1="654" x2="1520" y2="654" stroke="var(--szene-holz-dunkel)" strokeWidth="3" />
-        <rect x="192" y="654" width="1328" height="206" fill="var(--szene-holz)" />
-        <rect x="200" y="860" width="30" height="38" fill="var(--szene-holz-dunkel)" />
-        <rect x="1490" y="860" width="30" height="38" fill="var(--szene-holz-dunkel)" />
+        {/* Pinnwand - fuellt die tote Wandflaeche links neben der Tafel und
+            macht den Raum bewohnt. Bewusst ohne lesbaren Text: sie traegt
+            kein Lernwort und soll die Beschriftungen nicht konkurrenzieren. */}
+        <g transform="translate(300 330)">
+          <rect x="-96" y="-70" width="192" height="140" rx="6" fill="var(--szene-holz-dunkel)" />
+          <rect x="-86" y="-60" width="172" height="120" rx="3" fill="#c4b49a" />
+          <rect x="-66" y="-42" width="60" height="44" rx="2" fill="var(--szene-papier)" transform="rotate(-4)" />
+          <rect x="8" y="-46" width="52" height="38" rx="2" fill="var(--m-petrol-hell)" transform="rotate(3)" />
+          <rect x="-48" y="12" width="72" height="34" rx="2" fill="var(--m-ocker-hell)" transform="rotate(2)" />
+          <circle cx="-36" cy="-44" r="4" fill="var(--m-ocker)" />
+          <circle cx="34" cy="-48" r="4" fill="var(--a-die)" />
+          <circle cx="-12" cy="10" r="4" fill="var(--a-der)" />
+        </g>
+
+        {/* Tischplatte (heller, oben) und Schuerze (Vorderseite, dunkler).
+            Schmaler als die Bildbreite: rechts bleibt Boden frei, damit der
+            Papierkorb dort STEHEN kann statt in der Luft zu schweben. */}
+        <rect x="176" y="430" width="1216" height="264" rx="4" fill="var(--szene-holz-hell)" />
+        <rect x="176" y="684" width="1216" height="10" fill="var(--t-stark)" opacity="0.08" />
+        <line x1="192" y1="694" x2="1376" y2="694" stroke="var(--szene-holz-dunkel)" strokeWidth="3" />
+        <rect x="192" y="694" width="1184" height="168" fill="var(--szene-holz)" />
+        <rect x="200" y="862" width="30" height="36" fill="var(--szene-holz-dunkel)" />
+        <rect x="1346" y="862" width="30" height="36" fill="var(--szene-holz-dunkel)" />
       </g>
 
       {/* ----------------------------------------------------------------
@@ -306,7 +336,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (schultasche): x=15 y=77 -> cx=240 cy=693 */}
-      <ObjektGruppe id="schultasche" {...gemeinsam} ziel={{ breite: 190, hoehe: 190 }}>
+      <ObjektGruppe id="schultasche" {...gemeinsam} ziel={{ breite: 190, hoehe: 190 }} skalierung={1.15}>
         <path d="M -28 -60 Q 0 -84 28 -60" fill="none" stroke="var(--szene-holz-dunkel)" strokeWidth="9" strokeLinecap="round" />
         <rect x="-80" y="-58" width="160" height="115" rx="24" fill="var(--m-petrol)" />
         <rect x="-80" y="37" width="160" height="20" rx="10" fill="var(--m-petrol-tief)" opacity="0.55" />
@@ -328,7 +358,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (papierkorb): x=91 y=66 -> cx=1456 cy=594 */}
-      <ObjektGruppe id="papierkorb" {...gemeinsam} ziel={{ breite: 140, hoehe: 200 }}>
+      <ObjektGruppe id="papierkorb" {...gemeinsam} ziel={{ breite: 140, hoehe: 200 }} skalierung={1.25}>
         <path d="M -55 -55 L 55 -55 L 40 65 L -40 65 Z" fill="var(--m-petrol)" />
         <path d="M -40 30 L 40 30 L 32 65 L -32 65 Z" fill="var(--m-petrol-tief)" opacity="0.55" />
         <line x1="-30" y1="-50" x2="-22" y2="60" stroke="var(--m-petrol-tief)" strokeWidth="3" opacity="0.5" />
@@ -346,7 +376,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (buch): x=24 y=60 -> cx=384 cy=540 */}
-      <ObjektGruppe id="buch" {...gemeinsam} ziel={{ breite: 150, hoehe: 110 }} drehung={-3}>
+      <ObjektGruppe id="buch" {...gemeinsam} ziel={{ breite: 150, hoehe: 110 }} drehung={-3} skalierung={1.25}>
         <rect x="-58" y="-34" width="124" height="76" rx="6" fill="var(--szene-papier)" />
         <rect x="-65" y="-42" width="120" height="76" rx="6" fill="var(--m-ocker)" />
         <rect x="-65" y="-42" width="14" height="76" rx="6" fill="var(--szene-holz-dunkel)" opacity="0.7" />
@@ -355,7 +385,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (heft): x=34 y=64 -> cx=544 cy=576 */}
-      <ObjektGruppe id="heft" {...gemeinsam} ziel={{ breite: 130, hoehe: 110 }} drehung={4}>
+      <ObjektGruppe id="heft" {...gemeinsam} ziel={{ breite: 130, hoehe: 110 }} drehung={4} skalierung={1.45}>
         <rect x="-55" y="-40" width="110" height="80" rx="4" fill="var(--szene-papier)" stroke="var(--f-rand-stark)" strokeWidth="2" />
         <rect x="-55" y="28" width="110" height="12" fill="var(--f-rand-stark)" opacity="0.4" />
         <rect x="-55" y="-40" width="16" height="80" fill="var(--m-petrol)" />
@@ -366,7 +396,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (lineal): x=44 y=57 -> cx=704 cy=513 */}
-      <ObjektGruppe id="lineal" {...gemeinsam} ziel={{ breite: 200, hoehe: 70 }} drehung={-6}>
+      <ObjektGruppe id="lineal" {...gemeinsam} ziel={{ breite: 200, hoehe: 70 }} drehung={-6} skalierung={1.35}>
         <rect x="-85" y="-16" width="170" height="32" rx="4" fill="var(--szene-holz-hell)" stroke="var(--szene-holz-dunkel)" strokeWidth="2" />
         <rect x="-85" y="8" width="170" height="8" rx="2" fill="var(--szene-holz-dunkel)" opacity="0.45" />
         {Array.from({ length: 13 }, (_, i) => -72 + i * 12).map((x, i) => (
@@ -383,7 +413,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (radiergummi): x=61 y=58 -> cx=976 cy=522 */}
-      <ObjektGruppe id="radiergummi" {...gemeinsam} ziel={{ breite: 110, hoehe: 70 }} drehung={-8}>
+      <ObjektGruppe id="radiergummi" {...gemeinsam} ziel={{ breite: 110, hoehe: 70 }} drehung={-8} skalierung={1.75}>
         <g clipPath={`url(#${clipRadiergummi})`}>
           <rect x="-45" y="-24" width="45" height="48" fill="var(--szene-radierer-a)" />
           <rect x="0" y="-24" width="45" height="48" fill="var(--szene-radierer-b)" />
@@ -394,7 +424,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (spitzer): x=68 y=66 -> cx=1088 cy=594 */}
-      <ObjektGruppe id="spitzer" {...gemeinsam} ziel={{ breite: 100, hoehe: 80 }} drehung={5}>
+      <ObjektGruppe id="spitzer" {...gemeinsam} ziel={{ breite: 100, hoehe: 80 }} drehung={5} skalierung={1.9}>
         <rect x="-35" y="-26" width="70" height="52" rx="10" fill="var(--szene-lila)" />
         <rect x="-35" y="14" width="70" height="12" rx="6" fill="var(--t-stark)" opacity="0.16" />
         <circle cx="0" cy="-2" r="15" fill="var(--szene-metall-dunkel)" />
@@ -403,7 +433,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (schere): x=76 y=57 -> cx=1216 cy=513 */}
-      <ObjektGruppe id="schere" {...gemeinsam} ziel={{ breite: 130, hoehe: 190 }} drehung={-8}>
+      <ObjektGruppe id="schere" {...gemeinsam} ziel={{ breite: 130, hoehe: 190 }} drehung={-8} skalierung={1.25}>
         <line x1="-4" y1="4" x2="-16" y2="34" stroke="var(--szene-metall-dunkel)" strokeWidth="8" strokeLinecap="round" />
         <line x1="4" y1="4" x2="16" y2="34" stroke="var(--szene-metall-dunkel)" strokeWidth="8" strokeLinecap="round" />
         <circle cx="-20" cy="50" r="22" fill="none" stroke="var(--szene-lila)" strokeWidth="14" />
@@ -424,7 +454,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (kleber): x=84 y=65 -> cx=1344 cy=585 */}
-      <ObjektGruppe id="kleber" {...gemeinsam} ziel={{ breite: 90, hoehe: 150 }} drehung={-5}>
+      <ObjektGruppe id="kleber" {...gemeinsam} ziel={{ breite: 90, hoehe: 150 }} drehung={-5} skalierung={1.4}>
         <rect x="-20" y="-8" width="40" height="70" rx="8" fill="var(--szene-papier)" stroke="var(--f-rand-stark)" strokeWidth="2" />
         <rect x="-20" y="48" width="40" height="14" rx="6" fill="var(--t-stark)" opacity="0.12" />
         <rect x="-20" y="18" width="40" height="16" fill="var(--m-petrol)" />
@@ -433,7 +463,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       </ObjektGruppe>
 
       {/* wort.punkt (stift): x=52 y=65 -> cx=832 cy=585 */}
-      <ObjektGruppe id="stift" {...gemeinsam} ziel={{ breite: 200, hoehe: 60 }} drehung={28}>
+      <ObjektGruppe id="stift" {...gemeinsam} ziel={{ breite: 200, hoehe: 60 }} drehung={28} skalierung={1.4}>
         <rect x="-84" y="-11" width="16" height="22" rx="4" fill="var(--szene-radierer-a)" />
         <rect x="-68" y="-11" width="14" height="22" fill="var(--szene-metall)" />
         <rect x="-54" y="-11" width="108" height="22" fill="var(--m-ocker)" />

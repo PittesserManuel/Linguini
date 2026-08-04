@@ -64,7 +64,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Mit dem Lineal male ich eine gerade Linie.',
       erklaerung: 'Ein flaches, langes Ding. Damit malst du gerade Linien.',
       neu: true,
-      punkt: { x: 44, y: 57 },
+      punkt: { x: 40, y: 60 },
       labelSeite: 'oben',
     },
     {
@@ -75,7 +75,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Mit dem Radiergummi mache ich den Fehler weg.',
       erklaerung: 'Damit machst du etwas weg, das du mit Bleistift geschrieben hast.',
       neu: true,
-      punkt: { x: 66, y: 57 },
+      punkt: { x: 57, y: 60 },
       labelSeite: 'oben',
     },
     {
@@ -86,7 +86,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Mein Stift ist stumpf. Ich brauche den Spitzer.',
       erklaerung: 'Damit machst du deinen Stift wieder spitz.',
       neu: true,
-      punkt: { x: 77, y: 66 },
+      punkt: { x: 66, y: 70 },
       labelSeite: 'unten',
     },
     {
@@ -97,7 +97,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Ich schneide das Papier mit der Schere.',
       erklaerung: 'Damit schneidest du Papier.',
       neu: true,
-      punkt: { x: 88, y: 57 },
+      punkt: { x: 76, y: 60 },
       labelSeite: 'oben',
     },
     {
@@ -108,7 +108,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Ich klebe das Bild mit dem Kleber in mein Heft.',
       erklaerung: 'Damit machst du zwei Dinge fest zusammen.',
       neu: true,
-      punkt: { x: 92, y: 66 },
+      punkt: { x: 84, y: 70 },
       labelSeite: 'unten',
     },
     {
@@ -119,7 +119,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Das alte Blatt kommt in den Papierkorb.',
       erklaerung: 'Da wirfst du Papier hinein, das du nicht mehr brauchst.',
       neu: true,
-      punkt: { x: 96, y: 38 },
+      punkt: { x: 94, y: 88 },
       labelSeite: 'links',
     },
 
@@ -176,7 +176,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Wir lesen zusammen ein Buch.',
       erklaerung: 'Darin stehen Texte und Bilder zum Lesen.',
       neu: false,
-      punkt: { x: 22, y: 57 },
+      punkt: { x: 21, y: 60 },
       labelSeite: 'oben',
     },
     {
@@ -187,7 +187,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Ich schreibe den Satz in mein Heft.',
       erklaerung: 'Ein dünnes Buch mit leeren Seiten zum Schreiben.',
       neu: false,
-      punkt: { x: 33, y: 66 },
+      punkt: { x: 30, y: 70 },
       labelSeite: 'unten',
     },
     {
@@ -198,7 +198,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Mein Stift schreibt blau.',
       erklaerung: 'Damit schreibst und malst du.',
       neu: false,
-      punkt: { x: 55, y: 66 },
+      punkt: { x: 49, y: 70 },
       labelSeite: 'unten',
     },
     {
@@ -209,7 +209,7 @@ export const modulKlassenzimmer: Modul = {
       beispiel: 'Meine Sachen liegen auf dem Tisch.',
       erklaerung: 'Darauf legst du deine Sachen und schreibst.',
       neu: false,
-      punkt: { x: 20, y: 86 },
+      punkt: { x: 20, y: 88 },
       labelSeite: 'unten',
     },
   ],

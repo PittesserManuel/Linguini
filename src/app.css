@@ -1,0 +1,293 @@
+/**
+ * Linguini App-Shell
+ *
+ * Layout fuer Kopfzeile, Reiter-Einbettung, Hauptbereich und Fusszeile - dazu
+ * die Startseite, die keine eigene Feature-CSS-Datei hat und deshalb hier
+ * mitlaeuft. Ausschliesslich Tokens aus tokens.css. Einzige Ausnahme ist die
+ * Breakpoint-Zahl 640px: tokens.css definiert keine Breakpoints, und
+ * komponenten.css nutzt an dieser Stelle bereits denselben rohen Wert - wir
+ * bleiben konsistent dazu, statt eine zweite Zahl zu erfinden.
+ *
+ * Bewusst OHNE --f-dunkel/--t-invers fuer die Fusszeile: Im Dunkelmodus
+ * ergeben diese beiden Tokens zusammen einen Kontrast von rund 1,1:1 -
+ * praktisch unlesbar. tokens.css ist fixiert und wird hier nicht angefasst;
+ * fuer eigene Flaechen weichen wir stattdessen auf die im Kommentar von
+ * tokens.css als AA-geprueft ausgewiesene Kombination --f-karte-tief /
+ * --t-normal aus. Barrierefreiheit geht vor der wortwoertlichen Verwendung
+ * des dort vorgeschlagenen Tokenpaars.
+ */
+
+#root {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+/* ---------------------------------------------------------------------
+ * Kopfzeile
+ * --------------------------------------------------------------------- */
+.kopf {
+  border-bottom: 1px solid var(--f-rand);
+  background-color: var(--f-karte);
+}
+
+.kopf__marke-reihe {
+  display: flex;
+  padding-block: var(--r-4);
+}
+
+.kopf__marke {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--r-1);
+  min-height: var(--ziel-min);
+  padding: var(--r-2) var(--r-3);
+  margin-inline-start: calc(var(--r-3) * -1);
+  background: none;
+  border: none;
+  border-radius: var(--e-md);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--tempo) var(--kurve);
+}
+
+.kopf__marke:hover {
+  background-color: var(--f-karte-tief);
+}
+
+.kopf__marke-titel {
+  font-family: var(--schrift-anzeige);
+  font-size: var(--s-h3);
+  font-weight: 600;
+  line-height: var(--zeile-eng);
+  color: var(--t-stark);
+}
+
+.kopf__marke-modul {
+  font-size: var(--s-sm);
+  color: var(--t-leise);
+}
+
+.kopf__navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--r-5);
+  padding-bottom: var(--r-4);
+}
+
+.kopf__stufenwahl {
+  padding: 0;
+  border: none;
+}
+
+.kopf__stufenwahl-legende {
+  padding: 0;
+  margin-bottom: var(--r-2);
+  font-size: var(--s-sm);
+  font-weight: 700;
+  color: var(--t-leise);
+}
+
+.kopf__stufenwahl-optionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+}
+
+.kopf__stufe-option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-2);
+  min-height: var(--ziel-min);
+  padding: var(--r-2) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border: 2px solid transparent;
+  border-radius: var(--e-rund);
+  color: var(--t-normal);
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--tempo) var(--kurve);
+}
+
+.kopf__stufe-option:has(:focus-visible) {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 2px;
+}
+
+.kopf__stufe-option.ist-gewaehlt {
+  border-color: var(--m-petrol);
+  background-color: var(--m-petrol-hell);
+  color: var(--m-petrol-tief);
+}
+
+.kopf__stufe-option input {
+  width: var(--r-4);
+  height: var(--r-4);
+  accent-color: var(--m-petrol);
+}
+
+.kopf__stufenwahl-hinweis {
+  margin-top: var(--r-3);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.kopf__stufenwahl-hinweis summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-1);
+  min-height: var(--ziel-min);
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--m-petrol);
+}
+
+.kopf__stufenwahl-hinweis p {
+  max-width: var(--breite-schmal);
+  margin-top: var(--r-2);
+  line-height: var(--zeile-normal);
+}
+
+/* ---------------------------------------------------------------------
+ * Hauptbereich
+ * --------------------------------------------------------------------- */
+.hauptbereich {
+  flex: 1;
+  padding-block: var(--r-6);
+}
+
+/* ---------------------------------------------------------------------
+ * Fusszeile
+ * --------------------------------------------------------------------- */
+.fuss {
+  border-top: 1px solid var(--f-rand);
+  background-color: var(--f-karte-tief);
+}
+
+.fuss__inhalt {
+  padding-block: var(--r-6);
+}
+
+.fuss__datenschutz {
+  gap: var(--r-4);
+  justify-content: space-between;
+}
+
+.fuss__schalter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-3);
+  min-height: var(--ziel-min);
+  color: var(--t-stark);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Eigens gestalteter Schalter statt der Standard-Kontrollkaeschen: bleibt
+   eine echte Checkbox (Tastatur, Screenreader-Status "angehakt/nicht
+   angehakt" funktionieren unveraendert), wirkt optisch aber wie ein Kippschalter. */
+.fuss__schalter input[type='checkbox'] {
+  appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: var(--ziel-min);
+  height: var(--r-5);
+  margin: 0;
+  background-color: var(--f-rand-stark);
+  border-radius: var(--e-rund);
+  cursor: pointer;
+  transition: background-color var(--tempo) var(--kurve);
+}
+
+.fuss__schalter input[type='checkbox']::before {
+  content: '';
+  position: absolute;
+  top: var(--r-1);
+  left: var(--r-1);
+  width: calc(var(--r-5) - (var(--r-1) * 2));
+  height: calc(var(--r-5) - (var(--r-1) * 2));
+  background-color: var(--f-karte);
+  border-radius: var(--e-rund);
+  transition: transform var(--tempo) var(--kurve);
+}
+
+.fuss__schalter input[type='checkbox']:checked {
+  background-color: var(--m-petrol);
+}
+
+.fuss__schalter input[type='checkbox']:checked::before {
+  transform: translateX(calc(var(--ziel-min) - var(--r-5)));
+}
+
+.fuss__hinweis {
+  max-width: var(--breite-schmal);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.fuss__meldung {
+  display: inline-block;
+  padding: var(--r-2) var(--r-3);
+  background-color: var(--f-karte);
+  border: 1px solid var(--f-rand);
+  border-radius: var(--e-sm);
+  color: var(--t-normal);
+  font-size: var(--s-sm);
+}
+
+.fuss__marke {
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+}
+
+/* ---------------------------------------------------------------------
+ * Startseite
+ * --------------------------------------------------------------------- */
+.start {
+  max-width: var(--breite-inhalt);
+}
+
+.start__unterzeile {
+  color: var(--t-leise);
+  font-size: var(--s-lg);
+}
+
+.start__chips {
+  padding: 0;
+  list-style: none;
+}
+
+.start__karten {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--r-5);
+}
+
+.start__karten h2 {
+  font-size: var(--s-h3);
+}
+
+.start__einstieg {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--r-3);
+}
+
+.start__einstieg-hinweis {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+/* ---------------------------------------------------------------------
+ * Kleine Bildschirme
+ * --------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .start__karten {
+    grid-template-columns: 1fr;
+  }
+}

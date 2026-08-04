@@ -1,0 +1,209 @@
+/**
+ * Linguini Basis-Stylesheet
+ *
+ * Reset, Grundschrift, Ueberschriften und die global gueltigen
+ * Barrierefreiheits-Grundlagen (Fokus, Skip-Link, Screenreader-Utility).
+ * Komponentenklassen (Knopf, Karte, Melde, ...) leben in komponenten.css.
+ *
+ * Es werden ausschliesslich Tokens aus tokens.css verwendet - keine
+ * hartkodierten Farben, Groessen, Radien oder Abstaende.
+ */
+
+/* --- Schriften --------------------------------------------------------
+ * Selbst gehostet ueber @fontsource statt Google Fonts CDN. Das ist in
+ * Deutschland kein Stilargument, sondern ein Datenschutzargument: Das
+ * LG Muenchen hat 2022 (Urteil vom 20.01.2022, Az. 3 O 17493/20) die
+ * dynamische Einbindung von Google Fonts per CDN als DSGVO-Verstoss
+ * gewertet, weil dabei die IP-Adresse der Besucherin an Google uebertragen
+ * wird - ohne Rechtsgrundlage. Fuer Schulsoftware, die ohne Einwilligung
+ * der Eltern laufen soll, ist das kein Nice-to-have, sondern Voraussetzung.
+ */
+@import '@fontsource-variable/fraunces/index.css';
+@import '@fontsource/atkinson-hyperlegible/400.css';
+@import '@fontsource/atkinson-hyperlegible/700.css';
+
+/* --- Reset --------------------------------------------------------------
+ * Knapp gehalten: nur was fuer ein konsistentes Fundament noetig ist.
+ * Kein Zuruecksetzen von Listen- oder Linkstilen - das entscheiden die
+ * Komponenten, die diese Elemente tatsaechlich einsetzen.
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* --- Grunddokument ------------------------------------------------------ */
+html {
+  -webkit-text-size-adjust: 100%;
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--f-papier);
+  color: var(--t-normal);
+  font-family: var(--schrift-text);
+  font-size: var(--s-md);
+  line-height: var(--zeile-normal);
+  font-optical-sizing: auto;
+}
+
+/* --- Ueberschriften -------------------------------------------------------
+ * Fraunces gibt den Ueberschriften redaktionellen Ernst - wichtig fuer die
+ * Lehrkraft-Perspektive: Das soll wie ein Lehrmittel wirken, nicht wie eine
+ * Spiele-App. text-wrap: balance verhindert einzelne, verwaiste Woerter in
+ * der letzten Zeile bei umbrechenden Titeln.
+ */
+h1,
+h2,
+h3 {
+  font-family: var(--schrift-anzeige);
+  font-weight: 600;
+  line-height: var(--zeile-eng);
+  color: var(--t-stark);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--s-h1);
+}
+
+h2 {
+  font-size: var(--s-h2);
+}
+
+h3 {
+  font-size: var(--s-h3);
+}
+
+/* --- Fokus ----------------------------------------------------------------
+ * Gilt fuer JEDES interaktive Element im Produkt. Niemals outline: none
+ * ohne einen mindestens ebenso sichtbaren Ersatz - das waere ein
+ * BITV-2.0-Verstoss (Kriterium 2.4.7, Fokus sichtbar).
+ */
+:focus-visible {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 2px;
+  border-radius: var(--e-sm);
+}
+
+/* --- Screenreader-Utility --------------------------------------------------
+ * Inhalt bleibt fuer Screenreader lesbar, ist aber visuell ausgeblendet.
+ * Bewusst NICHT display: none oder visibility: hidden - beides wuerde den
+ * Inhalt auch aus der Barrierefreiheits-API entfernen. Bleibt fokussierbar,
+ * falls das versteckte Element selbst interaktiv ist (z. B. ein Link).
+ */
+.visuell-versteckt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  margin: -1px;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
+}
+
+/* --- Skip-Link --------------------------------------------------------------
+ * Erstes fokussierbares Element im Dokument. Liegt ausserhalb des
+ * Sichtbereichs und faehrt beim Fokus sichtbar ein, statt bei top: -9999px
+ * plotzlich zu erscheinen - das vermeidet einen Sprung im Layout.
+ */
+.sprungmarke {
+  position: absolute;
+  top: var(--r-2);
+  left: var(--r-2);
+  z-index: 100;
+  padding: var(--r-3) var(--r-5);
+  background-color: var(--m-petrol);
+  color: var(--t-invers);
+  font-weight: 700;
+  border-radius: var(--e-md);
+  box-shadow: var(--schatten-md);
+  transform: translateY(-150%);
+  transition: transform var(--tempo) var(--kurve);
+}
+
+.sprungmarke:focus-visible {
+  transform: translateY(0);
+}
+
+/* --- Textauswahl ------------------------------------------------------- */
+::selection {
+  background-color: var(--m-petrol-hell);
+  color: var(--t-stark);
+}
+
+/* --- Scrollbar -----------------------------------------------------------
+ * Nur kosmetisch, keine Funktionsaenderung. scrollbar-color deckt Firefox,
+ * die ::-webkit-Pseudoelemente Chrome/Safari/Edge ab.
+ */
+html {
+  scrollbar-color: var(--f-rand-stark) var(--f-papier);
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--f-papier);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--f-rand-stark);
+  border: 3px solid var(--f-papier);
+  border-radius: var(--e-rund);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--t-leise);
+}
+
+/* --- Druck -----------------------------------------------------------------
+ * Lehrkraefte drucken Arbeitsblaetter aus. Hintergruende (Karten, Marken)
+ * bleiben erhalten, weil sie Information tragen (Artikelfarbe); Navigation
+ * ist auf Papier nutzlos und faellt weg.
+ */
+@media print {
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  nav,
+  .sprungmarke {
+    display: none;
+  }
+}

@@ -1,0 +1,310 @@
+/**
+ * Linguini Komponentenklassen
+ *
+ * Gemeinsame, wiederverwendbare Bausteine fuer alle Feature-Agenten.
+ * Ausschliesslich Tokens aus tokens.css, keine hartkodierten Werte,
+ * keine !important. base.css muss vor dieser Datei geladen werden
+ * (Reset, Grundschrift, globaler Fokusstil).
+ */
+
+/* ---------------------------------------------------------------------
+ * Karte
+ * --------------------------------------------------------------------- */
+.karte {
+  padding: var(--r-5);
+  background-color: var(--f-karte);
+  border: 1px solid var(--f-rand);
+  border-radius: var(--e-lg);
+  box-shadow: var(--schatten-sm);
+}
+
+/* Ohne Schatten wirkt die Flaeche sonst wie "schwebend, aber flach" -
+   ein staerkerer Rand gleicht die fehlende Tiefe aus. */
+.karte--ruhig {
+  border-color: var(--f-rand-stark);
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------------------
+ * Knopf
+ * --------------------------------------------------------------------- */
+.knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--r-2);
+  min-height: var(--ziel-min);
+  padding: var(--r-3) var(--r-5);
+  border: none;
+  border-radius: var(--e-rund);
+  font-family: inherit;
+  font-size: var(--s-md);
+  font-weight: 700;
+  line-height: var(--zeile-eng);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--tempo) var(--kurve),
+    border-color var(--tempo) var(--kurve),
+    opacity var(--tempo) var(--kurve),
+    transform var(--tempo) var(--kurve);
+}
+
+.knopf:active {
+  transform: translateY(1px);
+}
+
+.knopf:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.knopf--haupt {
+  background-color: var(--m-petrol);
+  color: var(--t-invers);
+}
+
+.knopf--haupt:hover:not(:disabled) {
+  background-color: var(--m-petrol-tief);
+}
+
+.knopf--zweit {
+  background-color: transparent;
+  border: 2px solid var(--f-rand-stark);
+  color: var(--t-normal);
+}
+
+.knopf--zweit:hover:not(:disabled) {
+  border-color: var(--m-petrol);
+}
+
+.knopf--leise {
+  background-color: transparent;
+  color: var(--m-petrol);
+}
+
+.knopf--leise:hover:not(:disabled) {
+  background-color: var(--m-petrol-hell);
+}
+
+/* ---------------------------------------------------------------------
+ * Artikel-Marke
+ *
+ * Farbe ist hier NIE alleiniger Informationstraeger (WCAG 1.4.1): Neben
+ * der Flaechenfarbe steht der ausgeschriebene Artikel als Text, zusaetzlich
+ * codiert das ::before eine Form - der = Kreis, die = Raute, das = Quadrat.
+ * So bleibt der Chip auch fuer farbfehlsichtige Kinder eindeutig.
+ * --------------------------------------------------------------------- */
+.marke--der,
+.marke--die,
+.marke--das {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-1);
+  padding: var(--r-1) var(--r-3);
+  border-radius: var(--e-rund);
+  font-size: var(--s-sm);
+  font-weight: 700;
+  line-height: var(--zeile-eng);
+}
+
+.marke--der::before,
+.marke--die::before,
+.marke--das::before {
+  font-size: 0.7em;
+}
+
+.marke--der {
+  background-color: var(--a-der-flaeche);
+  color: var(--a-der);
+}
+
+.marke--der::before {
+  content: '●';
+}
+
+.marke--die {
+  background-color: var(--a-die-flaeche);
+  color: var(--a-die);
+}
+
+.marke--die::before {
+  content: '◆';
+}
+
+.marke--das {
+  background-color: var(--a-das-flaeche);
+  color: var(--a-das);
+}
+
+.marke--das::before {
+  content: '■';
+}
+
+/* ---------------------------------------------------------------------
+ * Rueckmeldung
+ *
+ * Dreistufig, nicht zweistufig (siehe grading/types.ts): "fast" ist der
+ * paedagogisch wichtigste Zustand und bekommt bewusst Ocker statt Rot.
+ * --------------------------------------------------------------------- */
+.melde {
+  padding: var(--r-4) var(--r-5);
+  border-left: 4px solid;
+  border-radius: var(--e-md);
+  color: var(--t-stark);
+  font-size: var(--s-md);
+  line-height: var(--zeile-normal);
+}
+
+.melde--richtig {
+  background-color: var(--r-richtig-flaeche);
+  border-left-color: var(--r-richtig);
+}
+
+.melde--fast {
+  background-color: var(--r-fast-flaeche);
+  border-left-color: var(--r-fast);
+}
+
+.melde--falsch {
+  background-color: var(--r-falsch-flaeche);
+  border-left-color: var(--r-falsch);
+}
+
+/* ---------------------------------------------------------------------
+ * Texteingabe
+ * --------------------------------------------------------------------- */
+.feld {
+  display: block;
+  width: 100%;
+  min-height: var(--ziel-min);
+  padding: var(--r-3) var(--r-4);
+  background-color: var(--f-karte);
+  border: 2px solid var(--f-rand-stark);
+  border-radius: var(--e-md);
+  color: var(--t-stark);
+  font-family: inherit;
+  font-size: var(--s-lg);
+  transition: border-color var(--tempo) var(--kurve);
+}
+
+.feld::placeholder {
+  color: var(--t-leise);
+}
+
+.feld:focus-visible {
+  border-color: var(--m-petrol);
+}
+
+/* ---------------------------------------------------------------------
+ * Chip (Metadaten: Niveau, Dauer, ...)
+ * --------------------------------------------------------------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-1);
+  padding: var(--r-1) var(--r-3);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-sm);
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------
+ * Fortschritt
+ *
+ * Reine Optik hier - role="progressbar" und aria-valuenow setzt die
+ * Komponente, die den Lernstand kennt.
+ * --------------------------------------------------------------------- */
+.fortschritt {
+  width: 100%;
+  height: var(--r-2);
+  overflow: hidden;
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-rund);
+}
+
+.fortschritt__balken {
+  height: 100%;
+  background-color: var(--m-petrol);
+  border-radius: var(--e-rund);
+  transition: width var(--tempo-lang) var(--kurve);
+}
+
+/* ---------------------------------------------------------------------
+ * Reiter (Tab-Leiste)
+ *
+ * Erwartet role="tablist" / role="tab" auf den Elementen - das setzt die
+ * verwendende Komponente. aria-selected steuert hier die Optik.
+ * --------------------------------------------------------------------- */
+.reiter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+  border-bottom: 1px solid var(--f-rand);
+}
+
+.reiter__knopf {
+  min-height: var(--ziel-min);
+  padding: var(--r-3) var(--r-4);
+  margin-bottom: -1px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--t-leise);
+  font-family: inherit;
+  font-size: var(--s-md);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color var(--tempo) var(--kurve),
+    border-color var(--tempo) var(--kurve);
+}
+
+.reiter__knopf:hover {
+  color: var(--t-normal);
+}
+
+.reiter__knopf[aria-selected='true'] {
+  color: var(--m-petrol);
+  border-bottom-color: var(--m-petrol);
+}
+
+/* ---------------------------------------------------------------------
+ * Layout-Helfer
+ * --------------------------------------------------------------------- */
+.inhalt {
+  width: 100%;
+  max-width: var(--breite-inhalt);
+  margin-inline: auto;
+  padding-inline: var(--r-5);
+}
+
+/* Vertikaler Rhythmus: nur Abstand ZWISCHEN Kindern, keiner am Rand -
+   damit sich .stapel beliebig schachteln laesst, ohne Abstaende zu addieren. */
+.stapel > * + * {
+  margin-block-start: var(--r-4);
+}
+
+.reihe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--r-3);
+}
+
+/* ---------------------------------------------------------------------
+ * Kleine Bildschirme
+ * --------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .reihe--gestapelt {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reihe--gestapelt > .knopf {
+    width: 100%;
+  }
+}

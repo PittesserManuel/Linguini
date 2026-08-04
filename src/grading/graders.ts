@@ -154,7 +154,7 @@ function bewerteAuswahl(antwort: Antwort, aufgabe: AufgabeAuswahl, ctx: GraderKo
       : fehlerart === 'leer'
         ? 'Waehle zuerst eine Antwort aus.'
         : 'Noch nicht ganz. Schau dir die Aufgabe noch einmal genau an.',
-    rueckmeldungReveal: `Die richtige Antwort ist: „${richtigeOption?.text ?? ''}“. ${aufgabe.loesungserklaerung}`,
+    rueckmeldungReveal: aufgabe.loesungserklaerung,
     aufgabe,
     ctx,
   })
@@ -258,7 +258,7 @@ function bewerteFreitextMitArtikel(
     return abschliessenFreitextRichtig(getrimmt, aufgabe, ctx)
   }
 
-  const loesungReveal = `Die Loesung ist: ${aufgabe.akzeptiert[0] ?? ''}. ${aufgabe.loesungserklaerung}`
+  const loesungReveal = aufgabe.loesungserklaerung
 
   if (nomenRichtig) {
     const rueckmeldungKnapp =
@@ -315,7 +315,7 @@ function bewerteFreitextOhneArtikel(
     }
   }
 
-  const loesungReveal = `Die Loesung ist: ${aufgabe.akzeptiert[0] ?? ''}. ${aufgabe.loesungserklaerung}`
+  const loesungReveal = aufgabe.loesungserklaerung
 
   if (istRechtschreibNah(eingabeVergleich, vergleichsform(bestErwartet))) {
     return abschliessen({
@@ -454,7 +454,7 @@ function bewerteLuecken(antwort: Antwort, aufgabe: AufgabeLuecken, ctx: GraderKo
       bewertung === 'richtig'
         ? 'Richtig! Alle Luecken passen.'
         : 'Noch nicht alle Luecken passen. Schau dir die markierten Woerter noch einmal an.',
-    rueckmeldungReveal: `Die Loesung: ${aufgabe.loesungen.join(', ')}. ${aufgabe.loesungserklaerung}`,
+    rueckmeldungReveal: aufgabe.loesungserklaerung,
     aufgabe,
     ctx,
   })
@@ -495,7 +495,7 @@ function bewerteReihenfolge(antwort: Antwort, aufgabe: AufgabeReihenfolge, ctx: 
       bewertung === 'richtig'
         ? 'Richtig! Das ist die passende Reihenfolge.'
         : `Noch nicht ganz. Welches Ereignis passiert ganz am Anfang? „${ersterSchritt?.text ?? ''}“ gehoert an den Anfang.`,
-    rueckmeldungReveal: `Die richtige Reihenfolge: ${aufgabe.schritte.map((s) => s.text).join(' ')} ${aufgabe.loesungserklaerung}`,
+    rueckmeldungReveal: aufgabe.loesungserklaerung,
     aufgabe,
     ctx,
   })

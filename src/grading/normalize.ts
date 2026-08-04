@@ -77,7 +77,7 @@ const UMLAUT_TABELLE: Record<string, string> = {
   Ü: 'Ue',
   // Grossbuchstaben-ss gibt es im Deutschen praktisch nie am Wortanfang,
   // wird hier aber der Vollstaendigkeit halber wie Kleinschreibung behandelt.
-};
+}
 
 /**
  * Faltet deutsche Umlaute und scharfes S auf ihre ASCII-Ersatzschreibung.

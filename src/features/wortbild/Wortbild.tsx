@@ -16,6 +16,7 @@ import type { CSSProperties, ReactElement, ReactNode, RefObject } from 'react'
 import { findeWort, istLernwort, wortMitArtikel } from '@/content/types'
 import type { Modul, Wort } from '@/content/types'
 import { KlassenzimmerSzene } from './Szene'
+import { BildSzene } from './BildSzene'
 import { WortKarte } from './WortKarte'
 import './wortbild.css'
 
@@ -94,6 +95,7 @@ function Legende({ modul }: { modul: Modul }): ReactElement {
 // ---------------------------------------------------------------------------
 
 interface BuehneProps {
+  modul: Modul
   modus: Modus
   aktiv: string | null
   gefunden: ReadonlySet<string>
@@ -101,11 +103,23 @@ interface BuehneProps {
   children?: ReactNode
 }
 
-function Buehne({ modus, aktiv, gefunden, onObjektKlick, children }: BuehneProps): ReactElement {
+function Buehne({ modul, modus, aktiv, gefunden, onObjektKlick, children }: BuehneProps): ReactElement {
+  const szene = modul.szene
   return (
     <div className="wortbild__buehne">
-      <div className="wortbild__rahmen" data-modus={modus}>
-        <KlassenzimmerSzene aktiv={aktiv} gefunden={gefunden} onObjektKlick={onObjektKlick} interaktiv />
+      <div className="wortbild__rahmen" data-modus={modus} data-szene={szene.art}>
+        {szene.art === 'svg' ? (
+          <KlassenzimmerSzene aktiv={aktiv} gefunden={gefunden} onObjektKlick={onObjektKlick} interaktiv />
+        ) : (
+          <BildSzene
+            szene={szene}
+            woerter={modul.wortschatz}
+            aktiv={aktiv}
+            gefunden={gefunden}
+            onObjektKlick={onObjektKlick}
+            interaktiv
+          />
+        )}
       </div>
       {/* Die Beschriftungsebene liegt NEBEN dem Rahmen, nicht darin. Sie ist
           absolut auf die Buehne positioniert, deren Hoehe der Rahmen vorgibt -
@@ -356,7 +370,7 @@ export function Wortbild(props: WortbildProps): ReactElement {
               Klicke auf ein Wort oder auf einen Gegenstand im Bild. Große Wörter sind neu, kleine
               Wörter kennst du schon.
             </p>
-            <Buehne modus="entdecken" aktiv={offenesWortId} gefunden={LEERE_MENGE} onObjektKlick={handleObjektKlick}>
+            <Buehne modul={modul} modus="entdecken" aktiv={offenesWortId} gefunden={LEERE_MENGE} onObjektKlick={handleObjektKlick}>
               <BeschriftungsEbene modul={modul} offenesWortId={offenesWortId} onLabelKlick={oeffneWortkarte} />
             </Buehne>
           </>
@@ -374,7 +388,7 @@ export function Wortbild(props: WortbildProps): ReactElement {
               fertigRef={fertigRef}
               onNeuStarten={starteUebungNeu}
             />
-            <Buehne modus="ueben" aktiv={falschesObjekt} gefunden={uebenGefunden} onObjektKlick={handleObjektKlick} />
+            <Buehne modul={modul} modus="ueben" aktiv={falschesObjekt} gefunden={uebenGefunden} onObjektKlick={handleObjektKlick} />
           </div>
         )}
       </div>

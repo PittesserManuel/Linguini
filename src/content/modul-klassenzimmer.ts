@@ -35,6 +35,8 @@ export const modulKlassenzimmer: Modul = {
   jahrgang: 'Klasse 3/4',
   dauerMinuten: 25,
 
+  szene: { art: 'svg', komponente: 'klassenzimmer' },
+
   // -------------------------------------------------------------------------
   // Wortschatz - 7 Lernwoerter (neu: true) + 8 Stuetzwoerter (neu: false)
   // Genusverteilung ueber alle 15: der 6 / die 5 / das 4

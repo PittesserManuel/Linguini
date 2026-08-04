@@ -43,6 +43,38 @@ export interface Wort {
 }
 
 // ---------------------------------------------------------------------------
+// Szene - woher kommt das Bild?
+// ---------------------------------------------------------------------------
+
+/**
+ * Ein Modul bringt seine eigene Bildquelle mit. Zwei Arten, mit einem echten
+ * fachlichen Unterschied:
+ *
+ * 'svg'  - handgezeichnete Vektorszene. Jeder Gegenstand ist eine eigene
+ *          Gruppe und damit einzeln ansprechbar: Klickt das Kind ein Wort an,
+ *          hebt sich der Gegenstand selbst hervor, alles andere wird gedimmt.
+ *          Aufwaendig herzustellen, didaktisch am staerksten.
+ *
+ * 'bild' - Rasterbild (WebP). Schnell verfuegbar und optisch reicher, aber
+ *          die Pixel sind nicht adressierbar. Statt echter Hervorhebung gibt
+ *          es Trefferflaechen an den hinterlegten Koordinaten. Der Kompromiss
+ *          ist bewusst und steht im Lehrkraft-Bereich transparent dabei.
+ */
+export type Szene =
+  | { art: 'svg'; komponente: 'klassenzimmer' }
+  | {
+      art: 'bild'
+      /** Pfad unterhalb von public/, z. B. "bilder/wochenmarkt-1600.webp". */
+      quelle: string
+      /** Schmalere Fassung fuer kleine Bildschirme. */
+      quelleKlein?: string
+      breite: number
+      hoehe: number
+      /** Bildbeschreibung fuer Screenreader - Pflicht, nicht optional. */
+      alt: string
+    }
+
+// ---------------------------------------------------------------------------
 // Lesetext
 // ---------------------------------------------------------------------------
 
@@ -199,6 +231,8 @@ export interface Modul {
   jahrgang: string
   /** Geschaetzte Bearbeitungsdauer in Minuten. */
   dauerMinuten: number
+  /** Die Bildquelle des Bild-Wort-Teils. */
+  szene: Szene
   wortschatz: Wort[]
   lesetext: Lesetext
   aufgaben: Aufgabe[]

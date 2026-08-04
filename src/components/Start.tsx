@@ -10,27 +10,27 @@ import type { ReactElement } from 'react'
 import type { Modul } from '@/content/types'
 
 export interface StartProps {
-  modul: Modul
-  onModulStarten: () => void
+  module: readonly Modul[]
+  onModulStarten: (modulId: string) => void
 }
 
 export function Start(props: StartProps): ReactElement {
-  const { modul, onModulStarten } = props
+  const { module, onModulStarten } = props
 
   return (
     <div className="start stapel">
       <header className="start__kopf stapel">
         <h1>Linguini</h1>
         <p className="start__unterzeile">Deutsch lernen mit Bildern und Geschichten</p>
-        <ul className="reihe start__chips" aria-label="Eckdaten des Moduls">
+        <ul className="reihe start__chips" aria-label="Eckdaten der Module">
           <li>
-            <span className="chip">Niveau {modul.niveau}</span>
+            <span className="chip">Niveau A2</span>
           </li>
           <li>
-            <span className="chip">{modul.jahrgang}</span>
+            <span className="chip">Klasse 3/4</span>
           </li>
           <li>
-            <span className="chip">Dauer {modul.dauerMinuten} Minuten</span>
+            <span className="chip">Deutsch als Zweitsprache</span>
           </li>
         </ul>
       </header>
@@ -65,14 +65,46 @@ export function Start(props: StartProps): ReactElement {
         </article>
       </div>
 
-      <div className="start__einstieg">
-        <button type="button" className="knopf knopf--haupt" onClick={onModulStarten}>
-          Modul starten
-        </button>
-        <p className="start__einstieg-hinweis">
-          Modul: {modul.titel} – {modul.untertitel}
-        </p>
-      </div>
+      <section className="start__module stapel" aria-labelledby="module-titel">
+        <h2 id="module-titel">Module</h2>
+        <ul className="start__modulliste">
+          {module.map((modul) => (
+            <li key={modul.id}>
+              <article className="karte stapel start__modulkarte">
+                <h3>{modul.titel}</h3>
+                <p className="start__modul-untertitel">{modul.untertitel}</p>
+                <ul className="reihe start__chips" aria-label={`Eckdaten: ${modul.titel}`}>
+                  <li>
+                    <span className="chip">{modul.niveau}</span>
+                  </li>
+                  <li>
+                    <span className="chip">{modul.dauerMinuten} Minuten</span>
+                  </li>
+                  <li>
+                    <span className="chip">
+                      {modul.wortschatz.filter((w) => w.neu).length} neue Wörter
+                    </span>
+                  </li>
+                </ul>
+                <p className="start__modul-bild">
+                  {modul.szene.art === 'svg'
+                    ? 'Gezeichnete Vektorszene – ein angeklicktes Wort hebt den Gegenstand selbst hervor.'
+                    : 'Illustriertes Bild – Wörter werden über Trefferflächen im Bild angetippt.'}
+                </p>
+                <div>
+                  <button
+                    type="button"
+                    className="knopf knopf--haupt"
+                    onClick={() => onModulStarten(modul.id)}
+                  >
+                    {modul.titel} starten
+                  </button>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   )
 }

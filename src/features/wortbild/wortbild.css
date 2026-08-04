@@ -408,3 +408,82 @@
     font-size: var(--s-h1);
   }
 }
+
+/* ---------------------------------------------------------------------
+ * Rasterbild-Szene (BildSzene.tsx)
+ *
+ * Der Rahmen uebernimmt hier das echte Seitenverhaeltnis des Bildes statt
+ * pauschal 16/9. Sonst wuerde object-fit das Bild minimal beschneiden und
+ * die Trefferflaechen saessen um genau diesen Betrag daneben - bei einem
+ * Bild-Wort-Teil faellt das sofort auf.
+ * --------------------------------------------------------------------- */
+.wortbild__rahmen[data-szene='bild'] {
+  aspect-ratio: 1600 / 893;
+}
+
+.bildszene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.bildszene__bild {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Trefferflaeche: unsichtbar, bis sie gebraucht wird. Das Kind klickt den
+   Gegenstand im Bild an - ein sichtbarer Punktehaufen wuerde im Uebungsmodus
+   alle Loesungen auf einmal verraten. */
+.bildszene__treffer {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%);
+  width: clamp(var(--ziel-min), 7%, 88px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: var(--e-rund);
+  background-color: transparent;
+  cursor: pointer;
+  transition:
+    border-color var(--tempo) var(--kurve),
+    background-color var(--tempo) var(--kurve),
+    box-shadow var(--tempo) var(--kurve);
+}
+
+.bildszene__treffer:hover {
+  border-color: var(--m-petrol);
+  background-color: color-mix(in srgb, var(--m-petrol) 14%, transparent);
+}
+
+.bildszene__treffer:focus-visible {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 3px;
+}
+
+/* Hervorhebung: ein Ring an der Stelle. Anders als beim SVG kann nicht der
+   Gegenstand selbst leuchten - der Ring ist der ehrliche Ersatz dafuer. */
+.bildszene__treffer.ist-aktiv {
+  border-color: var(--m-ocker);
+  background-color: color-mix(in srgb, var(--m-ocker) 22%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--m-ocker) 22%, transparent);
+}
+
+.bildszene__treffer.ist-gefunden {
+  border-color: var(--r-richtig);
+  background-color: color-mix(in srgb, var(--r-richtig) 18%, transparent);
+}
+
+/* Auf kleinen Bildschirmen brechen die Beschriftungen zur Liste um; dann
+   sind die Trefferflaechen als Bedienelement ueberfluessig und wuerden das
+   Bild nur mit Tippzielen zupflastern. */
+@media (max-width: 900px) {
+  .bildszene__treffer:not(.ist-aktiv):not(.ist-gefunden) {
+    border-color: transparent;
+    background-color: transparent;
+  }
+}

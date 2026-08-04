@@ -291,3 +291,41 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Modulauswahl auf der Startseite ---------------------------------- */
+
+.start__module h2 {
+  font-size: var(--s-h3);
+}
+
+.start__modulliste {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: var(--r-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.start__modulliste > li {
+  display: flex;
+}
+
+.start__modulkarte {
+  flex: 1;
+}
+
+.start__modulkarte h3 {
+  font-size: var(--s-h3);
+}
+
+.start__modul-untertitel {
+  color: var(--t-normal);
+}
+
+/* Benennt offen, welche Bildart das Modul nutzt - der Unterschied zwischen
+   Vektorszene und Rasterbild ist didaktisch relevant, nicht nur technisch. */
+.start__modul-bild {
+  font-size: var(--s-sm);
+  color: var(--t-leise);
+}

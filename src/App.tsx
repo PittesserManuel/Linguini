@@ -11,7 +11,8 @@
 import { Component } from 'react'
 import { useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
-import { modulKlassenzimmer } from '@/content/modul-klassenzimmer'
+import { MODULE, STANDARD_MODUL_ID, findeModul } from '@/content/module'
+import type { Modul } from '@/content/types'
 import { Wortbild } from '@/features/wortbild'
 import { Lesen } from '@/features/lesen'
 import { Lehrkraft } from '@/features/lehrkraft'
@@ -69,9 +70,24 @@ class Fehlergrenze extends Component<FehlergrenzeProps, FehlergrenzeState> {
 // Die Komponente
 // ---------------------------------------------------------------------------
 
-export default function App(): ReactElement {
-  const [ansicht, setAnsicht] = useState<Ansicht>('start')
-
+/**
+ * Traegt den Lernstand EINES Moduls.
+ *
+ * Wird in App mit key={modul.id} eingehaengt. Der Modulwechsel montiert die
+ * Komponente damit neu, und jedes Modul bekommt einen eigenen, frischen
+ * Lernstand - der Artikelfehler aus dem Klassenzimmer taucht nicht in der
+ * Auswertung des Wochenmarkts auf. Das ist billiger und weniger fehleranfaellig
+ * als ein Reducer, der auf Modulwechsel selbst reagieren muesste.
+ */
+function ModulSitzung({
+  modul,
+  ansicht,
+  onAnsichtWechseln,
+}: {
+  modul: Modul
+  ansicht: ModulAnsicht
+  onAnsichtWechseln: (a: Ansicht) => void
+}): ReactElement {
   const {
     lernstand,
     meldeErgebnis,
@@ -81,41 +97,33 @@ export default function App(): ReactElement {
     zuruecksetzen,
     speichernAktiv,
     setzeSpeichernAktiv,
-  } = useLernstand(modulKlassenzimmer.id, 'standard')
+  } = useLernstand(modul.id, 'standard')
 
   return (
     <>
-      <a className="sprungmarke" href="#inhalt">
-        Zum Inhalt springen
-      </a>
-
       <Kopfzeile
-        ansicht={ansicht === 'start' ? undefined : ansicht}
-        onAnsichtWechseln={setAnsicht}
+        ansicht={ansicht}
+        onAnsichtWechseln={onAnsichtWechseln}
         stufe={lernstand.stufe}
         onStufeWechseln={setzeStufe}
-        modulTitel={modulKlassenzimmer.titel}
-        onLogoKlick={() => setAnsicht('start')}
+        modulTitel={modul.titel}
+        onLogoKlick={() => onAnsichtWechseln('start')}
       />
 
       <main id="inhalt" className="hauptbereich inhalt">
-        {ansicht === 'start' ? (
-          <Start modul={modulKlassenzimmer} onModulStarten={() => setAnsicht('wortbild')} />
-        ) : (
-          <Fehlergrenze key={ansicht}>
-            {ansicht === 'wortbild' && (
-              <Wortbild
-                modul={modulKlassenzimmer}
-                onWortAngesehen={meldeWortAngesehen}
-                onArtikelAntwort={meldeArtikelAntwort}
-              />
-            )}
-            {ansicht === 'lesen' && (
-              <Lesen modul={modulKlassenzimmer} stufe={lernstand.stufe} onErgebnis={meldeErgebnis} />
-            )}
-            {ansicht === 'lehrkraft' && <Lehrkraft modul={modulKlassenzimmer} lernstand={lernstand} />}
-          </Fehlergrenze>
-        )}
+        <Fehlergrenze key={ansicht}>
+          {ansicht === 'wortbild' && (
+            <Wortbild
+              modul={modul}
+              onWortAngesehen={meldeWortAngesehen}
+              onArtikelAntwort={meldeArtikelAntwort}
+            />
+          )}
+          {ansicht === 'lesen' && (
+            <Lesen modul={modul} stufe={lernstand.stufe} onErgebnis={meldeErgebnis} />
+          )}
+          {ansicht === 'lehrkraft' && <Lehrkraft modul={modul} lernstand={lernstand} />}
+        </Fehlergrenze>
       </main>
 
       <Fusszeile
@@ -123,6 +131,42 @@ export default function App(): ReactElement {
         onSpeichernUmschalten={setzeSpeichernAktiv}
         onLernstandLoeschen={zuruecksetzen}
       />
+    </>
+  )
+}
+
+export default function App(): ReactElement {
+  const [ansicht, setAnsicht] = useState<Ansicht>('start')
+  const [modulId, setModulId] = useState<string>(STANDARD_MODUL_ID)
+  const modul = findeModul(modulId)
+
+  function starteModul(id: string): void {
+    setModulId(id)
+    setAnsicht('wortbild')
+  }
+
+  return (
+    <>
+      <a className="sprungmarke" href="#inhalt">
+        Zum Inhalt springen
+      </a>
+
+      {ansicht === 'start' ? (
+        <>
+          <Kopfzeile
+            onAnsichtWechseln={setAnsicht}
+            stufe="standard"
+            onStufeWechseln={() => undefined}
+            modulTitel=""
+            onLogoKlick={() => setAnsicht('start')}
+          />
+          <main id="inhalt" className="hauptbereich inhalt">
+            <Start module={MODULE} onModulStarten={starteModul} />
+          </main>
+        </>
+      ) : (
+        <ModulSitzung key={modul.id} modul={modul} ansicht={ansicht} onAnsichtWechseln={setAnsicht} />
+      )}
     </>
   )
 }

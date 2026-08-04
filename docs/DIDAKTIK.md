@@ -1,8 +1,13 @@
 # Didaktische Grundlage
 
-Dieses Dokument begründet, warum das Modul so aussieht, wie es aussieht. Es richtet
-sich an Lehrkräfte, Fachberatungen und an alle, die die Plattform fachlich prüfen,
-bevor sie sie in eine Klasse lassen.
+Dieses Dokument begründet, warum die Module so aussehen, wie sie aussehen. Es
+richtet sich an Lehrkräfte, Fachberatungen und an alle, die die Plattform fachlich
+prüfen, bevor sie sie in eine Klasse lassen.
+
+Die Beispiele stammen durchgehend aus dem ersten Modul **„Im Klassenzimmer"**.
+Für **„Auf dem Wochenmarkt"** gelten dieselben Grundsätze; wo es abweicht — der
+Lernschwerpunkt liegt dort auf dem Plural, und die Bildquelle ist ein Rasterbild
+statt einer Vektorszene — steht es in Abschnitt 13.
 
 Kurzfassung: Fast jede Entscheidung hier ist eine Entscheidung **gegen** etwas
 Naheliegendes. Die Begründungen stehen dabei.
@@ -294,20 +299,42 @@ ausprobieren" und „in drei Monaten vielleicht".
 
 Ehrlichkeit über das, was die Demo nicht ist:
 
-- **Ein Modul.** Spaced Repetition über mehrere Tage — nach der Forschung
-  entscheidend für Behalten — ist damit nicht abgebildet. Die druckbaren Wortkarten
-  im Lehrkraft-Bereich sind der analoge Behelf.
+- **Keine Wiederholung über Tage.** Spaced Repetition — nach der Forschung
+  entscheidend für Behalten — ist nicht abgebildet, weil dafür ein Lernstand über
+  Sitzungen hinweg nötig wäre, den die Demo bewusst nicht führt. Die druckbaren
+  Wortkarten im Lehrkraft-Bereich sind der analoge Behelf.
 - **Die Silbentrennung ist redaktionell gepflegt**, nicht algorithmisch. Für ein
   Modul ist das robuster; für eine Plattform bräuchte es einen echten
   Trennalgorithmus.
 - **Die Sprachausgabe hängt an den Systemstimmen des Browsers.** Qualität und
   Verfügbarkeit schwanken. Produktiv wären vorgerenderte Audiodateien besser.
 - **Kein Mehrbenutzerbetrieb, kein Backend, keine Klassenverwaltung.**
-- **Die Themenwahl ist begründet, aber nicht alternativlos.** Die
-  Recherchesynthese sprach sich für „Auf dem Wochenmarkt" aus: Schulwortschatz sei
-  nach ein bis drei Jahren Immersion großenteils erworben, Marktwortschatz
-  transferiere über die Schule hinaus. Dagegen steht, dass die hier geprüften
-  sieben Wörter (Radiergummi, Spitzer, Kleber, Lineal, Papierkorb) gerade nicht zu
-  den täglich gehörten gehören und der Alltagsnutzen unmittelbar ist. Beides ist
-  vertretbar. Weil Inhalte in dieser Plattform **Daten** sind, ist ein zweites
-  Modul eine neue Datei in `src/content/` — kein Umbau.
+---
+
+## 13. Nachtrag: die Themenfrage, aufgelöst
+
+Die Recherchesynthese sprach sich gegen „Im Klassenzimmer" und für „Auf dem
+Wochenmarkt" aus: Schulwortschatz sei nach ein bis drei Jahren Immersion
+großenteils erworben, Marktwortschatz transferiere über die Schule hinaus — er
+wird am Samstag darauf gebraucht, mit den Eltern.
+
+Dagegen stand, dass die hier geprüften sieben Wörter (Radiergummi, Spitzer,
+Kleber, Lineal, Papierkorb) gerade *nicht* zu den täglich gehörten gehören und
+ihr Nutzen unmittelbar ist.
+
+Beides ist vertretbar, und die Frage ist inzwischen gegenstandslos: Es gibt
+**beide Module**. Das war möglich, weil Inhalte in dieser Plattform Daten sind
+— das zweite Modul ist eine Datendatei plus ein Eintrag im Verzeichnis.
+
+Die beiden ergänzen sich fachlich sogar:
+
+| | Im Klassenzimmer | Auf dem Wochenmarkt |
+|---|---|---|
+| Lernschwerpunkt | Genus (der/die/das) | Plural (fünf Typen) |
+| Lebensbereich | Schule, sofort anwendbar | Alltag außerhalb der Schule |
+| Textkern | neu sein, geteilt bekommen | zum ersten Mal allein bezahlen |
+
+Für den Unterricht heißt das: erst „Im Klassenzimmer" für die Artikelfarben,
+dann „Auf dem Wochenmarkt" für den Plural — dieselbe Struktur, anderer
+Lebensbereich, und die Artikelkodierung wird durch die Wiederbegegnung
+gefestigt statt neu gelernt.

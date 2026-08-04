@@ -6,11 +6,26 @@ Erstsprache sprechen, auf Niveau **A2**. Ein zweites, gleichrangiges Publikum
 sind Lehrkräfte und Eltern: Die App soll als seriöses Lernmittel lesbar sein,
 nicht als Spielzeug.
 
-Diese Demo enthält ein Modul: **„Im Klassenzimmer“** – sieben Lernwörter mit
-Artikel, ein kurzer Lesetext („Malas erster Tag“) und sieben dazu gestufte
-Aufgaben. Inhalte sind in dieser Plattform **Daten**, keine Komponenten
-(siehe `src/content/types.ts`): Ein zweites Modul wäre eine neue Datei in
-`src/content/`, kein Umbau der Oberfläche.
+Diese Demo enthält zwei Module:
+
+| Modul | Schwerpunkt | Bildquelle |
+|---|---|---|
+| **Im Klassenzimmer** | Schulsachen, Genus | gezeichnete SVG-Szene |
+| **Auf dem Wochenmarkt** | Einkaufen, Plural (fünf Typen) | illustriertes Bild |
+
+Jedes hat sieben Lernwörter mit Artikel, acht beschriftete Stützwörter, einen
+kurzen Lesetext und sieben gestufte Aufgaben.
+
+Inhalte sind in dieser Plattform **Daten**, keine Komponenten (siehe
+`src/content/types.ts`). Das zweite Modul ist der Beleg dafür: Es besteht aus
+einer Datendatei und einem Eintrag im Modulverzeichnis – für seinen Inhalt
+wurde keine Zeile React geschrieben.
+
+Die beiden Bildquellen unterscheiden sich nicht nur technisch. Bei der
+SVG-Szene ist jeder Gegenstand ein eigenes Element, ein angeklicktes Wort kann
+ihn deshalb selbst hervorheben. Bei einem Rasterbild geht das nicht – Pixel
+sind nicht ansprechbar –, dort gibt es Trefferflächen und einen Ring an der
+Stelle. Die Startseite benennt das bei jedem Modul.
 
 Die Begründung jeder didaktischen Entscheidung im Detail steht in
 [`docs/DIDAKTIK.md`](docs/DIDAKTIK.md), der Weg zu einer späteren
@@ -191,7 +206,9 @@ Linguini/
 │   │   └── Start.tsx              # Startseite
 │   ├── content/
 │   │   ├── types.ts               # Datenmodell der Lerninhalte
-│   │   └── modul-klassenzimmer.ts # Das Demo-Modul (Wortschatz, Text, Aufgaben)
+│   │   ├── module.ts              # Modulverzeichnis
+│   │   ├── modul-klassenzimmer.ts # Modul 1 (SVG-Szene)
+│   │   └── modul-wochenmarkt.ts   # Modul 2 (Rasterbild)
 │   ├── features/
 │   │   ├── wortbild/              # Bild-Wort-Lernteil
 │   │   ├── lesen/                 # Lesetext + Aufgabenlauf
@@ -218,12 +235,14 @@ Linguini/
 
 ## Bekannte Grenzen der Demo
 
-- **Nur ein Modul.** Spaced Repetition über mehrere Tage – nach der Forschung
-  entscheidend für Behalten – ist damit nicht abgebildet.
+- **Zwei Module, aber keine Wiederholung über Tage.** Spaced Repetition –
+  nach der Forschung entscheidend für Behalten – ist nicht abgebildet, weil
+  dafür ein Lernstand über Sitzungen hinweg nötig wäre. Die druckbaren
+  Wortkarten im Lehrkraft-Bereich sind der analoge Behelf.
 - **Kein Backend, kein Mehrbenutzerbetrieb, keine Klassenverwaltung.** Der
   Lernstand lebt ausschließlich im Browser einer einzelnen Sitzung.
 - **Die Silbentrennung ist redaktionell gepflegt**, nicht algorithmisch. Für
-  ein Modul mit sieben Lernwörtern ist eine gepflegte Zuordnung robuster als
+  Module mit je sieben Lernwörtern ist eine gepflegte Zuordnung robuster als
   ein allgemeiner Trennalgorithmus, der an Komposita wie „Radiergummi“
   zuverlässig scheitert.
 - **Die Sprachausgabe hängt an den Systemstimmen des Browsers.** Qualität und

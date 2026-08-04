@@ -17,6 +17,7 @@ import { findeWort, istLernwort, wortMitArtikel } from '@/content/types'
 import type { Modul, Wort } from '@/content/types'
 import { KlassenzimmerSzene } from './Szene'
 import { WortKarte } from './WortKarte'
+import './wortbild.css'
 
 export interface WortbildProps {
   modul: Modul
@@ -105,8 +106,10 @@ function Buehne({ modus, aktiv, gefunden, onObjektKlick, children }: BuehneProps
     <div className="wortbild__buehne">
       <div className="wortbild__rahmen" data-modus={modus}>
         <KlassenzimmerSzene aktiv={aktiv} gefunden={gefunden} onObjektKlick={onObjektKlick} interaktiv />
+        {/* Die Beschriftungsebene MUSS hier drin liegen: ihre Prozentkoordinaten
+            beziehen sich auf das Bild, nicht auf die Buehne drumherum. */}
+        {children}
       </div>
-      {children}
     </div>
   )
 }

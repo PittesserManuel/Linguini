@@ -247,14 +247,17 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
         <rect x="-104" y="122" width="208" height="14" rx="4" fill="var(--szene-holz)" />
       </ObjektGruppe>
 
-      {/* wort.punkt (tafel): x=46 y=21 -> cx=736 cy=189 */}
+      {/* wort.punkt (tafel): x=46 y=22 -> cx=736 cy=198
+          Die Kreideschrift sitzt bewusst in der UNTEREN Tafelhaelfte: die
+          Beschriftung "die Tafel" wird ueber dem Ankerpunkt gesetzt und wuerde
+          das Wort sonst verdecken. */}
       <ObjektGruppe id="tafel" {...gemeinsam} ziel={{ breite: 600, hoehe: 340 }}>
         <rect x="-282" y="-158" width="564" height="306" rx="12" fill="var(--szene-holz-dunkel)" />
         <rect x="-262" y="-140" width="524" height="250" rx="6" fill="var(--m-petrol-tief)" />
         <rect x="-262" y="76" width="524" height="34" rx="4" fill="var(--f-dunkel)" opacity="0.25" />
         <text
           x="0"
-          y="-4"
+          y="52"
           textAnchor="middle"
           fontFamily="var(--schrift-anzeige)"
           fontStyle="italic"
@@ -263,7 +266,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
         >
           Willkommen
         </text>
-        <path d="M -150 30 Q -40 42 60 26 T 150 22" fill="none" stroke="var(--t-invers)" strokeWidth="3" opacity="0.8" strokeLinecap="round" />
+        <path d="M -150 86 Q -40 98 60 82 T 150 78" fill="none" stroke="var(--t-invers)" strokeWidth="3" opacity="0.8" strokeLinecap="round" />
         <rect x="-262" y="112" width="524" height="20" rx="4" fill="var(--szene-holz)" />
         <rect x="-42" y="104" width="46" height="12" rx="4" fill="var(--szene-papier)" />
         <rect x="26" y="104" width="40" height="12" rx="4" fill="var(--szene-papier)" opacity="0.85" />

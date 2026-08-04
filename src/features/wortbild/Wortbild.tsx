@@ -227,6 +227,7 @@ function UebenKopf({
 
 export function Wortbild(props: WortbildProps): ReactElement {
   const { modul, onWortAngesehen, onArtikelAntwort } = props
+  const ueberschriftId = useId()
   const tabEntdeckenId = useId()
   const tabUebenId = useId()
   const panelEntdeckenId = useId()
@@ -312,8 +313,8 @@ export function Wortbild(props: WortbildProps): ReactElement {
   }
 
   return (
-    <section className="wortbild stapel" aria-label="Wortschatz im Bild">
-      <h2>Wortschatz im Bild</h2>
+    <section className="wortbild stapel" aria-labelledby={ueberschriftId}>
+      <h2 id={ueberschriftId}>Wortschatz im Bild</h2>
 
       <Legende modul={modul} />
 

@@ -1,0 +1,410 @@
+/**
+ * Wortbild - der Bild-Wort-Lernteil.
+ *
+ * Ausschliesslich Tokens aus tokens.css, keine hartkodierten Farben, Groessen,
+ * Radien oder Abstaende. Muss NACH base.css und komponenten.css geladen
+ * werden (nutzt .karte, .knopf, .marke--*, .melde, .reiter, .fortschritt,
+ * .chip, .reihe, .stapel, .visuell-versteckt daraus).
+ */
+
+/* ---------------------------------------------------------------------
+ * Kopf / Anleitung
+ * --------------------------------------------------------------------- */
+.wortbild__anleitung {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+/* ---------------------------------------------------------------------
+ * Legende - Farbe + Form + Beispielwort
+ * --------------------------------------------------------------------- */
+.wortbild__legende-titel {
+  font-size: var(--s-md);
+  margin-block-end: var(--r-3);
+}
+
+.wortbild__legende-liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wortbild__legende-eintrag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-2);
+}
+
+.wortbild__legende-form {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.wortbild__legende-beispiel {
+  color: var(--t-normal);
+  font-size: var(--s-sm);
+}
+
+/* ---------------------------------------------------------------------
+ * Buehne: Bildrahmen + Beschriftungsebene
+ * --------------------------------------------------------------------- */
+.wortbild__buehne {
+  position: relative;
+  width: 100%;
+}
+
+.wortbild__rahmen {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--f-karte);
+  border: 1px solid var(--f-rand);
+  border-radius: var(--e-lg);
+  box-shadow: var(--schatten-md);
+}
+
+.wortbild__beschriftungen {
+  position: absolute;
+  inset: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* Klicks fallen standardmaessig durch zur Szene darunter - nur die
+     Wort-Knoepfe selbst (siehe unten) nehmen sie wieder an. */
+  pointer-events: none;
+}
+
+.wortbild__label {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+}
+
+.wortbild__label--oben {
+  transform: translate(-50%, calc(-100% - var(--r-3)));
+}
+
+.wortbild__label--unten {
+  transform: translate(-50%, var(--r-3));
+}
+
+.wortbild__label--links {
+  transform: translate(calc(-100% - var(--r-3)), -50%);
+}
+
+.wortbild__label--rechts {
+  transform: translate(var(--r-3), -50%);
+}
+
+/* Kleiner Punkt am Ankerpunkt - markiert, worauf sich das Label bezieht. */
+.wortbild__anker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--r-2);
+  height: var(--r-2);
+  transform: translate(-50%, -50%);
+  border-radius: var(--e-rund);
+  border: 2px solid var(--f-karte);
+  box-shadow: var(--schatten-sm);
+}
+
+.wortbild__anker--der {
+  background-color: var(--a-der);
+}
+
+.wortbild__anker--die {
+  background-color: var(--a-die);
+}
+
+.wortbild__anker--das {
+  background-color: var(--a-das);
+}
+
+.wortbild__label-knopf {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-2);
+  min-height: var(--ziel-min);
+  padding: var(--r-1) var(--r-3);
+  background-color: var(--f-karte);
+  border: 1px solid var(--f-rand-stark);
+  border-radius: var(--e-rund);
+  box-shadow: var(--schatten-sm);
+  font-family: var(--schrift-text);
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    border-color var(--tempo) var(--kurve),
+    box-shadow var(--tempo) var(--kurve),
+    transform var(--tempo) var(--kurve);
+}
+
+.wortbild__label-knopf:hover {
+  border-color: var(--m-petrol);
+}
+
+.wortbild__label-marke {
+  font-size: 0.8125em;
+}
+
+.wortbild__label-nomen {
+  color: var(--t-stark);
+}
+
+/* Lernwoerter deutlich hervorgehoben ... */
+.wortbild__label--lernwort .wortbild__label-knopf {
+  border-width: 2px;
+  border-color: var(--m-petrol);
+}
+
+.wortbild__label--lernwort .wortbild__label-nomen {
+  font-size: var(--s-md);
+  font-weight: 700;
+}
+
+/* ... Stuetzwoerter dezenter - kleiner, weniger Kontrast, aber weiterhin
+   AA-konform: --t-leise ist gegen --f-karte gepruefte 5.2:1 (siehe tokens.css). */
+.wortbild__label--stuetzwort .wortbild__label-knopf {
+  padding-block: calc(var(--r-1) / 2);
+  box-shadow: none;
+}
+
+.wortbild__label--stuetzwort .wortbild__label-nomen {
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+}
+
+.wortbild__label--aktiv .wortbild__label-knopf {
+  border-color: var(--m-petrol);
+  box-shadow: var(--schatten-md);
+  transform: translateY(-1px);
+}
+
+/* ---------------------------------------------------------------------
+ * Szene-Zustaende (Klassen setzt Szene.tsx, Optik lebt hier)
+ * --------------------------------------------------------------------- */
+.szene__objekt {
+  transition:
+    opacity var(--tempo) var(--kurve),
+    filter var(--tempo) var(--kurve);
+}
+
+.szene__objekt[role='button'] {
+  cursor: pointer;
+}
+
+.szene__objekt[role='button']:focus-visible {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 4px;
+  border-radius: var(--e-sm);
+}
+
+/* Entdecken: aktiv = Objekt der geoeffneten Wortkarte - ein weicher
+   Schlagschatten hebt es an, ohne Farbe als einzigen Traeger zu nutzen
+   (die Wortkarte selbst benennt das Wort textuell). */
+.szene__objekt.ist-aktiv {
+  filter: drop-shadow(var(--schatten-lg));
+}
+
+/* Ueben: aktiv = zuletzt FALSCH angeklicktes Objekt - roter Umriss statt
+   Schlagschatten. Kein Wackeln (prefers-reduced-motion gilt fuer alle
+   Bewegung, hier ist ohnehin keine - nur ein Filterwechsel). */
+.wortbild__rahmen[data-modus='ueben'] .szene__objekt.ist-aktiv {
+  filter: drop-shadow(1.5px 0 0 var(--r-falsch)) drop-shadow(-1.5px 0 0 var(--r-falsch))
+    drop-shadow(0 1.5px 0 var(--r-falsch)) drop-shadow(0 -1.5px 0 var(--r-falsch));
+}
+
+/* Ueben: gefunden = bereits richtig zugeordnetes Lernwort - bleibt
+   dauerhaft mit gruenem Umriss markiert. */
+.szene__objekt.ist-gefunden {
+  filter: drop-shadow(2px 0 0 var(--r-richtig)) drop-shadow(-2px 0 0 var(--r-richtig))
+    drop-shadow(0 2px 0 var(--r-richtig)) drop-shadow(0 -2px 0 var(--r-richtig));
+}
+
+/* Entdecken: sobald ein Objekt aktiv ist, alle anderen dezent abdunkeln -
+   das hebt das aktive Objekt zusaetzlich heraus. Reines Progressive
+   Enhancement (":has()"): ohne Unterstuetzung bleibt der Schlagschatten
+   oben die einzige, aber ausreichende Hervorhebung. Nur im Entdecken-Modus:
+   im Uebungsmodus wuerde das Abdunkeln der Nachbarn die Suche verraten. */
+.wortbild__rahmen[data-modus='entdecken'] svg:has(.szene__objekt.ist-aktiv) .szene__objekt:not(.ist-aktiv) {
+  opacity: 0.4;
+  filter: saturate(0.5);
+}
+
+/* ---------------------------------------------------------------------
+ * Ueben-Kopf: Zielwort, Fortschritt, Rueckmeldung
+ * --------------------------------------------------------------------- */
+.wortbild__ueben-frage {
+  font-size: var(--s-lg);
+}
+
+.wortbild__ueben-nomen {
+  font-weight: 700;
+}
+
+.wortbild__ueben-fortschritt {
+  display: flex;
+  align-items: center;
+  gap: var(--r-3);
+}
+
+.wortbild__ueben-fortschritt .fortschritt {
+  flex: 1 1 auto;
+}
+
+.wortbild__ueben-fortschritt-text {
+  flex: 0 0 auto;
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------
+ * Wortkarte - natives <dialog>, siehe WortKarte.tsx
+ * --------------------------------------------------------------------- */
+.wortkarte {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(92vw, var(--breite-schmal));
+  max-height: min(88vh, 42rem);
+  padding: 0;
+  overflow-y: auto;
+  background-color: var(--f-karte);
+  color: var(--t-normal);
+  border: 1px solid var(--f-rand);
+  border-radius: var(--e-xl);
+  box-shadow: var(--schatten-lg);
+}
+
+.wortkarte::backdrop {
+  /* Aus dem vorhandenen Token abgeleitet statt neu hartkodiert. */
+  background-color: color-mix(in srgb, var(--f-dunkel) 55%, transparent);
+}
+
+.wortkarte__inhalt {
+  padding: var(--r-6);
+}
+
+.wortkarte__kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r-3);
+}
+
+.wortkarte__marke {
+  font-size: var(--s-md);
+}
+
+.wortkarte__nomen {
+  font-family: var(--schrift-anzeige);
+  font-size: var(--s-display);
+  line-height: var(--zeile-eng);
+}
+
+.wortkarte__feldname {
+  color: var(--t-leise);
+  font-weight: 700;
+}
+
+.wortkarte__erklaerung {
+  font-size: var(--s-lg);
+  line-height: var(--zeile-normal);
+}
+
+.wortkarte__beispiel {
+  padding-inline-start: var(--r-4);
+  border-inline-start: 3px solid var(--f-rand-stark);
+  color: var(--t-normal);
+  font-style: italic;
+}
+
+.wortkarte__uebung {
+  padding: 0;
+  padding-block-start: var(--r-4);
+  border: none;
+  border-block-start: 1px solid var(--f-rand);
+}
+
+.wortkarte__uebung legend {
+  padding: 0;
+  margin-block-end: var(--r-3);
+  color: var(--t-stark);
+  font-weight: 700;
+}
+
+.wortkarte__artikel-knopf--richtig {
+  background-color: var(--r-richtig-flaeche);
+  border-color: var(--r-richtig);
+  color: var(--r-richtig);
+}
+
+.wortkarte__artikel-knopf--falsch {
+  background-color: var(--r-falsch-flaeche);
+  border-color: var(--r-falsch);
+  color: var(--r-falsch);
+}
+
+/* ---------------------------------------------------------------------
+ * Kleine Bildschirme (< 900px): Beschriftungsebene wird zur Liste unter
+ * dem Bild, statt auf engem Raum zu ueberlappen.
+ * --------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .wortbild__beschriftungen {
+    position: static;
+    inset: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--r-2);
+    margin-block-start: var(--r-4);
+    pointer-events: auto;
+  }
+
+  .wortbild__label {
+    position: static;
+    left: auto;
+    top: auto;
+  }
+
+  .wortbild__label--oben,
+  .wortbild__label--unten,
+  .wortbild__label--links,
+  .wortbild__label--rechts {
+    transform: none;
+  }
+
+  .wortbild__anker {
+    display: none;
+  }
+
+  .wortbild__label-knopf {
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: var(--e-md);
+  }
+}
+
+@media (max-width: 640px) {
+  .wortkarte {
+    width: 100vw;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .wortkarte__inhalt {
+    padding: var(--r-5);
+  }
+
+  .wortkarte__nomen {
+    font-size: var(--s-h1);
+  }
+}

@@ -133,16 +133,28 @@ function SchliessenIcon(): ReactElement {
 
 const ARTIKEL_OPTIONEN: Genus[] = ['der', 'die', 'das']
 
+/**
+ * Ein Versuch der Mini-Uebung. `id` erhoeht sich bei jedem Klick - auch wenn
+ * zweimal hintereinander dieselbe (falsche) Antwort gewaehlt wird, aendert
+ * sich damit der DOM-Knoten der Rueckmeldung (per `key`), und aria-live
+ * kuendigt sie zuverlaessig erneut an statt eine unveraenderte Textstelle
+ * stillschweigend zu ueberschreiben.
+ */
+interface ArtikelVersuch {
+  id: number
+  artikel: Genus
+}
+
 export function WortKarte(props: WortKarteProps): ReactElement {
   const { wort, offen, onSchliessen, onArtikelAntwort, onAngehoert } = props
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titelId = useId()
-  const [gewaehlterArtikel, setGewaehlterArtikel] = useState<Genus | null>(null)
+  const [versuch, setVersuch] = useState<ArtikelVersuch | null>(null)
   const { verfuegbar, unterstuetzt, sprich } = useSprachausgabe()
 
   // Mini-Uebung pro Wort zuruecksetzen, sobald ein anderes Wort angezeigt wird.
   useEffect(() => {
-    setGewaehlterArtikel(null)
+    setVersuch(null)
   }, [wort?.id])
 
   // showModal()/close() synchron zur `offen`-Prop halten.
@@ -196,9 +208,11 @@ export function WortKarte(props: WortKarteProps): ReactElement {
 
   function artikelKlick(gewaehlt: Genus): void {
     if (!wort) return
-    setGewaehlterArtikel(gewaehlt)
+    setVersuch((vorheriger) => ({ id: (vorheriger?.id ?? 0) + 1, artikel: gewaehlt }))
     onArtikelAntwort?.(wort.id, gewaehlt === wort.genus)
   }
+
+  const gewaehlterArtikel = versuch?.artikel ?? null
 
   return (
     <dialog
@@ -268,8 +282,9 @@ export function WortKarte(props: WortKarteProps): ReactElement {
               })}
             </div>
             <div aria-live="polite">
-              {gewaehlterArtikel && (
+              {versuch && (
                 <p
+                  key={versuch.id}
                   className={`melde ${
                     gewaehlterArtikel === wort.genus ? 'melde--richtig' : 'melde--falsch'
                   }`}

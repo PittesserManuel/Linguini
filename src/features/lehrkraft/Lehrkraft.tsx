@@ -18,6 +18,8 @@ import { findeWort, istLernwort, wortMitArtikel } from '@/content/types'
 import type { Fehlerart } from '@/grading/types'
 import type { Lernstand } from '@/state/types'
 import { AUSSAGEKRAEFTIG_AB, alleAufgaben, berechneAuswertung } from './auswertung'
+import { ELTERNBRIEF_SPRACHEN, fuelle } from './elternbrief-sprachen'
+import type { SprachCode } from './elternbrief-sprachen'
 import { Uebergabe } from './Uebergabe'
 import { Wortkarten } from './Wortkarten'
 import './lehrkraft.css'
@@ -678,10 +680,18 @@ function FuerEltern(props: { modul: Modul; lernstand: Lernstand }): ReactElement
   const { modul, lernstand } = props
   const auswertung = useMemo(() => berechneAuswertung(lernstand, modul), [lernstand, modul])
   const lernwoerter = useMemo(() => modul.wortschatz.filter(istLernwort), [modul])
+  const [sprachCode, setSprachCode] = useState<SprachCode>('de')
 
-  function drucken(): void {
-    window.print()
-  }
+  const texte = ELTERNBRIEF_SPRACHEN.find((s) => s.code === sprachCode) ?? ELTERNBRIEF_SPRACHEN[0]!
+
+  // Die Wortlisten bleiben deutsch - sie sind der Gegenstand des Briefs.
+  // "der Radiergummi" soll zu Hause auf Deutsch gesagt werden.
+  const neueWoerter = lernwoerter.map((wort) => wortMitArtikel(wort)).join(', ')
+  const unsichereWoerter = auswertung.genusUnsicher
+    .map((wortId) => findeWort(modul, wortId))
+    .filter((wort): wort is NonNullable<typeof wort> => wort !== undefined)
+    .map((wort) => wortMitArtikel(wort))
+    .join(', ')
 
   return (
     <>
@@ -689,76 +699,105 @@ function FuerEltern(props: { modul: Modul; lernstand: Lernstand }): ReactElement
         <p className="lehrkraft__einordnung">
           Dieser Brief ist bereits fertig formuliert. Er kann direkt ausgedruckt werden.
         </p>
-        <button type="button" className="knopf knopf--zweit lehrkraft__drucken-knopf" onClick={drucken}>
+        <button
+          type="button"
+          className="knopf knopf--zweit lehrkraft__drucken-knopf"
+          onClick={() => window.print()}
+        >
           <DruckenIcon />
           Diese Seite drucken
         </button>
       </div>
 
-      <article className="karte lehrkraft__brief stapel" aria-label="Elternbrief">
-        <p>Liebe Eltern,</p>
+      {/*
+        Die Sprachwahl steht ueber dem Brief und wird nicht mitgedruckt.
+        Der Eigenname zuerst ("Türkçe"), der deutsche Name klein darunter:
+        Wer die Sprache braucht, erkennt sie am Eigennamen; die Lehrkraft
+        beim Auswaehlen am deutschen.
+      */}
+      <fieldset className="lehrkraft__sprachwahl">
+        <legend className="lehrkraft__sprachwahl-legende">Sprache des Briefs</legend>
+        <div className="lehrkraft__sprachwahl-optionen">
+          {ELTERNBRIEF_SPRACHEN.map((sprache) => (
+            <label
+              key={sprache.code}
+              className={`lehrkraft__sprache${sprachCode === sprache.code ? ' ist-gewaehlt' : ''}`}
+            >
+              <input
+                type="radio"
+                name="elternbrief-sprache"
+                value={sprache.code}
+                checked={sprachCode === sprache.code}
+                onChange={() => setSprachCode(sprache.code)}
+              />
+              <span lang={sprache.code === 'bks' ? 'bs' : sprache.code} dir={sprache.richtung}>
+                {sprache.eigenname}
+              </span>
+              {sprache.code !== 'de' && (
+                <span className="lehrkraft__sprache-deutsch">{sprache.deutsch}</span>
+              )}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <article
+        className="karte lehrkraft__brief stapel"
+        aria-label="Elternbrief"
+        lang={texte.code === 'bks' ? 'bs' : texte.code}
+        dir={texte.richtung}
+      >
+        <p>{texte.anrede}</p>
 
         <section className="stapel lehrkraft__brief-abschnitt">
-          <h3>Was Ihr Kind heute geübt hat</h3>
-          <p>
-            Ihr Kind hat zum Thema „{modul.titel}“ gearbeitet. Es hat diese neuen Wörter gelernt:{' '}
-            {lernwoerter.map((wort) => wortMitArtikel(wort)).join(', ')}. Danach hat es einen kurzen Text
-            gelesen und dazu Fragen beantwortet.
-          </p>
+          <h3>{texte.titelGeuebt}</h3>
+          <p>{fuelle(texte.satzGeuebt, { thema: modul.titel, woerter: neueWoerter })}</p>
         </section>
 
         <section className="stapel lehrkraft__brief-abschnitt">
-          <h3>Was schon gut klappt</h3>
-          {auswertung.bearbeitet === 0 ? (
-            <p>Ihr Kind steht noch am Anfang mit diesem Thema. Bald gibt es hier mehr zu berichten.</p>
+          <h3>{texte.titelKlappt}</h3>
+          {/*
+            Bewusst ohne Zahlen. Frueher stand hier "Ihr Kind hat 3 Aufgaben
+            bearbeitet, 1 davon gleich richtig" - eine Quote aus einer
+            Handvoll Versuchen, die im Elterngespraech ein Gewicht bekommt,
+            das sie nicht tragen kann. Dieselbe Ueberlegung wie bei der
+            Kennzahlenschwelle in der Auswertung. Wer Zahlen braucht, findet
+            sie dort; dieser Brief soll etwas anderes leisten.
+          */}
+          {!auswertung.aussagekraeftig ? (
+            <p>{texte.satzAnfang}</p>
           ) : (
             <p>
-              Ihr Kind hat {auswertung.bearbeitet} Aufgaben bearbeitet. {auswertung.ersterVersuchRichtig}{' '}
-              davon hat es gleich beim ersten Mal richtig gemacht.
+              {texte.satzArbeitet}
               {auswertung.selbstkorrekturQuote !== null && auswertung.selbstkorrekturQuote > 0
-                ? ' Wenn etwas nicht sofort richtig war, hat Ihr Kind oft selbst die richtige Antwort gefunden. Das ist eine sehr gute Fähigkeit.'
+                ? ` ${texte.satzSelbstkorrektur}`
                 : ''}
             </p>
           )}
         </section>
 
         <section className="stapel lehrkraft__brief-abschnitt">
-          <h3>Woran wir weiter arbeiten</h3>
-          {auswertung.genusUnsicher.length > 0 ? (
-            <p>
-              Wir üben weiter, welches kleine Wort vor einem Nomen steht: der, die oder das. Das üben wir
-              zum Beispiel bei diesen Wörtern:{' '}
-              {auswertung.genusUnsicher
-                .map((wortId) => findeWort(modul, wortId))
-                .filter((wort): wort is NonNullable<typeof wort> => wort !== undefined)
-                .map((wort) => wortMitArtikel(wort))
-                .join(', ')}
-              .
-            </p>
+          <h3>{texte.titelWeiter}</h3>
+          {unsichereWoerter.length > 0 ? (
+            <p>{fuelle(texte.satzArtikel, { woerter: unsichereWoerter })}</p>
           ) : (
-            <p>Wir üben weiter das Lesen und Verstehen von kurzen Texten.</p>
+            <p>{texte.satzLesen}</p>
           )}
         </section>
 
         <section className="stapel lehrkraft__brief-abschnitt">
-          <h3>Wie Sie zu Hause helfen können</h3>
+          <h3>{texte.titelHilfe}</h3>
           <ul>
-            <li>
-              Benennen Sie zusammen Dinge zu Hause auf Deutsch, zum Beispiel: der Tisch, die Tür, das
-              Fenster.
-            </li>
-            <li>
-              Lassen Sie Ihr Kind laut vorlesen. Das ist wichtig, auch wenn nicht jedes Wort verstanden
-              wird.
-            </li>
-            <li>Fragen Sie nach der Schule: „Was hast du heute gelernt?“ Auch eine kurze Antwort hilft.</li>
+            {texte.hilfen.map((hilfe, i) => (
+              <li key={i}>{hilfe}</li>
+            ))}
           </ul>
         </section>
 
-        <p>Vielen Dank für Ihre Unterstützung!</p>
-        <p>Mit freundlichen Grüßen</p>
+        <p>{texte.dank}</p>
+        <p>{texte.gruss}</p>
         <div className="lehrkraft__unterschrift-linie" aria-hidden="true" />
-        <p className="lehrkraft__brief-signatur-label">Unterschrift der Lehrkraft</p>
+        <p className="lehrkraft__brief-signatur-label">{texte.unterschrift}</p>
       </article>
 
       <div className="karte">

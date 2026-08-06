@@ -388,12 +388,79 @@
  * durch eine Karte umbrechen; der Elternbrief bricht sauber zwischen den
  * Abschnitten um.
  * --------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------
+ * Sprachwahl fuer den Elternbrief
+ *
+ * Optisch die Niveaustufenwahl aus der Kopfzeile: Beides sind Schalter,
+ * die den Inhalt darunter austauschen. Gleiche Funktion, gleiche Form.
+ * --------------------------------------------------------------------- */
+.lehrkraft__sprachwahl {
+  padding: 0;
+  border: none;
+}
+
+.lehrkraft__sprachwahl-legende {
+  padding: 0;
+  margin-bottom: var(--r-2);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+  font-weight: 700;
+}
+
+.lehrkraft__sprachwahl-optionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+}
+
+.lehrkraft__sprache {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-2);
+  min-height: var(--ziel-min);
+  padding: var(--r-2) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border: 2px solid transparent;
+  border-radius: var(--e-rund);
+  color: var(--t-normal);
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--tempo) var(--kurve);
+}
+
+.lehrkraft__sprache:has(:focus-visible) {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 2px;
+}
+
+.lehrkraft__sprache.ist-gewaehlt {
+  border-color: var(--m-petrol);
+  background-color: var(--m-petrol-hell);
+  color: var(--m-petrol-tief);
+}
+
+.lehrkraft__sprache input {
+  width: var(--r-4);
+  height: var(--r-4);
+  accent-color: var(--m-petrol);
+}
+
+/* Der deutsche Name klein daneben - fuer die Lehrkraft beim Auswaehlen.
+   Wer die Sprache braucht, erkennt sie am Eigennamen davor. */
+.lehrkraft__sprache-deutsch {
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+  font-weight: 400;
+}
+
 @media print {
   /* Der Kopf ueber Elternbrief und Uebergabezettel enthaelt nur eine
      Bildschirmanweisung ("kann direkt ausgedruckt werden") und den
-     Druckknopf selbst - beides auf dem Ausdruck sinnlos. */
+     Druckknopf selbst - beides auf dem Ausdruck sinnlos. Die Sprachwahl
+     ebenso: Auf Papier steht genau eine Sprache. */
   .lehrkraft__reiter,
   .lehrkraft__eltern-kopf,
+  .lehrkraft__sprachwahl,
   .lehrkraft__drucken-knopf {
     display: none;
   }

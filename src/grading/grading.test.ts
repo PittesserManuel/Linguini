@@ -254,9 +254,15 @@ describe('freitextGrader', () => {
     expect(ergebnis.nochmal).toBe(false)
   })
 
-  it('akzeptiert das blosse Nomen ohne Artikel (im Modul explizit erlaubt)', async () => {
+  it('das blosse Nomen ist bei Artikelpflicht NICHT richtig, sondern fast', async () => {
+    // Die Aufgabe fragt woertlich nach dem Artikel. Frueher stand
+    // "Radiergummi" mit in der akzeptiert-Liste und die Liste wird VOR der
+    // Artikelpruefung ausgewertet - damit war die Artikeluebung genau die
+    // Uebung, in der der Artikel nichts galt.
     const ergebnis = await freitextGrader.bewerte({ wert: 'Radiergummi' }, f4, ctx(1))
-    expect(ergebnis.bewertung).toBe('richtig')
+    expect(ergebnis.bewertung).toBe('fast')
+    expect(ergebnis.fehlerart).toBe('genus')
+    expect(ergebnis.rueckmeldung).toContain('Artikel')
   })
 
   it('akzeptiert die Praepositionalform aus dem Beispielsatz', async () => {
@@ -264,11 +270,34 @@ describe('freitextGrader', () => {
     expect(ergebnis.bewertung).toBe('richtig')
   })
 
+  it('akzeptiert die Dativform, weil sie einen Artikel traegt', async () => {
+    const ergebnis = await freitextGrader.bewerte({ wert: 'dem Radiergummi' }, f4, ctx(1))
+    expect(ergebnis.bewertung).toBe('richtig')
+  })
+
+  it('ohne Artikelpflicht bleibt das blosse Nomen richtig', async () => {
+    // Die Verschaerfung gilt nur dort, wo die Aufgabe den Artikel verlangt.
+    const aufgabe = baueFreitextAufgabe({ akzeptiert: ['Radiergummi'], artikelPflicht: false })
+    const ergebnis = await freitextGrader.bewerte({ wert: 'Radiergummi' }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('richtig')
+  })
+
   it('Grossschreibung: kleingeschriebenes Nomen bleibt richtig, aber mit Hinweis', async () => {
-    const ergebnis = await freitextGrader.bewerte({ wert: 'radiergummi' }, f4, ctx(1))
+    // MIT Artikel, sonst ueberdeckt der fehlende Artikel den Befund: Wer
+    // "radiergummi" schreibt, hat zwei Maengel, und der fehlende Artikel
+    // wiegt in dieser Aufgabe schwerer. Hier soll allein die
+    // Grossschreibung geprueft werden.
+    const ergebnis = await freitextGrader.bewerte({ wert: 'der radiergummi' }, f4, ctx(1))
     expect(ergebnis.bewertung).toBe('richtig')
     expect(ergebnis.fehlerart).toBe('grossschreibung')
     expect(ergebnis.rueckmeldung.toLowerCase()).toContain('groß')
+  })
+
+  it('Grossschreibung bleibt auch ohne Artikelpflicht nur ein Hinweis, kein Fehler', async () => {
+    const aufgabe = baueFreitextAufgabe({ akzeptiert: ['Radiergummi'], artikelPflicht: false })
+    const ergebnis = await freitextGrader.bewerte({ wert: 'radiergummi' }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('richtig')
+    expect(ergebnis.fehlerart).toBe('grossschreibung')
   })
 
   it('Nomen richtig + Artikel falsch -> fast, Fehlerart genus', async () => {

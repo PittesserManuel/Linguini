@@ -359,7 +359,29 @@ function bewerteFreitext(antwort: Antwort, aufgabe: AufgabeFreitext, ctx: Grader
   }
 
   const eingabeVergleich = vergleichsform(rohtext)
-  const treffer = aufgabe.akzeptiert.some((a) => vergleichsform(a) === eingabeVergleich)
+
+  /*
+   * Bei Artikelpflicht zaehlt ein Eintrag der Trefferliste nur, wenn er
+   * SELBST einen Artikel traegt.
+   *
+   * Ohne diese Bedingung gewinnt die Trefferliste immer, weil sie vor der
+   * Artikelpruefung steht. "Radiergummi" galt damit als vollstaendig
+   * richtig auf einer Aufgabe, die woertlich "Schreibe das Wort mit
+   * Artikel" verlangt - das Kind lernte ausgerechnet an der Artikeluebung,
+   * dass der Artikel entbehrlich ist.
+   *
+   * Die Dativ- und Praepositionalformen bleiben gueltig: teileArtikelNomen
+   * kennt auch den/dem/einen/einem und schneidet eine fuehrende
+   * Praeposition vorher ab, "mit dem Radiergummi" traegt also einen
+   * Artikel. Faellt eine artikellose Eingabe hier durch, landet sie in
+   * bewerteFreitextMitArtikel und bekommt dort die Rueckmeldung, die es
+   * laengst gibt: "Das Wort stimmt! Es fehlt aber noch der Artikel."
+   */
+  const treffer = aufgabe.akzeptiert.some(
+    (a) =>
+      vergleichsform(a) === eingabeVergleich &&
+      (!aufgabe.artikelPflicht || teileArtikelNomen(a).artikel !== null),
+  )
 
   if (treffer) {
     return abschliessenFreitextRichtig(getrimmt, aufgabe, ctx)

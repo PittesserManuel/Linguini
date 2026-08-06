@@ -360,7 +360,10 @@ function schreibAufgabe(wort: Wort): AufgabeFreitext {
     frage: 'Wie heißt dieser Gegenstand? Schreibe das Wort mit Artikel.',
     ebene: 'sprachbetrachtend',
     abStufe: 'einfach',
-    akzeptiert: [wortMitArtikel(wort), wort.nomen],
+    // Nur die Form MIT Artikel, denn genau danach fragt die Aufgabe. Das
+    // blosse Nomen stand hier frueher mit drin und hat die Artikelpflicht
+    // ausgehebelt - siehe bewerteFreitext().
+    akzeptiert: [wortMitArtikel(wort)],
     artikelPflicht: true,
     platzhalter: 'zum Beispiel: das Buch',
     hilfen: [

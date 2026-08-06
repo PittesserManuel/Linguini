@@ -375,7 +375,7 @@ export const modulWochenmarkt: Modul = {
       ebene: 'literal',
       abStufe: 'standard',
       belegAbsatz: 'a3',
-      akzeptiert: ['der Korb', 'Korb', 'in den Korb', 'den Korb'],
+      akzeptiert: ['der Korb', 'in den Korb', 'den Korb'],
       artikelPflicht: true,
       platzhalter: 'zum Beispiel: die Tasche',
       hilfen: [

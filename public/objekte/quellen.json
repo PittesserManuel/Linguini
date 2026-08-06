@@ -1,0 +1,21 @@
+{
+  "hinweis": "Erzeugt mit Recraft V4.1 (model_type utility, 1k, Hintergrund #FFFDF9). Abholen: node werkzeuge/objektbilder-holen.mjs. Die URLs sind Ergebnislinks des Bilddienstes und koennen ablaufen - liegt eine Datei erst einmal in diesem Ordner, wird sie nicht erneut geladen.",
+  "bilder": {
+    "radiergummi": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_183223_140873ea-7076-4312-91f3-b0e21d285350.png",
+    "bleistift": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_184650_bde2aac0-848c-4490-ade5-0971f0bd45e7.png",
+    "buntstift": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192209_0f1e6ddf-8898-4053-8ce5-ecea27bd82c8.png",
+    "spitzer": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192209_204f7d0e-3f9a-4426-9eb5-9efd2fd284f6.png",
+    "kleber": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192210_00788053-d44b-4cf1-af61-555a9df1f3e9.png",
+    "lineal": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192210_2b94ce12-961a-4f22-82b2-33af315a29b1.png",
+    "geodreieck": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_184650_e286ec08-614f-4bc5-9585-4fa2b8733bb5.png",
+    "zirkel": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192210_d742de18-6d69-4710-af1d-c90a2efb1e87.png",
+    "schere": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_184650_6e6fdb47-0b47-498c-87c2-10500a0eb902.png",
+    "tafel": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_184650_4c84d6c8-4d61-4a40-8448-f2f972b9a00a.png",
+    "tuer": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192210_87711bec-016c-4389-8136-e58308107d34.png",
+    "pflanze": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_184650_efe8e73f-1214-4119-9ef9-69187bc4c43d.png",
+    "papierkorb": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192210_8ee51f61-cff2-44e1-a849-fd5ce7c479bb.png",
+    "buch": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192210_a9ed2cfa-74db-4e76-b38c-ff59a1a67e08.png",
+    "heft": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192210_f393cb89-2ce8-4cc5-a18b-2828cd3d5ed9.png",
+    "stift": "https://d8j0ntlcm91z4.cloudfront.net/user_3EgB1LxV4V9QqCHfqohumZMh5bu/hf_20260806_192314_5cfcf60d-904c-4790-b636-8188723ac0bb.png"
+  }
+}

@@ -53,6 +53,27 @@ sonst wird eine richtige Antwort als falsch angezeigt:
 | Lineal | gelb | Musterzeile im Heftauftrag |
 | Geodreieck | durchsichtig | Musterzeile im Heftauftrag, Wortkarte |
 
+## Abholen
+
+Die Zuordnung „welcher Gegenstand hat welches Bild“ steht in
+[`quellen.json`](quellen.json). Sie gehört ins Repository und nicht in einen
+Chatverlauf – nur so lässt sich später nachvollziehen, woher ein Bild kommt.
+
+```
+node werkzeuge/objektbilder-holen.mjs        # holt, was noch fehlt
+node werkzeuge/objektbilder-holen.mjs --neu  # lädt auch Vorhandenes neu
+```
+
+Vorhandene Dateien werden **nicht** überschrieben – von Hand freigestellte
+Bilder überleben also jeden weiteren Lauf.
+
+Schlägt alles mit `HTTP 403` fehl, ist die Auslieferungsdomain in der
+laufenden Umgebung gesperrt. Freizugeben ist genau:
+
+```
+d8j0ntlcm91z4.cloudfront.net   (HTTPS, Port 443)
+```
+
 ## Erzeugung
 
 Die vorhandenen Entwürfe stammen aus Recraft V4.1 (`model_type: "utility"`,
@@ -62,5 +83,10 @@ gemeinsame Stilzusatz am Ende jedes Prompts lautet:
 > Clean flat illustration for a children's schoolbook, even solid fills, one
 > subtle darker outline, no gradients, no shadow, no text, no lettering, no
 > numerals. Single isolated object, centered, generous empty margin around it.
+
+„no text, no lettering, no numerals“ ist nicht kosmetisch: Bildgeneratoren
+schreiben auf Lineale und Geodreiecke gern erfundene Zahlen. In einem
+Lernmittel für Kinder, die gerade lesen lernen, ist Pseudoschrift schlimmer
+als gar keine.
 
 Danach Hintergrund entfernen (Freisteller) und als PNG hier ablegen.

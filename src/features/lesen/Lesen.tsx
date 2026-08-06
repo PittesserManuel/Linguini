@@ -9,7 +9,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
-import type { Lesetext, Modul, Niveaustufe, Wort } from '@/content/types'
+import type { Jahrgangsstufe, Jahrgangstext, Lesetext, Modul, Niveaustufe, Wort } from '@/content/types'
 import { istLernwort } from '@/content/types'
 import type { GraderErgebnis } from '@/grading/types'
 import { Aufgaben } from './Aufgaben'
@@ -324,19 +324,73 @@ function Werkzeugleiste(props: {
 // Die Komponente
 // ---------------------------------------------------------------------------
 
+/**
+ * Die Umschaltleiste der Jahrgangsfassungen.
+ *
+ * Steht bewusst UEBER dem Text und nicht in der Kopfzeile neben der
+ * Niveaustufe: Die Niveaustufe waehlt das Kind (oder die Lehrkraft) einmal
+ * pro Sitzung, die Jahrgangsfassung gehoert zum Text und wechselt mit ihm.
+ * Zwei gleich aussehende Schalter nebeneinander wuerden nur verwechselt.
+ */
+function Jahrgangswahl(props: {
+  texte: Jahrgangstext[]
+  aktiv: Jahrgangstext
+  onWaehlen: (jahrgang: Jahrgangsstufe) => void
+}): ReactElement {
+  const { texte, aktiv, onWaehlen } = props
+  return (
+    <fieldset className="lesen__jahrgangswahl">
+      <legend className="lesen__jahrgangswahl-legende">Für welche Klasse?</legend>
+      <div className="lesen__jahrgangswahl-optionen">
+        {texte.map((text) => (
+          <label
+            key={text.jahrgang}
+            className={`lesen__jahrgang-option${text.jahrgang === aktiv.jahrgang ? ' ist-gewaehlt' : ''}`}
+            title={`${text.bezeichnung}, ${text.alter}`}
+          >
+            <input
+              type="radio"
+              name="jahrgang"
+              value={text.jahrgang}
+              checked={text.jahrgang === aktiv.jahrgang}
+              onChange={() => onWaehlen(text.jahrgang)}
+            />
+            {text.kurz}
+          </label>
+        ))}
+      </div>
+      <p className="lesen__jahrgangswahl-hinweis">
+        {aktiv.bezeichnung}, {aktiv.alter} – {aktiv.lesetext.kennzahlen.woerter} Wörter, Ø{' '}
+        {aktiv.lesetext.kennzahlen.woerterProSatzDurchschnitt.toLocaleString('de-AT')} Wörter pro Satz
+      </p>
+    </fieldset>
+  )
+}
+
 export function Lesen(props: {
   modul: Modul
   stufe: Niveaustufe
+  /** Gewaehlte Jahrgangsfassung, oder null solange keine gewaehlt wurde. */
+  jahrgang: Jahrgangsstufe | null
+  onJahrgangWechseln: (jahrgang: Jahrgangsstufe) => void
   onErgebnis: (aufgabeId: string, ergebnis: GraderErgebnis, versuch: number, hilfeGenutzt: boolean) => void
 }): ReactElement {
-  const { modul, stufe, onErgebnis } = props
+  const { modul, stufe, jahrgang, onJahrgangWechseln, onErgebnis } = props
+
+  // Voreinstellung ist die mittlere Fassung: Sie passt fuer die meisten
+  // Gruppen, und von dort ist der Weg in beide Richtungen gleich kurz.
+  const jahrgangstexte = modul.jahrgangstexte ?? []
+  const aktiveFassung =
+    jahrgangstexte.find((t) => t.jahrgang === jahrgang) ?? jahrgangstexte[1] ?? jahrgangstexte[0] ?? null
+  const lesetext = aktiveFassung?.lesetext ?? modul.lesetext
+  const aufgaben = aktiveFassung?.aufgaben ?? modul.aufgaben
 
   const [werkzeuge, setWerkzeuge] = useState<WerkzeugStand>(WERKZEUGE_START)
   const [vorleseIndex, setVorleseIndex] = useState<number | null>(null)
   const [linealIndex, setLinealIndex] = useState(0)
   const [hervorgehobenerAbsatz, setHervorgehobenerAbsatz] = useState<string | null>(null)
 
-  const zeilen = useMemo(() => baueZeilen(modul.lesetext), [modul])
+  const zeilen = useMemo(() => baueZeilen(lesetext), [lesetext])
   const globalIndexKarte = useMemo(() => {
     const karte = new Map<string, number>()
     zeilen.forEach((zeile) => karte.set(`${zeile.absatzId}:${zeile.satzIndex}`, zeile.globalIndex))
@@ -423,7 +477,11 @@ export function Lesen(props: {
   return (
     <section className="lesen" aria-labelledby="lesen-titel">
       <div className="lesen__text-spalte stapel">
-        <h2 id="lesen-titel">{modul.lesetext.titel}</h2>
+        {jahrgangstexte.length > 1 && aktiveFassung && (
+          <Jahrgangswahl texte={jahrgangstexte} aktiv={aktiveFassung} onWaehlen={onJahrgangWechseln} />
+        )}
+
+        <h2 id="lesen-titel">{lesetext.titel}</h2>
 
         <Werkzeugleiste
           werkzeuge={werkzeuge}
@@ -472,7 +530,7 @@ export function Lesen(props: {
         )}
 
         <div className={`lesen__text${werkzeuge.grosseSchriftAktiv ? ' lesen__text--gross' : ''}`} lang="de">
-          {modul.lesetext.absaetze.map((absatz) => (
+          {lesetext.absaetze.map((absatz) => (
             <p
               key={absatz.id}
               ref={(el) => {
@@ -508,7 +566,14 @@ export function Lesen(props: {
       </div>
 
       <div className="lesen__aufgaben-spalte">
-        <Aufgaben modul={modul} stufe={stufe} onErgebnis={onErgebnis} onBelegZeigen={setHervorgehobenerAbsatz} />
+        <Aufgaben
+          key={aktiveFassung?.jahrgang ?? 'standard'}
+          modul={modul}
+          stufe={stufe}
+          aufgaben={aufgaben}
+          onErgebnis={onErgebnis}
+          onBelegZeigen={setHervorgehobenerAbsatz}
+        />
       </div>
     </section>
   )

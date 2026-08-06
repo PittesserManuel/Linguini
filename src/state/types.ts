@@ -1,5 +1,5 @@
 import type { Fehlerart, Bewertung } from '@/grading/types'
-import type { Niveaustufe } from '@/content/types'
+import type { Jahrgangsstufe, Niveaustufe } from '@/content/types'
 
 /**
  * Lernstand einer Sitzung.
@@ -45,6 +45,16 @@ export interface WortStand {
 export interface Lernstand {
   modulId: string
   stufe: Niveaustufe
+  /**
+   * Gewaehlte Jahrgangsfassung des Lesetexts, oder null bei Modulen ohne
+   * Fassungen.
+   *
+   * Gehoert in den Lernstand und nicht in eine lokale Komponente, weil die
+   * Auswertung ihn braucht: Ohne ihn wuesste sie nicht, WELCHE Aufgaben in
+   * diesem Lernweg ueberhaupt erreichbar waren, und wuerde "bearbeitet 6 von
+   * 25" melden, wo 6 von 9 richtig waere.
+   */
+  jahrgang: Jahrgangsstufe | null
   aufgaben: Record<string, AufgabenStand>
   woerter: Record<string, WortStand>
   /** Beginn der Sitzung als ISO-String - nur fuer die Dauer-Anzeige. */
@@ -90,6 +100,7 @@ export interface Auswertung {
 export const LEERER_LERNSTAND = (modulId: string, stufe: Niveaustufe): Lernstand => ({
   modulId,
   stufe,
+  jahrgang: null,
   aufgaben: {},
   woerter: {},
   begonnen: null,

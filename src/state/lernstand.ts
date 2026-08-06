@@ -10,7 +10,7 @@
  */
 
 import { useCallback, useEffect, useReducer, useState } from 'react'
-import type { Niveaustufe } from '@/content/types'
+import type { Jahrgangsstufe, Niveaustufe } from '@/content/types'
 import type { GraderErgebnis } from '@/grading/types'
 import type { AufgabenStand, Lernstand, Versuch, WortStand } from './types'
 import { LEERER_LERNSTAND } from './types'
@@ -60,6 +60,7 @@ function leseGespeichertenLernstand(modulId: string): Lernstand | null {
     return {
       modulId,
       stufe: geparst.stufe ?? 'standard',
+      jahrgang: geparst.jahrgang ?? null,
       aufgaben: geparst.aufgaben ?? {},
       woerter: geparst.woerter ?? {},
       begonnen: geparst.begonnen ?? null,
@@ -94,6 +95,7 @@ type Aktion =
   | { typ: 'WORT_ANGESEHEN'; wortId: string }
   | { typ: 'ARTIKEL_ANTWORT'; wortId: string; richtig: boolean }
   | { typ: 'STUFE_GESETZT'; stufe: Niveaustufe }
+  | { typ: 'JAHRGANG_GESETZT'; jahrgang: Jahrgangsstufe }
   | { typ: 'ZURUECKGESETZT' }
 
 function leererAufgabenStand(aufgabeId: string): AufgabenStand {
@@ -167,6 +169,9 @@ function reducer(stand: Lernstand, aktion: Aktion): Lernstand {
     case 'STUFE_GESETZT':
       return { ...stand, stufe: aktion.stufe }
 
+    case 'JAHRGANG_GESETZT':
+      return { ...stand, jahrgang: aktion.jahrgang }
+
     case 'ZURUECKGESETZT':
       return LEERER_LERNSTAND(stand.modulId, stand.stufe)
 
@@ -217,6 +222,10 @@ export function useLernstand(modulId: string, anfangsStufe: Niveaustufe) {
     dispatch({ typ: 'STUFE_GESETZT', stufe })
   }, [])
 
+  const setzeJahrgang = useCallback((jahrgang: Jahrgangsstufe): void => {
+    dispatch({ typ: 'JAHRGANG_GESETZT', jahrgang })
+  }, [])
+
   /** Loescht den Lernstand - im Speicher UND, falls vorhanden, in localStorage. */
   const zuruecksetzen = useCallback((): void => {
     dispatch({ typ: 'ZURUECKGESETZT' })
@@ -236,6 +245,7 @@ export function useLernstand(modulId: string, anfangsStufe: Niveaustufe) {
     meldeWortAngesehen,
     meldeArtikelAntwort,
     setzeStufe,
+    setzeJahrgang,
     zuruecksetzen,
     speichernAktiv,
     setzeSpeichernAktiv,

@@ -369,3 +369,22 @@
     width: 100%;
   }
 }
+
+/* Rasterfassung: mehrere Stueck stehen nebeneinander in einer Zeile.
+   Der Vektorpfad legt sie im SVG selbst nebeneinander - beim Rasterbild
+   uebernimmt das Flexbox, damit die Einzeldatei unveraendert bleiben kann. */
+.objektbild--raster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--r-2);
+  inline-size: 100%;
+}
+
+.objektbild--raster img {
+  display: block;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  object-fit: contain;
+}

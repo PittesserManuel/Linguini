@@ -36,6 +36,21 @@ export interface Wort {
   erklaerung: string
   /** Lernwort dieser Einheit (true) oder bekanntes Stuetzwort (false). */
   neu: boolean
+  /**
+   * Pfad zu einem freigestellten Objektbild unterhalb von public/, z. B.
+   * "objekte/radiergummi.png".
+   *
+   * Ist er gesetzt, zeigen ALLE Stellen, an denen der Gegenstand einzeln
+   * erscheint (Bildstuetze zur Aufgabe, Mengenbild in der
+   * Einzahl-/Mehrzahl-Uebung, Illustration im Hefteintrag) dieses Bild statt
+   * der Vektorzeichnung. Fehlt er, bleibt die Vektorfassung - die Datei ist
+   * damit optional und nichts bricht, solange die Bilder noch fehlen.
+   *
+   * Die Szene selbst nutzt weiterhin die Vektorfassung: Dort muss jeder
+   * Gegenstand einzeln ansprechbar sein (Hervorheben, Einrahmen), und das
+   * kann ein Rasterbild nicht leisten.
+   */
+  bildQuelle?: string
   /** Ankerpunkt der Beschriftung im Bild, in Prozent der Bildflaeche (0-100). */
   punkt: { x: number; y: number }
   /** Auf welche Seite des Ankerpunkts das Label gesetzt wird. */
@@ -365,6 +380,38 @@ export type HeftBlock =
   /** Die hervorgehobene Wichtig-Zeile. */
   | { art: 'wichtig'; text: string; beispiele?: string[] }
 
+// ---------------------------------------------------------------------------
+// Jahrgangsfassungen des Lesetexts
+// ---------------------------------------------------------------------------
+
+/**
+ * Die vier Jahrgaenge der Mittelschule (10 bis 14 Jahre).
+ *
+ * Bewusst eine eigene Achse NEBEN der Niveaustufe, nicht statt ihr: Der
+ * Jahrgang sagt, wie ALT das Kind ist, die Niveaustufe, wie sicher es im
+ * Deutschen ist. Beides faellt bei DaZ-Lernenden regelmaessig auseinander -
+ * eine Vierzehnjaehrige mit vier Monaten Deutschkontakt braucht einen
+ * altersgerechten Inhalt in einfacher Sprache, keinen Text fuer Zehnjaehrige.
+ */
+export type Jahrgangsstufe = 'ms1' | 'ms2' | 'ms3' | 'ms4'
+
+export const JAHRGANG_ORDNUNG: Jahrgangsstufe[] = ['ms1', 'ms2', 'ms3', 'ms4']
+
+export interface Jahrgangstext {
+  jahrgang: Jahrgangsstufe
+  /** Kurzform fuer die Umschaltleiste, z. B. "1. Klasse". */
+  kurz: string
+  /** Ausgeschrieben fuer den Lehrkraft-Bereich. */
+  bezeichnung: string
+  /** Zielalter, z. B. "10 bis 11 Jahre". */
+  alter: string
+  /** Was diese Fassung sprachlich anders macht - fuer die Lehrkraft. */
+  sprachprofil: string
+  lesetext: Lesetext
+  /** Eigene Aufgaben: Eine Frage zu Text A ergibt zu Text B keinen Sinn. */
+  aufgaben: Aufgabe[]
+}
+
 export interface Grammatikthema {
   id: string
   /** Ueberschrift des Hefteintrags, z. B. "Ist / sind". */
@@ -418,8 +465,14 @@ export interface Modul {
    * ein einziges Paket (siehe `wortpaketeVon`) - fuer kleine Module reicht das.
    */
   wortpakete?: Wortpaket[]
+  /** Standardfassung des Lesetexts - bei Modulen mit Jahrgangsfassungen die mittlere. */
   lesetext: Lesetext
   aufgaben: Aufgabe[]
+  /**
+   * Fassungen desselben Themas fuer die vier Jahrgaenge der Mittelschule.
+   * Fehlen sie, gibt es nur `lesetext`/`aufgaben` und keine Jahrgangswahl.
+   */
+  jahrgangstexte?: Jahrgangstext[]
   /** Grammatikthemen: je Thema erst der Hefteintrag, dann die Uebungen. */
   grammatik?: Grammatikthema[]
   /**

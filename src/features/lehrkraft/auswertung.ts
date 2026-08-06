@@ -16,7 +16,7 @@
  */
 
 import { aufgabeSichtbar, istLernwort } from '@/content/types'
-import type { Aufgabe, Modul } from '@/content/types'
+import type { Aufgabe, Jahrgangsstufe, Modul } from '@/content/types'
 import type { Fehlerart } from '@/grading/types'
 import type { AufgabenStand, Auswertung, Lernstand } from '@/state/types'
 
@@ -58,8 +58,36 @@ function hatFehlversuch(stand: AufgabenStand): boolean {
  * geuebt hat.
  */
 export function alleAufgaben(modul: Modul): Aufgabe[] {
-  return [
+  const gesehen = new Set<string>()
+  const alle = [
     ...modul.aufgaben,
+    // Jede Jahrgangsfassung bringt eigene Aufgaben mit. Die mittlere Fassung
+    // ist zugleich `modul.aufgaben`, ihre Aufgaben stehen also doppelt in der
+    // Liste - deshalb die Deduplizierung ueber die ID.
+    ...(modul.jahrgangstexte ?? []).flatMap((fassung) => fassung.aufgaben),
+    ...(modul.grammatik ?? []).flatMap((thema) => thema.aufgaben),
+    ...(modul.heftauftraege ?? []),
+  ]
+  return alle.filter((aufgabe) => {
+    if (gesehen.has(aufgabe.id)) return false
+    gesehen.add(aufgabe.id)
+    return true
+  })
+}
+
+/**
+ * Die Aufgaben, die in DIESEM Lernweg erreichbar waren.
+ *
+ * Unterschied zu `alleAufgaben`: Dort stehen alle Aufgaben des Moduls, damit
+ * sich zu jeder gespeicherten ID ein Fragetext finden laesst. Hier steht nur,
+ * was das Kind tatsaechlich vorgelegt bekam - genau eine Jahrgangsfassung,
+ * nicht alle vier. Nur damit ergibt "bearbeitet 6 von 9" einen Sinn.
+ */
+export function aufgabenImLernweg(modul: Modul, jahrgang: Jahrgangsstufe | null): Aufgabe[] {
+  const fassungen = modul.jahrgangstexte ?? []
+  const gewaehlt = fassungen.find((f) => f.jahrgang === jahrgang) ?? fassungen[1] ?? fassungen[0]
+  return [
+    ...(gewaehlt ? gewaehlt.aufgaben : modul.aufgaben),
     ...(modul.grammatik ?? []).flatMap((thema) => thema.aufgaben),
     ...(modul.heftauftraege ?? []),
   ]
@@ -75,7 +103,7 @@ export function berechneAuswertung(lernstand: Lernstand, modul: Modul): Auswertu
   // sondern offen, bis eine Lehrperson hineingeschaut hat. Sie in Quoten
   // einzurechnen wuerde jede Kennzahl darunter verfaelschen - sie stehen
   // stattdessen als eigene Arbeitsliste (offeneHeftauftraege) daneben.
-  const alle = alleAufgaben(modul)
+  const alle = aufgabenImLernweg(modul, lernstand.jahrgang)
   const sichtbareAufgaben = alle.filter(
     (aufgabe) => aufgabe.typ !== 'heft' && aufgabeSichtbar(aufgabe, lernstand.stufe),
   )

@@ -679,3 +679,69 @@
   align-items: flex-start;
   gap: var(--r-2);
 }
+
+/* ---------------------------------------------------------------------
+ * Jahrgangswahl
+ *
+ * Bewusst anders gestaltet als die Niveaustufenwahl in der Kopfzeile:
+ * eckige Reiter statt runder Pillen. Die beiden Schalter stehen inhaltlich
+ * nebeneinander (wie alt / wie sicher) und duerfen deshalb nicht gleich
+ * aussehen - sonst greift man zum falschen.
+ * --------------------------------------------------------------------- */
+.lesen__jahrgangswahl {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lesen__jahrgangswahl-legende {
+  padding: 0;
+  margin-block-end: var(--r-2);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.lesen__jahrgangswahl-optionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+}
+
+.lesen__jahrgang-option {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ziel-min);
+  padding: var(--r-2) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border: 1px solid var(--f-rand-stark);
+  border-radius: var(--e-md);
+  color: var(--t-normal);
+  cursor: pointer;
+  font-size: var(--s-sm);
+  font-weight: 600;
+}
+
+.lesen__jahrgang-option input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.lesen__jahrgang-option:has(input:focus-visible) {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 2px;
+}
+
+.lesen__jahrgang-option.ist-gewaehlt {
+  background-color: var(--m-ocker-hell);
+  border-color: var(--m-ocker);
+  color: var(--t-stark);
+}
+
+.lesen__jahrgangswahl-hinweis {
+  margin-block-start: var(--r-2);
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+}

@@ -95,6 +95,7 @@ function ModulSitzung({
     meldeWortAngesehen,
     meldeArtikelAntwort,
     setzeStufe,
+    setzeJahrgang,
     zuruecksetzen,
     speichernAktiv,
     setzeSpeichernAktiv,
@@ -125,7 +126,13 @@ function ModulSitzung({
             <Grammatik modul={modul} stufe={lernstand.stufe} onErgebnis={meldeErgebnis} />
           )}
           {ansicht === 'lesen' && (
-            <Lesen modul={modul} stufe={lernstand.stufe} onErgebnis={meldeErgebnis} />
+            <Lesen
+              modul={modul}
+              stufe={lernstand.stufe}
+              jahrgang={lernstand.jahrgang}
+              onJahrgangWechseln={setzeJahrgang}
+              onErgebnis={meldeErgebnis}
+            />
           )}
           {ansicht === 'lehrkraft' && <Lehrkraft modul={modul} lernstand={lernstand} />}
         </Fehlergrenze>

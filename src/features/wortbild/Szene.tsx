@@ -891,14 +891,28 @@ export function ObjektBild({ wortId, anzahl = 1, alt }: ObjektBildProps): ReactE
   const wort = findeWortOderFehler(wortId)
   const { ziel, drehung, skalierung = 1, zeichnung } = darstellungOderFehler(wortId)
 
+  const beschreibungRoh =
+    alt ?? (anzahl === 1 ? wortMitArtikel(wort) : `${anzahl} Stück: ${wort.plural ?? wort.nomen}`)
+
+  // Liegt ein freigestelltes Objektbild vor, gewinnt es. Die Vektorfassung
+  // bleibt als Rueckfallebene bestehen, damit die App auch dann vollstaendig
+  // funktioniert, wenn die Bilddateien (noch) fehlen.
+  if (wort.bildQuelle) {
+    return (
+      <span className="objektbild objektbild--raster" role="img" aria-label={beschreibungRoh}>
+        {Array.from({ length: anzahl }, (_, i) => (
+          <img key={i} src={`${import.meta.env.BASE_URL}${wort.bildQuelle}`} alt="" loading="lazy" />
+        ))}
+      </span>
+    )
+  }
+
   // Die Zeichnung ist auf (0,0) zentriert; ihr Platzbedarf ergibt sich aus
   // Zielflaeche mal Massstab. Etwas Luft drumherum, damit nichts anschneidet.
   const feldBreite = ziel.breite * skalierung + 40
   const feldHoehe = ziel.hoehe * skalierung + 40
   const gesamtBreite = feldBreite * anzahl
-
-  const beschreibung =
-    alt ?? (anzahl === 1 ? wortMitArtikel(wort) : `${anzahl} Stück: ${wort.plural ?? wort.nomen}`)
+  const beschreibung = beschreibungRoh
 
   return (
     <svg

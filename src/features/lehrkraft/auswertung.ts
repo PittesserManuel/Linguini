@@ -93,6 +93,16 @@ export function aufgabenImLernweg(modul: Modul, jahrgang: Jahrgangsstufe | null)
   ]
 }
 
+/**
+ * Ab wie vielen bearbeiteten Aufgaben Quoten gezeigt werden.
+ *
+ * Fuenf ist keine statistische Groesse, sondern eine paedagogische: Es ist
+ * die kleinste Zahl, bei der ein Muster ueberhaupt zweimal auftreten kann.
+ * Darunter zeigt der Lehrkraft-Bereich lieber gar nichts als eine Zahl, die
+ * nach Befund aussieht.
+ */
+export const AUSSAGEKRAEFTIG_AB = 5
+
 export function berechneAuswertung(lernstand: Lernstand, modul: Modul): Auswertung {
   // Nur Aufgaben, die auf der aktuellen Niveaustufe ueberhaupt gestellt
   // werden - alles andere waere fuer dieses Kind in dieser Sitzung nicht
@@ -170,6 +180,7 @@ export function berechneAuswertung(lernstand: Lernstand, modul: Modul): Auswertu
   return {
     bearbeitet,
     gesamt,
+    aussagekraeftig: bearbeitet >= AUSSAGEKRAEFTIG_AB,
     ersterVersuchRichtig,
     selbstkorrekturQuote,
     versucheBisLoesungMedian,

@@ -88,6 +88,17 @@ export interface Lernstand {
 export interface Auswertung {
   bearbeitet: number
   gesamt: number
+  /**
+   * Reichen die Daten fuer eine Aussage ueber das Kind?
+   *
+   * Unter einer Handvoll bearbeiteter Aufgaben sind Quoten Rauschen: "0 von
+   * 1 richtig" und "0 %" mit einem Fehlerbalken ueber die volle Breite sieht
+   * nach Alarm aus, obwohl nichts gemessen wurde. Der Lehrkraft-Bereich
+   * blendet die Kennzahlen darunter aus und sagt stattdessen, dass es noch
+   * zu frueh ist. Der Bearbeitungsstand bleibt sichtbar - der stimmt ab der
+   * ersten Aufgabe.
+   */
+  aussagekraeftig: boolean
   /** Im ersten Anlauf geloest. */
   ersterVersuchRichtig: number
   /** Nach einem Fehlversuch selbst korrigiert - starker Lernindikator. */

@@ -17,7 +17,7 @@ import type { Modul, Niveaustufe, Verstehensebene } from '@/content/types'
 import { findeWort, istLernwort, wortMitArtikel } from '@/content/types'
 import type { Fehlerart } from '@/grading/types'
 import type { Lernstand } from '@/state/types'
-import { alleAufgaben, berechneAuswertung } from './auswertung'
+import { AUSSAGEKRAEFTIG_AB, alleAufgaben, berechneAuswertung } from './auswertung'
 import { Wortkarten } from './Wortkarten'
 import './lehrkraft.css'
 
@@ -456,55 +456,83 @@ function AuswertungsAnsicht(props: { modul: Modul; lernstand: Lernstand }): Reac
         </div>
       </div>
 
-      <div className="lehrkraft__kennzahlen-reihe">
-        <div className="karte lehrkraft__kennzahl-karte">
-          <p className="lehrkraft__kennzahl-wert">
-            {auswertung.ersterVersuchRichtig} von {auswertung.bearbeitet}
+      {!auswertung.aussagekraeftig ? (
+        /*
+         * Unter fuenf bearbeiteten Aufgaben stand hier "0 von 1", "0 %" und
+         * ein Fehlerbalken ueber die volle Breite. Das ist kein Befund, das
+         * sieht nur aus wie einer - und zwar wie ein Alarm. Eine Quote aus
+         * einem einzigen Versuch ist Rauschen; sie zu zeigen, laedt zu einem
+         * Urteil ein, das die Daten nicht hergeben.
+         *
+         * Der Bearbeitungsstand darueber bleibt sichtbar, denn der stimmt ab
+         * der ersten Aufgabe.
+         */
+        <div className="karte karte--ruhig stapel">
+          <h3>Noch zu wenige Aufgaben für eine Aussage</h3>
+          <p>
+            Kennzahlen und Fehlerprofil erscheinen ab {AUSSAGEKRAEFTIG_AB} bearbeiteten Aufgaben.
+            Bisher sind es {auswertung.bearbeitet}. Aus einzelnen Versuchen lässt sich keine Quote
+            bilden, die etwas über das Kind aussagt – ein „0 %“ nach einer Aufgabe wäre nur eine Zahl,
+            die falsch aussieht.
           </p>
-          <p className="lehrkraft__kennzahl-label">Im ersten Anlauf richtig</p>
-        </div>
-        <div className="karte lehrkraft__kennzahl-karte">
-          <p className="lehrkraft__kennzahl-wert">
-            {selbstkorrekturProzent !== null ? `${selbstkorrekturProzent} %` : '–'}
+          <p className="lehrkraft__einordnung">
+            Was schon jetzt zählt, steht weiter unten: die Wörter mit unsicherem Artikel und die
+            Schreibaufträge, die auf Ihre Korrektur im Heft warten.
           </p>
-          <p className="lehrkraft__kennzahl-label">Nach einem Fehler selbst korrigiert</p>
         </div>
-        <div className="karte lehrkraft__kennzahl-karte">
-          <p className="lehrkraft__kennzahl-wert">{auswertung.versucheBisLoesungMedian ?? '–'}</p>
-          <p className="lehrkraft__kennzahl-label">Versuche bis zur Lösung (Median)</p>
-        </div>
-        <div className="karte lehrkraft__kennzahl-karte">
-          <p className="lehrkraft__kennzahl-wert">{auswertung.hilfenGenutzt}</p>
-          <p className="lehrkraft__kennzahl-label">Hilfen genutzt</p>
-        </div>
-      </div>
-      <p className="lehrkraft__einordnung">
-        Die Selbstkorrekturquote ist der aussagekräftigste Wert auf dieser Seite: Sie zeigt, ob ein Kind
-        einen eigenen Fehler erkennt und behebt – genau die Fähigkeit, die beim echten Sprechen und
-        Schreiben zählt, nicht ein fehlerfreier erster Versuch.
-      </p>
+      ) : (
+        <>
+          <div className="lehrkraft__kennzahlen-reihe">
+            <div className="karte lehrkraft__kennzahl-karte">
+              <p className="lehrkraft__kennzahl-wert">
+                {auswertung.ersterVersuchRichtig} von {auswertung.bearbeitet}
+              </p>
+              <p className="lehrkraft__kennzahl-label">Im ersten Anlauf richtig</p>
+            </div>
+            <div className="karte lehrkraft__kennzahl-karte">
+              <p className="lehrkraft__kennzahl-wert">
+                {selbstkorrekturProzent !== null ? `${selbstkorrekturProzent} %` : '–'}
+              </p>
+              <p className="lehrkraft__kennzahl-label">Nach einem Fehler selbst korrigiert</p>
+            </div>
+            <div className="karte lehrkraft__kennzahl-karte">
+              <p className="lehrkraft__kennzahl-wert">{auswertung.versucheBisLoesungMedian ?? '–'}</p>
+              <p className="lehrkraft__kennzahl-label">Versuche bis zur Lösung (Median)</p>
+            </div>
+            <div className="karte lehrkraft__kennzahl-karte">
+              <p className="lehrkraft__kennzahl-wert">{auswertung.hilfenGenutzt}</p>
+              <p className="lehrkraft__kennzahl-label">Hilfen genutzt</p>
+            </div>
+          </div>
+          <p className="lehrkraft__einordnung">
+            Die Selbstkorrekturquote ist der aussagekräftigste Wert auf dieser Seite: Sie zeigt, ob ein
+            Kind einen eigenen Fehler erkennt und behebt – genau die Fähigkeit, die beim echten Sprechen
+            und Schreiben zählt, nicht ein fehlerfreier erster Versuch.
+          </p>
 
-      <div className="karte stapel">
-        <h3>Fehlerprofil</h3>
-        {auswertung.fehlerprofil.length === 0 ? (
-          <p>Bisher ist keine wiederkehrende Fehlerart aufgetreten.</p>
-        ) : (
-          <ul className="lehrkraft__balken-liste">
-            {auswertung.fehlerprofil.map((eintrag) => (
-              <li key={eintrag.art} className="lehrkraft__balken-zeile">
-                <span className="lehrkraft__balken-label">{FEHLERART_LABEL[eintrag.art]}</span>
-                <div className="fortschritt lehrkraft__fehler-spur" aria-hidden="true">
-                  <div
-                    className="fortschritt__balken lehrkraft__fehler-balken"
-                    style={{ width: `${maxFehler > 0 ? (eintrag.anzahl / maxFehler) * 100 : 0}%` }}
-                  />
-                </div>
-                <span className="lehrkraft__balken-wert">{eintrag.anzahl}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+          <div className="karte stapel">
+            <h3>Fehlerprofil</h3>
+            {auswertung.fehlerprofil.length === 0 ? (
+              <p>Bisher ist keine wiederkehrende Fehlerart aufgetreten.</p>
+            ) : (
+              <ul className="lehrkraft__balken-liste">
+                {auswertung.fehlerprofil.map((eintrag) => (
+                  <li key={eintrag.art} className="lehrkraft__balken-zeile">
+                    <span className="lehrkraft__balken-label">{FEHLERART_LABEL[eintrag.art]}</span>
+                    <div className="fortschritt lehrkraft__fehler-spur" aria-hidden="true">
+                      <div
+                        className="fortschritt__balken lehrkraft__fehler-balken"
+                        style={{ width: `${maxFehler > 0 ? (eintrag.anzahl / maxFehler) * 100 : 0}%` }}
+                      />
+                    </div>
+                    <span className="lehrkraft__balken-wert">{eintrag.anzahl}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
 
       <div className="karte stapel">
         <h3>Wortschatz mit Unsicherheit beim Artikel</h3>

@@ -29,6 +29,10 @@ export interface WortKarteProps {
   onArtikelAntwort?: (wortId: string, richtig: boolean) => void
   /** Wird bei jedem erfolgreichen Vorlesen aufgerufen (fuer die Lernstand-Zaehlung). */
   onAngehoert?: (wortId: string) => void
+  /** Bisher eingetragene Uebersetzung in der Erstsprache des Kindes. */
+  eigeneSprache?: string
+  /** Meldet eine geaenderte Uebersetzung. Fehlt sie, wird das Feld nicht gezeigt. */
+  onEigeneSprache?: (wortId: string, text: string) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -146,9 +150,10 @@ interface ArtikelVersuch {
 }
 
 export function WortKarte(props: WortKarteProps): ReactElement {
-  const { wort, offen, onSchliessen, onArtikelAntwort, onAngehoert } = props
+  const { wort, offen, onSchliessen, onArtikelAntwort, onAngehoert, eigeneSprache, onEigeneSprache } = props
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titelId = useId()
+  const spracheId = useId()
   const [versuch, setVersuch] = useState<ArtikelVersuch | null>(null)
   const { verfuegbar, unterstuetzt, sprich } = useSprachausgabe()
 
@@ -238,6 +243,25 @@ export function WortKarte(props: WortKarteProps): ReactElement {
           {wort.nomen}
         </h2>
 
+        {/*
+          Das Bild zuerst, dann die Woerter. Wer "Radiergummi" nicht kennt,
+          dem hilft eine Erklaerung aus fuenf weiteren deutschen Woertern
+          nicht weiter - das Bild schon. Die freigestellten Objektbilder
+          liegen ohnehin vor; hier fehlte nur der Einbau.
+
+          alt="" ist hier richtig und keine Nachlaessigkeit: Direkt darueber
+          steht das Wort als Ueberschrift. Eine Vorlesehilfe wuerde sonst
+          "Radiergummi. Bild: Radiergummi" sagen.
+        */}
+        {wort.bildQuelle && (
+          <img
+            className="wortkarte__bild"
+            src={`${import.meta.env.BASE_URL}${wort.bildQuelle}`}
+            alt=""
+            loading="lazy"
+          />
+        )}
+
         {wort.plural && (
           <p className="wortkarte__plural">
             <span className="wortkarte__feldname">Mehrzahl:</span> {wort.plural}
@@ -296,6 +320,33 @@ export function WortKarte(props: WortKarteProps): ReactElement {
               )}
             </div>
           </fieldset>
+        )}
+
+        {/*
+          Die Erstsprache gehoert dazu, nicht daneben.
+
+          Der Heftauftrag verlangt sie ohnehin ("uebersetze sie in deine
+          Sprache") - die App hatte dafuer nur keinen Platz. Bewusst ein
+          freies Feld ohne Sprachauswahl und ohne Uebersetzungsdienst: Es
+          wird nichts erkannt, nichts gesendet, nichts bewertet. Kein
+          Prueflauf, kein Haken, kein Kreuz. Was hier steht, gehoert dem
+          Kind.
+        */}
+        {onEigeneSprache && (
+          <p className="wortkarte__eigene-sprache">
+            <label htmlFor={spracheId} className="wortkarte__feldname">
+              In meiner Sprache
+            </label>
+            <input
+              id={spracheId}
+              type="text"
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="optional"
+              value={eigeneSprache ?? ''}
+              onChange={(ereignis) => onEigeneSprache(wort.id, ereignis.target.value)}
+            />
+          </p>
         )}
       </div>
     </dialog>

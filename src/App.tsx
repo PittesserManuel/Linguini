@@ -9,7 +9,7 @@
  */
 
 import { Component } from 'react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { MODULE, STANDARD_MODUL_ID, findeModul } from '@/content/module'
 import type { Modul } from '@/content/types'
@@ -94,12 +94,23 @@ function ModulSitzung({
     meldeErgebnis,
     meldeWortAngesehen,
     meldeArtikelAntwort,
+    meldeEigeneSprache,
     setzeStufe,
     setzeJahrgang,
     zuruecksetzen,
     speichernAktiv,
     setzeSpeichernAktiv,
   } = useLernstand(modul.id, 'standard')
+
+  // Die Uebersetzungen liegen im Lernstand (je Wort), die Wortkarte braucht
+  // sie flach nach Wort-ID. Nur ableiten, nicht doppelt halten.
+  const eigeneSprachen = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.values(lernstand.woerter).map((stand) => [stand.wortId, stand.eigeneSprache]),
+      ),
+    [lernstand.woerter],
+  )
 
   return (
     <>
@@ -120,6 +131,8 @@ function ModulSitzung({
               stufe={lernstand.stufe}
               onWortAngesehen={meldeWortAngesehen}
               onArtikelAntwort={meldeArtikelAntwort}
+              eigeneSprachen={eigeneSprachen}
+              onEigeneSprache={meldeEigeneSprache}
             />
           )}
           {ansicht === 'grammatik' && (

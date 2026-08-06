@@ -37,6 +37,10 @@ export interface WortbildProps {
   onWortAngesehen?: (wortId: string) => void
   /** Antwort in der Mini-Uebung "Welcher Artikel?" innerhalb der Wortkarte. */
   onArtikelAntwort?: (wortId: string, richtig: boolean) => void
+  /** Bereits eingetragene Uebersetzungen, je Wort-ID. */
+  eigeneSprachen?: Record<string, string | undefined>
+  /** Meldet eine geaenderte Uebersetzung. Fehlt sie, zeigt die Wortkarte kein Feld. */
+  onEigeneSprache?: (wortId: string, text: string) => void
 }
 
 type Modus = 'entdecken' | 'zuordnen' | 'schreiben'
@@ -383,7 +387,7 @@ const SCHREIBEN_MAX_VERSUCHE = 3
 // ---------------------------------------------------------------------------
 
 export function Wortbild(props: WortbildProps): ReactElement {
-  const { modul, stufe, onWortAngesehen, onArtikelAntwort } = props
+  const { modul, stufe, onWortAngesehen, onArtikelAntwort, eigeneSprachen, onEigeneSprache } = props
   const ueberschriftId = useId()
   const reiterId = useId()
   const fertigRef = useRef<HTMLHeadingElement | null>(null)
@@ -702,6 +706,10 @@ export function Wortbild(props: WortbildProps): ReactElement {
         onSchliessen={() => setOffenesWortId(null)}
         onArtikelAntwort={onArtikelAntwort}
         onAngehoert={onWortAngesehen}
+        eigeneSprache={
+          letztesWortRef.current ? eigeneSprachen?.[letztesWortRef.current.id] : undefined
+        }
+        onEigeneSprache={onEigeneSprache}
       />
     </section>
   )

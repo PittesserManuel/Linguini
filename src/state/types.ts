@@ -40,6 +40,22 @@ export interface WortStand {
   /** Artikel richtig zugeordnet. */
   artikelRichtig: number
   artikelFalsch: number
+  /**
+   * Das Wort in der Erstsprache des Kindes, selbst eingetragen.
+   *
+   * In der DaZ-Wortschatzarbeit ist die Erstsprache kein Umweg, sondern der
+   * kuerzeste Weg zur Bedeutung: Wer "Radiergummi" nicht kennt, dem hilft
+   * eine Erklaerung aus fuenf weiteren deutschen Woertern wenig. Der
+   * Heftauftrag verlangt diese Uebersetzung ohnehin ("uebersetze sie in
+   * deine Sprache") - die App hatte dafuer nur keinen Platz.
+   *
+   * Bewusst ein freies Textfeld ohne Sprachauswahl und ohne
+   * Uebersetzungsdienst: Es wird nichts erkannt, nichts gesendet, nichts
+   * geprueft. Der Eintrag folgt exakt dem Speichern-Schalter (Voreinstellung
+   * aus, dann nur fuer die Sitzung) und taucht in keiner Auswertung und in
+   * keinem Elternbrief auf.
+   */
+  eigeneSprache?: string
 }
 
 export interface Lernstand {

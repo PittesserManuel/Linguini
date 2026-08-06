@@ -353,6 +353,18 @@
   font-weight: 700;
 }
 
+/* Das Objektbild steht zwischen Ueberschrift und Erklaerung: erst sehen,
+   dann lesen. Links ausgerichtet statt zentriert, damit es in der Spalte
+   mit dem Text steht und nicht als Deko daneben. Die Hoehe ist gedeckelt,
+   weil die Karte auf dem Handy die ganze Hoehe fuellt - ein 512er Bild
+   wuerde die Artikel-Uebung darunter aus dem Bild schieben. */
+.wortkarte__bild {
+  align-self: flex-start;
+  max-block-size: 7rem;
+  max-inline-size: 100%;
+  object-fit: contain;
+}
+
 .wortkarte__erklaerung {
   font-size: var(--s-lg);
   line-height: var(--zeile-normal);
@@ -370,6 +382,23 @@
   padding-block-start: var(--r-4);
   border: none;
   border-block-start: 1px solid var(--f-rand);
+}
+
+/* Die Erstsprache steht unten und ruhig: Sie wird nicht geprueft, nicht
+   bewertet und nicht gemeldet. Kein Rahmen um den Block, keine Marke,
+   keine Farbe - das Feld gehoert dem Kind, nicht der Aufgabe. */
+.wortkarte__eigene-sprache {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--r-2) var(--r-3);
+  padding-block-start: var(--r-4);
+  border-block-start: 1px solid var(--f-rand);
+}
+
+.wortkarte__eigene-sprache input {
+  flex: 1 1 10rem;
+  min-inline-size: 0;
 }
 
 .wortkarte__uebung legend {

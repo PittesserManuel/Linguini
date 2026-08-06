@@ -18,6 +18,7 @@ import { findeWort, istLernwort, wortMitArtikel } from '@/content/types'
 import type { Fehlerart } from '@/grading/types'
 import type { Lernstand } from '@/state/types'
 import { AUSSAGEKRAEFTIG_AB, alleAufgaben, berechneAuswertung } from './auswertung'
+import { Uebergabe } from './Uebergabe'
 import { Wortkarten } from './Wortkarten'
 import './lehrkraft.css'
 
@@ -120,12 +121,13 @@ function SchlossIcon(): ReactElement {
 // Reiter-Rahmen (WAI-ARIA APG "Tabs", automatische Aktivierung)
 // ---------------------------------------------------------------------------
 
-type ReiterId = 'lernziele' | 'differenzierung' | 'auswertung' | 'eltern'
+type ReiterId = 'lernziele' | 'differenzierung' | 'auswertung' | 'uebergabe' | 'eltern'
 
 const REITER: { id: ReiterId; label: string }[] = [
   { id: 'lernziele', label: 'Lernziele & Lehrplan' },
   { id: 'differenzierung', label: 'Differenzierung' },
   { id: 'auswertung', label: 'Auswertung' },
+  { id: 'uebergabe', label: 'Übergabe ans Heft' },
   { id: 'eltern', label: 'Für Eltern' },
 ]
 
@@ -225,6 +227,18 @@ export function Lehrkraft(props: { modul: Modul; lernstand: Lernstand }): ReactE
           className="lehrkraft__panel"
         >
           <AuswertungsAnsicht modul={modul} lernstand={lernstand} />
+        </div>
+      )}
+
+      {aktiv === 'uebergabe' && (
+        <div
+          id={`${basisId}-panel-uebergabe`}
+          role="tabpanel"
+          aria-labelledby={`${basisId}-reiter-uebergabe`}
+          tabIndex={0}
+          className="lehrkraft__panel"
+        >
+          <UebergabeAnsicht modul={modul} lernstand={lernstand} />
         </div>
       )}
 
@@ -624,6 +638,41 @@ function AuswertungsAnsicht(props: { modul: Modul; lernstand: Lernstand }): Reac
 // ---------------------------------------------------------------------------
 // Reiter 4: Für Eltern
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Uebergabe ans Heft - der Zettel, der die Sitzung mit der Korrektur verbindet
+// ---------------------------------------------------------------------------
+
+function UebergabeAnsicht(props: { modul: Modul; lernstand: Lernstand }): ReactElement {
+  const { modul, lernstand } = props
+  const auswertung = useMemo(() => berechneAuswertung(lernstand, modul), [lernstand, modul])
+
+  return (
+    <>
+      <div className="lehrkraft__eltern-kopf reihe reihe--gestapelt">
+        <p className="lehrkraft__einordnung">
+          Am Ende der Stunde ausdrucken, Namen eintragen und ins Heft kleben. Es werden keine Daten
+          übertragen – der Zettel entsteht in diesem Browser und geht auf Papier weiter.
+        </p>
+        <button
+          type="button"
+          className="knopf knopf--zweit lehrkraft__drucken-knopf"
+          onClick={() => window.print()}
+        >
+          <DruckenIcon />
+          Zettel drucken
+        </button>
+      </div>
+
+      <Uebergabe
+        modul={modul}
+        auswertung={auswertung}
+        stufe={lernstand.stufe}
+        jahrgang={lernstand.jahrgang}
+      />
+    </>
+  )
+}
 
 function FuerEltern(props: { modul: Modul; lernstand: Lernstand }): ReactElement {
   const { modul, lernstand } = props

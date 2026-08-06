@@ -202,8 +202,32 @@ html {
     -webkit-print-color-adjust: exact;
   }
 
+  /*
+   * `nav.reiter` und nicht nur `nav`: Die Reiterleiste traegt die Klasse
+   * .reiter mit `display: flex`, und eine Klasse schlaegt einen
+   * Elementselektor. Die Regel `nav { display: none }` stand hier seit
+   * jeher wirkungslos - die Reiterleiste kam bei jedem Ausdruck mit.
+   */
   nav,
+  nav.reiter,
   .sprungmarke {
+    display: none;
+  }
+
+  /*
+   * Bedienelemente sind auf Papier nicht nur nutzlos, sie irritieren: Der
+   * Uebergabezettel kam mit einem Schwierigkeitsregler und einem Knopf
+   * "Lernstand loeschen" aus dem Drucker. Ein Blatt, das ein Kind abgibt,
+   * darf keine Schaltflaechen zeigen, die es auf Papier nicht gibt.
+   *
+   * `.fuss` davorgestellt aus demselben Grund wie oben: Die Zeile traegt
+   * zusaetzlich .reihe mit `display: flex`.
+   *
+   * Die Marke oben bleibt - sie ist der Briefkopf und sagt, woher das
+   * Blatt kommt.
+   */
+  .kopf__stufenwahl,
+  .fuss .fuss__datenschutz {
     display: none;
   }
 }

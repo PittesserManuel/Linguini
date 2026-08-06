@@ -17,7 +17,7 @@ import type { Modul, Niveaustufe, Verstehensebene } from '@/content/types'
 import { findeWort, istLernwort, wortMitArtikel } from '@/content/types'
 import type { Fehlerart } from '@/grading/types'
 import type { Lernstand } from '@/state/types'
-import { berechneAuswertung } from './auswertung'
+import { alleAufgaben, berechneAuswertung } from './auswertung'
 import { Wortkarten } from './Wortkarten'
 import './lehrkraft.css'
 
@@ -48,6 +48,7 @@ const EBENEN_LABEL: Record<Verstehensebene, { titel: string; erklaerung: string 
 const FEHLERART_LABEL: Record<Fehlerart, string> = {
   keine: 'Kein Fehler',
   genus: 'Artikel (der/die/das)',
+  numerus: 'Einzahl / Mehrzahl',
   rechtschreibung: 'Schreibweise',
   wortwahl: 'Wortwahl',
   verstaendnis: 'Textverständnis',
@@ -522,10 +523,44 @@ function AuswertungsAnsicht(props: { modul: Modul; lernstand: Lernstand }): Reac
         ) : (
           <ul>
             {auswertung.aufgeloest.map((aufgabeId) => {
-              const aufgabe = modul.aufgaben.find((a) => a.id === aufgabeId)
+              const aufgabe = alleAufgaben(modul).find((a) => a.id === aufgabeId)
               return <li key={aufgabeId}>{aufgabe?.frage ?? aufgabeId}</li>
             })}
           </ul>
+        )}
+      </div>
+
+      {/* Die einzige Liste hier, die eine HANDLUNG verlangt: Diese Texte hat
+          die App nie gesehen. Sie kann nur melden, dass sie geschrieben
+          wurden - beurteilen muss sie ein Mensch. */}
+      <div className="karte stapel">
+        <h3>Wartet auf Ihre Korrektur im Heft</h3>
+        {auswertung.offeneHeftauftraege.length === 0 ? (
+          <p>Derzeit ist kein Schreibauftrag als erledigt gemeldet.</p>
+        ) : (
+          <>
+            <ul className="lehrkraft__heftliste">
+              {auswertung.offeneHeftauftraege.map((aufgabeId) => {
+                const aufgabe = alleAufgaben(modul).find((a) => a.id === aufgabeId)
+                const heft = aufgabe?.typ === 'heft' ? aufgabe.heft : undefined
+                return (
+                  <li key={aufgabeId}>
+                    {heft && (
+                      <span className="chip">
+                        {heft === 'vokabelheft' ? 'Vokabelheft' : 'Linguini-Heft'}
+                      </span>
+                    )}{' '}
+                    {aufgabe?.frage ?? aufgabeId}
+                  </li>
+                )
+              })}
+            </ul>
+            <p className="lehrkraft__hinweis">
+              Diese Aufträge werden absichtlich nicht automatisch bewertet. Es geht um selbst
+              formulierte Sätze – dort zählt neben dem Inhalt die Schreibrichtigkeit, und beides
+              zusammen kann nur eine Lehrperson beurteilen.
+            </p>
+          </>
         )}
       </div>
 

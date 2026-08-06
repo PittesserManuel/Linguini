@@ -13,7 +13,9 @@ import {
   artikelGrader,
   auswahlGrader,
   freitextGrader,
+  heftGrader,
   lueckenGrader,
+  mengeGrader,
   reihenfolgeGrader,
   wahrheitGrader,
 } from './graders'
@@ -25,6 +27,8 @@ const REGISTRY: Record<AufgabenTyp, Grader> = {
   luecken: lueckenGrader,
   reihenfolge: reihenfolgeGrader,
   artikel: artikelGrader,
+  menge: mengeGrader,
+  heft: heftGrader,
 }
 
 /** Liefert den passenden Grader fuer einen Aufgabentyp. */

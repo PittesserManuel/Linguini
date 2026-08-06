@@ -14,6 +14,7 @@ import type { ReactElement, ReactNode } from 'react'
 import { MODULE, STANDARD_MODUL_ID, findeModul } from '@/content/module'
 import type { Modul } from '@/content/types'
 import { Wortbild } from '@/features/wortbild'
+import { Grammatik } from '@/features/grammatik'
 import { Lesen } from '@/features/lesen'
 import { Lehrkraft } from '@/features/lehrkraft'
 import { useLernstand } from '@/state/lernstand'
@@ -115,9 +116,13 @@ function ModulSitzung({
           {ansicht === 'wortbild' && (
             <Wortbild
               modul={modul}
+              stufe={lernstand.stufe}
               onWortAngesehen={meldeWortAngesehen}
               onArtikelAntwort={meldeArtikelAntwort}
             />
+          )}
+          {ansicht === 'grammatik' && (
+            <Grammatik modul={modul} stufe={lernstand.stufe} onErgebnis={meldeErgebnis} />
           )}
           {ansicht === 'lesen' && (
             <Lesen modul={modul} stufe={lernstand.stufe} onErgebnis={meldeErgebnis} />

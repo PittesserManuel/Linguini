@@ -19,14 +19,17 @@ import type {
   AufgabeArtikel,
   AufgabeAuswahl,
   AufgabeFreitext,
+  AufgabeHeft,
   AufgabeLuecken,
+  AufgabeMenge,
   AufgabeReihenfolge,
   AufgabeWahrheit,
   Genus,
   Modul,
   WahrheitsWert,
 } from '@/content/types'
-import { findeWort } from '@/content/types'
+import { findeWort, zahlwort } from '@/content/types'
+import { ObjektBild } from '@/features/wortbild'
 import type { Antwort } from '@/grading/types'
 
 // ---------------------------------------------------------------------------
@@ -108,6 +111,11 @@ function WahrheitEingabe(props: {
 }): ReactElement {
   const { aufgabe, antwort, onChange, gesperrt } = props
   const zuordnung = antwort.zuordnung ?? {}
+  // Bei bildgestuetzten Aufgaben faellt die dritte Option weg: Was im Bild zu
+  // sehen ist, ist entscheidbar - "steht nicht im Text" waere dort sinnlos.
+  const optionen = aufgabe.nurRichtigFalsch
+    ? WAHRHEIT_OPTIONEN.filter((o) => o.wert !== 'unbekannt')
+    : WAHRHEIT_OPTIONEN
 
   function waehle(aussageId: string, wert: WahrheitsWert): void {
     onChange({ zuordnung: { ...zuordnung, [aussageId]: wert } })
@@ -119,7 +127,7 @@ function WahrheitEingabe(props: {
         <fieldset key={aussage.id} className="lesen__aussage">
           <legend>{aussage.text}</legend>
           <div className="reihe lesen__optionsreihe">
-            {WAHRHEIT_OPTIONEN.map((option) => (
+            {optionen.map((option) => (
               <label key={option.wert} className="lesen__option">
                 <input
                   type="radio"
@@ -375,6 +383,160 @@ function ArtikelEingabe(props: {
 }
 
 // ---------------------------------------------------------------------------
+// menge - Einzahl und Mehrzahl
+// ---------------------------------------------------------------------------
+
+/**
+ * Das ausgearbeitete Beispiel steht VOR den Eingabefeldern und bleibt
+ * waehrend der ganzen Aufgabe sichtbar (Worked Example Effect, Sweller):
+ * Beim Erlernen einer neuen Regel ist ein vollstaendig geloestes Beispiel
+ * wirksamer als der Versuch, sie aus Fehlversuchen zu rekonstruieren.
+ */
+function MengenBeispiel(props: { aufgabe: AufgabeMenge }): ReactElement {
+  return (
+    <div className="karte karte--ruhig lesen__beispiel">
+      <p className="lesen__beispiel-titel">So geht das</p>
+      <ul className="lesen__beispiel-liste">
+        {props.aufgabe.beispiel.map((zeile, i) => (
+          <li key={i} className="lesen__beispiel-zeile">
+            <ObjektBild wortId={zeile.wortId} anzahl={zeile.anzahl} />
+            <span className="lesen__beispiel-satz">{zeile.satz}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function MengeEingabe(props: {
+  aufgabe: AufgabeMenge
+  modul: Modul
+  antwort: Antwort
+  onChange: (antwort: Antwort) => void
+  gesperrt: boolean
+}): ReactElement {
+  const { aufgabe, modul, antwort, onChange, gesperrt } = props
+  const werte = antwort.werte ?? new Array<string>(aufgabe.runden.length).fill('')
+
+  function setzeWert(index: number, wert: string): void {
+    const neu = [...werte]
+    neu[index] = wert
+    onChange({ werte: neu })
+  }
+
+  return (
+    <div className="stapel">
+      <MengenBeispiel aufgabe={aufgabe} />
+
+      <ol className="lesen__mengen-liste">
+        {aufgabe.runden.map((runde, i) => {
+          const wort = findeWort(modul, runde.wortId)
+          const feldId = `menge-${aufgabe.id}-${runde.id}`
+          return (
+            <li key={runde.id} className="lesen__mengen-runde">
+              <div className="lesen__mengen-bild">
+                <ObjektBild
+                  wortId={runde.wortId}
+                  anzahl={runde.anzahl}
+                  alt={`${zahlwort(runde.anzahl)} Stück`}
+                />
+              </div>
+              <div className="lesen__mengen-eingabe">
+                <label className="lesen__feld-label" htmlFor={feldId}>
+                  {aufgabe.mitIstSind ? 'Schreibe den ganzen Satz' : 'Schreibe Anzahl und Wort'}
+                  <span className="visuell-versteckt"> zu Bild {i + 1}</span>
+                </label>
+                <input
+                  id={feldId}
+                  className="feld"
+                  type="text"
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder={
+                    aufgabe.mitIstSind ? 'zum Beispiel: Das sind drei Hefte.' : 'zum Beispiel: drei Hefte'
+                  }
+                  value={werte[i] ?? ''}
+                  disabled={gesperrt}
+                  onChange={(ereignis) => setzeWert(i, ereignis.target.value)}
+                />
+                {wort && <p className="lesen__mengen-hinweis">Gegenstand: {wort.nomen}</p>}
+              </div>
+            </li>
+          )
+        })}
+      </ol>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// heft - Schreibauftrag auf Papier
+//
+// Die App nimmt hier bewusst keinen Text entgegen. Ein Eingabefeld waere eine
+// stille Luege: Es wuerde suggerieren, die App koenne das Geschriebene
+// beurteilen. Stattdessen zeigt sie den Auftrag, die noetigen Vorlagen - und
+// ein Haekchen, mit dem das Kind meldet, dass es fertig ist.
+// ---------------------------------------------------------------------------
+
+const HEFT_NAME: Record<AufgabeHeft['heft'], string> = {
+  vokabelheft: 'Vokabelheft',
+  linguiniheft: 'Linguini-Heft',
+}
+
+function HeftEingabe(props: {
+  aufgabe: AufgabeHeft
+  antwort: Antwort
+  onChange: (antwort: Antwort) => void
+  gesperrt: boolean
+}): ReactElement {
+  const { aufgabe, antwort, onChange, gesperrt } = props
+  const erledigt = antwort.wert === 'erledigt'
+
+  return (
+    <div className="stapel lesen__heft">
+      <p className="chip lesen__heft-marke">Für dein {HEFT_NAME[aufgabe.heft]}</p>
+
+      {aufgabe.abschreiben && (
+        <div className="karte karte--ruhig lesen__heft-vorlage">
+          <p className="lesen__heft-vorlage-titel">Das schreibst du ab</p>
+          <ul className="lesen__heft-zeilen">
+            {aufgabe.abschreiben.map((zeile, i) => (
+              <li key={i}>{zeile}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {aufgabe.musterSaetze && (
+        <div className="karte karte--ruhig lesen__heft-vorlage">
+          <p className="lesen__heft-vorlage-titel">So könnte ein Satz aussehen</p>
+          <ul className="lesen__heft-zeilen lesen__heft-zeilen--muster">
+            {aufgabe.musterSaetze.map((satz, i) => (
+              <li key={i}>{satz}</li>
+            ))}
+          </ul>
+          <p className="lesen__heft-hinweis">
+            Das ist ein Beispiel, keine Lösung. Schreibe eigene Sätze über andere Sachen.
+          </p>
+        </div>
+      )}
+
+      {aufgabe.umfang && <p className="lesen__heft-umfang">Umfang: {aufgabe.umfang}</p>}
+
+      <label className="lesen__option lesen__heft-haken">
+        <input
+          type="checkbox"
+          checked={erledigt}
+          disabled={gesperrt}
+          onChange={(ereignis) => onChange({ wert: ereignis.target.checked ? 'erledigt' : '' })}
+        />
+        <span>Ich habe es in mein {HEFT_NAME[aufgabe.heft]} geschrieben.</span>
+      </label>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Weiche: waehlt die passende Komponente nach aufgabe.typ
 // ---------------------------------------------------------------------------
 
@@ -404,6 +566,10 @@ export function Eingabe(props: EingabeProps): ReactElement {
       return <ReihenfolgeEingabe {...props} aufgabe={aufgabe} />
     case 'artikel':
       return <ArtikelEingabe {...props} aufgabe={aufgabe} />
+    case 'menge':
+      return <MengeEingabe {...props} aufgabe={aufgabe} />
+    case 'heft':
+      return <HeftEingabe {...props} aufgabe={aufgabe} />
     default: {
       // Absicherung fuer neue Aufgabentypen: bricht sichtbar, statt still
       // eine leere Eingabe zu rendern (gleiche Haltung wie die Grader).
@@ -418,12 +584,15 @@ export function anfangsAntwort(aufgabe: Aufgabe): Antwort {
   switch (aufgabe.typ) {
     case 'auswahl':
     case 'freitext':
+    case 'heft':
       return { wert: '' }
     case 'wahrheit':
     case 'artikel':
       return { zuordnung: {} }
     case 'luecken':
       return { werte: new Array<string>(aufgabe.loesungen.length).fill('') }
+    case 'menge':
+      return { werte: new Array<string>(aufgabe.runden.length).fill('') }
     case 'reihenfolge':
       return { werte: deterministischGemischt(aufgabe.schritte.map((schritt) => schritt.id)) }
     default: {

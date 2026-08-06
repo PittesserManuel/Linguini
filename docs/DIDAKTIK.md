@@ -32,19 +32,39 @@ Thema gemacht wird.
 
 ---
 
-## 2. Warum nur sieben neue Wörter
+## 2. Warum der Wortschatz portioniert wird
 
-Das Bild zeigt **15 beschriftete Gegenstände**, geprüft werden aber nur **sieben**.
+Das Klassenzimmer-Bild zeigt **21 beschriftete Gegenstände**, davon sind **13
+Lernwörter** – aber es werden nie alle 13 am Stück abgefragt.
 
-Das ist kein Versehen, sondern die zentrale Entscheidung des Moduls. Das
-Arbeitsgedächtnis von Kindern dieses Alters verarbeitet vier bis sieben neue
-Einheiten gleichzeitig (Miller 1956; Cognitive Load Theory nach Sweller). Ein
-Modul, das fünfzehn neue Nomen gleichzeitig einführt, erzeugt messbar keine
-fünfzehn gelernten Wörter, sondern Überlastung.
+Das Arbeitsgedächtnis von Kindern dieses Alters verarbeitet vier bis sieben
+neue Einheiten gleichzeitig (Miller 1956; Cognitive Load Theory nach Sweller).
+Ein Modul, das dreizehn neue Nomen gleichzeitig einführt, erzeugt messbar keine
+dreizehn gelernten Wörter, sondern Überlastung.
 
-Die Lösung ist die Trennung in zwei Klassen von Wörtern:
+Der naheliegende Schluss – dann eben weniger Wörter – ist trotzdem falsch.
+Bleistift, Buntstift, Zirkel und Geodreieck braucht ein Kind im Unterricht
+täglich; sie wegzulassen macht das Modul nicht leichter, sondern unbrauchbar.
 
-**Lernwörter (7)** — werden eingeführt, geübt und geprüft:
+Die Lösung liegt deshalb nicht im Umfang, sondern in der **Portionierung**.
+Zwei Mechanismen greifen ineinander:
+
+**Erstens Lernpakete.** Die 13 Lernwörter sind in drei Pakete zu höchstens
+fünf Wörtern geteilt, geschnitten nach der Tätigkeit und nicht nach dem
+Alphabet – was man zusammen benutzt, lernt man zusammen:
+
+| Paket | Wörter |
+|---|---|
+| Schreiben und Radieren | Bleistift, Buntstift, Radiergummi, Spitzer, Kleber |
+| Messen und Schneiden | Lineal, Geodreieck, Zirkel, Schere |
+| Der Klassenraum | Tafel, Tür, Pflanze, Papierkorb |
+
+Geübt wird immer nur ein Paket. Das Bild bleibt dabei vollständig beschriftet –
+die Umgebung darf reich sein, die Lernlast nicht.
+
+**Zweitens die Trennung in zwei Klassen von Wörtern:**
+
+**Lernwörter (13)** — werden eingeführt, geübt und geprüft, darunter:
 
 | Artikel | Nomen | Plural |
 |---|---|---|

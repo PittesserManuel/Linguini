@@ -42,6 +42,25 @@ export interface Wort {
   labelSeite: 'links' | 'rechts' | 'oben' | 'unten'
 }
 
+/**
+ * Ein Lernpaket: eine Portion Wortschatz, die in EINEM Durchgang geuebt wird.
+ *
+ * Warum ueberhaupt Pakete? Ein Modul darf inzwischen mehr als sieben
+ * Lernwoerter haben (das Klassenzimmer hat dreizehn - Schulsachen, Raum und
+ * Geometrie gehoeren fachlich zusammen). Sie alle am Stueck abzufragen wuerde
+ * das Arbeitsgedaechtnis ueberlaufen lassen (Miller 1956, Cognitive Load
+ * Theory). Die Loesung ist nicht, Woerter wegzulassen, sondern sie zu
+ * portionieren: Das Bild zeigt alles, geuebt wird paketweise mit maximal
+ * sieben Woertern.
+ */
+export interface Wortpaket {
+  id: string
+  /** Kindgerechter Name der Portion, z. B. "Meine Schulsachen". */
+  titel: string
+  /** IDs aus dem Wortschatz des Moduls, in Lernreihenfolge. Hoechstens 7. */
+  woerter: string[]
+}
+
 // ---------------------------------------------------------------------------
 // Szene - woher kommt das Bild?
 // ---------------------------------------------------------------------------
@@ -132,6 +151,31 @@ interface AufgabeBasis {
   loesungserklaerung: string
   /** Verweis auf die Textstelle (Absatz-ID), an der die Antwort steht. */
   belegAbsatz?: string
+  /**
+   * Bildstuetze: ID eines Wortschatz-Objekts. Ist sie gesetzt, zeigt die
+   * Aufgabe einen Ausschnitt der Szene mit genau diesem Gegenstand.
+   *
+   * Fuer Kinder mit wenig Deutschkontakt ist das der Unterschied zwischen
+   * "Aufgabe nicht loesbar" und "Aufgabe loesbar": Sie muessen den Satz dann
+   * nicht aus dem Gedaechtnis pruefen, sondern koennen hinsehen.
+   */
+  bildObjekt?: string
+  /**
+   * Bildstuetze als ganze Szene statt als Einzelgegenstand. 'tisch' zeigt die
+   * Tischplatte mit allen Schulsachen - die Vorlage fuer Schreibauftraege, in
+   * denen das Kind selbst auswaehlt, worueber es einen Satz schreibt.
+   */
+  bildSzene?: 'raum' | 'tisch'
+  /**
+   * Antwort in ein Heft schreiben statt in die App tippen.
+   *
+   * Gilt fuer individuelle Schreibleistungen (eigene Saetze, eigene Texte).
+   * Die App deckt hier BEWUSST keine Musterloesung auf: Was das Kind
+   * geschrieben hat, kann nur ein Mensch beurteilen - Rechtschreibung,
+   * Satzbau und Inhalt zugleich. Eine automatische "Loesung" wuerde
+   * vortaeuschen, es gaebe genau einen richtigen Satz.
+   */
+  imHeft?: boolean
 }
 
 /** Einfachauswahl aus mehreren Optionen. */
@@ -151,6 +195,15 @@ export type WahrheitsWert = 'richtig' | 'falsch' | 'unbekannt'
 export interface AufgabeWahrheit extends AufgabeBasis {
   typ: 'wahrheit'
   aussagen: { id: string; text: string; richtig: WahrheitsWert; begruendung: string }[]
+  /**
+   * Nur "richtig" und "falsch" anbieten, ohne die dritte Option.
+   *
+   * Die dritte Option ist bei Textarbeit didaktisch zentral - bei einer
+   * BILDgestuetzten Aufgabe waere sie sinnlos: Was man sieht, sieht man.
+   * "Der Radiergummi ist rosa und blau" ist am Bild entscheidbar, und ein
+   * drittes Feld wuerde nur verwirren.
+   */
+  nurRichtigFalsch?: boolean
 }
 
 /** Kurze Freitextantwort - hier greift die Fuzzy-Korrektur. */
@@ -189,6 +242,67 @@ export interface AufgabeArtikel extends AufgabeBasis {
   woerter: string[]
 }
 
+/**
+ * Einzahl und Mehrzahl an einer Menge von Gegenstaenden.
+ *
+ * Das Bild zeigt n Stueck eines Gegenstands, das Kind schreibt die passende
+ * Form: bei n = 1 "der Radiergummi", bei n > 1 "zwei Radiergummis" - die Zahl
+ * ausgeschrieben, nicht als Ziffer. Genau daran haengt die Regel, die im
+ * Hefteintrag steht: Nach Zahlen groesser als eins steht das Nomen im Plural.
+ *
+ * `mitIstSind` koppelt die Uebung an das Grammatikthema "ist / sind": Dann
+ * lautet die erwartete Antwort "Das ist der Radiergummi." bzw. "Das sind zwei
+ * Radiergummis." - Menge und Verbform werden zusammen geuebt, weil sie
+ * zusammen gehoeren.
+ */
+export interface MengenRunde {
+  id: string
+  /** Wortschatz-ID des gezeigten Gegenstands. */
+  wortId: string
+  /** Wie viele Stueck im Bild liegen. 1 bis 5 - darueber wird Zaehlen zur Nebenaufgabe. */
+  anzahl: number
+}
+
+export interface AufgabeMenge extends AufgabeBasis {
+  typ: 'menge'
+  /**
+   * Ausgearbeitetes Beispiel, das VOR der ersten Runde steht (Worked Example
+   * Effect, Sweller): Erst zeigen, wie es geht, dann selbst machen.
+   */
+  beispiel: { wortId: string; anzahl: number; satz: string }[]
+  runden: MengenRunde[]
+  mitIstSind: boolean
+}
+
+/**
+ * Ein Schreibauftrag fuer das Heft - die App nimmt hier KEINE Antwort entgegen.
+ *
+ * Warum das ein eigener Aufgabentyp ist und keine Freitextaufgabe: Was ein
+ * Kind selbst formuliert, kann nur ein Mensch beurteilen. Eine automatische
+ * Musterloesung wuerde behaupten, es gaebe genau einen richtigen Satz - und
+ * das Kind wuerde abschreiben statt schreiben. Die App fuehrt den Auftrag
+ * daher nur, meldet ihn als "wartet auf Korrektur" an den Lehrkraft-Bereich
+ * und deckt nichts auf.
+ */
+export type HeftArt = 'vokabelheft' | 'linguiniheft'
+
+export interface AufgabeHeft extends AufgabeBasis {
+  typ: 'heft'
+  heft: HeftArt
+  /**
+   * Zeilen, die 1:1 ins Heft abgeschrieben werden (Merktexte, Regeln,
+   * Vokabeln). Die duerfen sichtbar sein - Abschreiben IST hier die Aufgabe.
+   */
+  abschreiben?: string[]
+  /**
+   * Musterzeilen, die die FORM zeigen, aber nicht die Loesung: "Das Lineal ist
+   * gelb." als Vorbild fuer eigene Saetze ueber andere Gegenstaende.
+   */
+  musterSaetze?: string[]
+  /** Wie viele eigene Saetze/Zeilen erwartet werden. */
+  umfang?: string
+}
+
 export type Aufgabe =
   | AufgabeAuswahl
   | AufgabeWahrheit
@@ -196,8 +310,73 @@ export type Aufgabe =
   | AufgabeLuecken
   | AufgabeReihenfolge
   | AufgabeArtikel
+  | AufgabeMenge
+  | AufgabeHeft
 
 export type AufgabenTyp = Aufgabe['typ']
+
+// ---------------------------------------------------------------------------
+// Grammatik: erst der Hefteintrag, dann die Uebung
+// ---------------------------------------------------------------------------
+
+/**
+ * Ein Grammatikthema laeuft in genau dieser Reihenfolge ab:
+ * 1. Hefteintrag lesen und ins linierte Heft abschreiben,
+ * 2. danach die Uebungen in der App.
+ *
+ * Diese Reihenfolge ist keine Deko: Die Regel steht dann in der eigenen
+ * Handschrift im eigenen Heft und ist im Unterricht nachschlagbar - auch
+ * ohne Geraet. Die App ist die Uebung, nicht der Merktext.
+ *
+ * Der Hefteintrag ist aus Bausteinen aufgebaut, weil die beiden Themen
+ * unterschiedlich aussehen: "ist/sind" stellt Einzahl und Mehrzahl
+ * gegenueber, "ein/eine" ordnet nach den drei Geschlechtern.
+ */
+
+/** n Stueck eines Gegenstands aus dem Wortschatz, als kleine Illustration. */
+export interface HeftBild {
+  wortId: string
+  anzahl: number
+}
+
+export type HeftBlock =
+  /** Regelzeile mit farbiger Marke davor - im handschriftlichen Vorbild ein Pfeil. */
+  | { art: 'regel'; schluesselwort: string; ton: 'einzahl' | 'mehrzahl'; text: string; bild?: HeftBild[] }
+  /** Umrandeter Kasten mit Fliesstext. */
+  | { art: 'kasten'; titel?: string; zeilen: string[] }
+  /** Zweispaltig: links Einzahl, rechts Mehrzahl. */
+  | {
+      art: 'gegenueberstellung'
+      titel: string
+      zeilen: { links: string; linksBild: HeftBild; rechts: string; rechtsBild: HeftBild }[]
+    }
+  /** Drei Genus-Spalten nebeneinander. */
+  | {
+      art: 'genusspalten'
+      spalten: {
+        genus: Genus
+        bezeichnung: string
+        regel: string
+        beispiele: { satz: string; bild: HeftBild }[]
+      }[]
+    }
+  /** Der Merke-Kasten am Fuss des Eintrags. */
+  | { art: 'merke'; zeilen: string[] }
+  /** Die hervorgehobene Wichtig-Zeile. */
+  | { art: 'wichtig'; text: string; beispiele?: string[] }
+
+export interface Grammatikthema {
+  id: string
+  /** Ueberschrift des Hefteintrags, z. B. "Ist / sind". */
+  titel: string
+  untertitel: string
+  /** Der Hefteintrag - genau das, was ins linierte Heft kommt. */
+  hefteintrag: HeftBlock[]
+  /** Uebungen, die NACH dem Hefteintrag freigeschaltet werden. */
+  aufgaben: Aufgabe[]
+  /** Hinweise fuer die Lehrkraft zu diesem Thema. */
+  hinweise: string[]
+}
 
 // ---------------------------------------------------------------------------
 // Lehrkraft-Ebene
@@ -234,8 +413,20 @@ export interface Modul {
   /** Die Bildquelle des Bild-Wort-Teils. */
   szene: Szene
   wortschatz: Wort[]
+  /**
+   * Portionierung des Lernwortschatzes. Fehlt sie, bilden alle Lernwoerter
+   * ein einziges Paket (siehe `wortpaketeVon`) - fuer kleine Module reicht das.
+   */
+  wortpakete?: Wortpaket[]
   lesetext: Lesetext
   aufgaben: Aufgabe[]
+  /** Grammatikthemen: je Thema erst der Hefteintrag, dann die Uebungen. */
+  grammatik?: Grammatikthema[]
+  /**
+   * Auftraege fuer das Vokabelheft und das linierte Linguini-Heft, die
+   * unabhaengig vom Lesetext gelten - sie stehen beim Bild-Wort-Teil.
+   */
+  heftauftraege?: AufgabeHeft[]
   lernziele: string[]
   kompetenzen: Kompetenz[]
   differenzierung: Differenzierung[]
@@ -262,4 +453,63 @@ export const STUFEN_ORDNUNG: Niveaustufe[] = ['einfach', 'standard', 'anspruchsv
 
 export function aufgabeSichtbar(aufgabe: Aufgabe, stufe: Niveaustufe): boolean {
   return STUFEN_ORDNUNG.indexOf(stufe) >= STUFEN_ORDNUNG.indexOf(aufgabe.abStufe)
+}
+
+/**
+ * Die Lernpakete eines Moduls. Ohne gepflegte Pakete bilden alle Lernwoerter
+ * eines - so bleiben aeltere Module ohne Aenderung lauffaehig.
+ */
+export function wortpaketeVon(modul: Modul): Wortpaket[] {
+  if (modul.wortpakete && modul.wortpakete.length > 0) return modul.wortpakete
+  return [
+    {
+      id: 'alle',
+      titel: 'Alle Wörter',
+      woerter: modul.wortschatz.filter(istLernwort).map((w) => w.id),
+    },
+  ]
+}
+
+/** Die Woerter eines Pakets, in gepflegter Reihenfolge und ohne Luecken. */
+export function woerterVonPaket(modul: Modul, paket: Wortpaket): Wort[] {
+  return paket.woerter
+    .map((id) => findeWort(modul, id))
+    .filter((w): w is Wort => w !== undefined)
+}
+
+/**
+ * Zahlwoerter fuer die Einzahl-/Mehrzahl-Uebung. Ausgeschrieben, nicht als
+ * Ziffer - genau das ist dort der Lerngegenstand.
+ */
+export const ZAHLWOERTER: readonly string[] = ['null', 'ein', 'zwei', 'drei', 'vier', 'fünf']
+
+export function zahlwort(anzahl: number): string {
+  return ZAHLWOERTER[anzahl] ?? String(anzahl)
+}
+
+/**
+ * Die Pluralform ohne Artikel. `plural` ist redaktionell inklusive Artikel
+ * gepflegt ("die Radiergummis"), fuer Mengenangaben braucht es nur das Nomen.
+ */
+export function pluralNomen(wort: Wort): string | null {
+  if (!wort.plural) return null
+  const teile = wort.plural.trim().split(/\s+/)
+  if (teile.length > 1 && ['der', 'die', 'das'].includes(teile[0]!.toLocaleLowerCase('de-DE'))) {
+    return teile.slice(1).join(' ')
+  }
+  return wort.plural.trim()
+}
+
+/**
+ * Die erwartete Antwort einer Mengen-Runde.
+ * n = 1  -> "der Radiergummi"        bzw. "Das ist der Radiergummi."
+ * n > 1  -> "zwei Radiergummis"      bzw. "Das sind zwei Radiergummis."
+ */
+export function mengenLoesung(wort: Wort, anzahl: number, mitIstSind: boolean): string {
+  const kern =
+    anzahl === 1
+      ? wortMitArtikel(wort)
+      : `${zahlwort(anzahl)} ${pluralNomen(wort) ?? wort.nomen}`
+  if (!mitIstSind) return kern
+  return anzahl === 1 ? `Das ist ${kern}.` : `Das sind ${kern}.`
 }

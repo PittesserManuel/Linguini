@@ -12,12 +12,15 @@ import type {
   AufgabeArtikel,
   AufgabeAuswahl,
   AufgabeFreitext,
+  AufgabeHeft,
   AufgabeLuecken,
+  AufgabeMenge,
   AufgabeReihenfolge,
   AufgabeWahrheit,
+  Genus,
+  Wort,
 } from '@/content/types'
-import { findeWort } from '@/content/types'
-import { modulKlassenzimmer } from '@/content/modul-klassenzimmer'
+import { findeWort, mengenLoesung, pluralNomen, wortMitArtikel, zahlwort } from '@/content/types'
 import type { Antwort, Bewertung, Fehlerart, Grader, GraderErgebnis, GraderKontext, TeilErgebnis } from './types'
 import { damerauLevenshtein, schwelleFuer } from './distance'
 import { istNomenGross, normalisiere, teileArtikelNomen } from './normalize'
@@ -152,7 +155,7 @@ function bewerteAuswahl(antwort: Antwort, aufgabe: AufgabeAuswahl, ctx: GraderKo
     rueckmeldungKnapp: korrekt
       ? `Richtig! „${richtigeOption?.text ?? ''}“ passt zu dieser Aufgabe.`
       : fehlerart === 'leer'
-        ? 'Waehle zuerst eine Antwort aus.'
+        ? 'Wähle zuerst eine Antwort aus.'
         : 'Noch nicht ganz. Schau dir die Aufgabe noch einmal genau an.',
     rueckmeldungReveal: aufgabe.loesungserklaerung,
     aufgabe,
@@ -228,7 +231,7 @@ function abschliessenFreitextRichtig(getrimmt: string, aufgabe: AufgabeFreitext,
     punkte: 1,
     rueckmeldungKnapp: grossOk
       ? 'Richtig! Das ist die passende Antwort.'
-      : 'Richtig! Denk daran: Nomen schreiben wir gross.',
+      : 'Richtig! Denk daran: Nomen schreiben wir groß.',
     rueckmeldungReveal: '',
     aufgabe,
     ctx,
@@ -263,8 +266,8 @@ function bewerteFreitextMitArtikel(
   if (nomenRichtig) {
     const rueckmeldungKnapp =
       artikelEingabeNorm === null
-        ? `Das Wort stimmt! Es fehlt aber noch der Artikel. Heisst es der, die oder das ${kanonisch.nomen}?`
-        : `Das Wort stimmt! Aber der Artikel passt noch nicht. Heisst es der, die oder das ${kanonisch.nomen}?`
+        ? `Das Wort stimmt! Es fehlt aber noch der Artikel. Heißt es der, die oder das ${kanonisch.nomen}?`
+        : `Das Wort stimmt! Aber der Artikel passt noch nicht. Heißt es der, die oder das ${kanonisch.nomen}?`
 
     return abschliessen({
       bewertung: 'fast',
@@ -417,7 +420,7 @@ function bewerteLuecken(antwort: Antwort, aufgabe: AufgabeLuecken, ctx: GraderKo
         fehlerart: 'wortwahl',
         gegeben: gegebenGetrimmt,
         erwartet: loesung,
-        rueckmeldung: 'Dieses Wort passt grammatisch nicht in diese Luecke. Schau dir den Satz noch einmal an.',
+        rueckmeldung: 'Dieses Wort passt grammatisch nicht in diese Lücke. Schau dir den Satz noch einmal an.',
       }
     }
 
@@ -452,8 +455,8 @@ function bewerteLuecken(antwort: Antwort, aufgabe: AufgabeLuecken, ctx: GraderKo
     teile,
     rueckmeldungKnapp:
       bewertung === 'richtig'
-        ? 'Richtig! Alle Luecken passen.'
-        : 'Noch nicht alle Luecken passen. Schau dir die markierten Woerter noch einmal an.',
+        ? 'Richtig! Alle Lücken passen.'
+        : 'Noch nicht alle Lücken passen. Schau dir die markierten Wörter noch einmal an.',
     rueckmeldungReveal: aufgabe.loesungserklaerung,
     aufgabe,
     ctx,
@@ -494,7 +497,7 @@ function bewerteReihenfolge(antwort: Antwort, aufgabe: AufgabeReihenfolge, ctx: 
     rueckmeldungKnapp:
       bewertung === 'richtig'
         ? 'Richtig! Das ist die passende Reihenfolge.'
-        : `Noch nicht ganz. Welches Ereignis passiert ganz am Anfang? „${ersterSchritt?.text ?? ''}“ gehoert an den Anfang.`,
+        : `Noch nicht ganz. Welches Ereignis passiert ganz am Anfang? „${ersterSchritt?.text ?? ''}“ gehört an den Anfang.`,
     rueckmeldungReveal: aufgabe.loesungserklaerung,
     aufgabe,
     ctx,
@@ -509,7 +512,10 @@ function bewerteArtikel(antwort: Antwort, aufgabe: AufgabeArtikel, ctx: GraderKo
   const zuordnung = antwort.zuordnung ?? {}
 
   const teile: TeilErgebnis[] = aufgabe.woerter.map((wortId) => {
-    const wort = findeWort(modulKlassenzimmer, wortId)
+    // Nachschlagen im Modul aus dem Kontext, nicht in einem fest verdrahteten:
+    // sonst bewertet jedes Modul ausser dem ersten gegen einen fremden
+    // Wortschatz und zaehlt jede richtige Antwort als falsch.
+    const wort = findeWort(ctx.modul, wortId)
     const erwarteterArtikel = wort?.genus ?? ''
     const gegebenerArtikel = zuordnung[wortId]
     const korrekt = gegebenerArtikel !== undefined && gegebenerArtikel === erwarteterArtikel
@@ -537,11 +543,198 @@ function bewerteArtikel(antwort: Antwort, aufgabe: AufgabeArtikel, ctx: GraderKo
     rueckmeldungKnapp:
       bewertung === 'richtig'
         ? 'Richtig! Alle Artikel passen.'
-        : 'Noch nicht alle Artikel passen. Schau dir die markierten Woerter noch einmal an.',
+        : 'Noch nicht alle Artikel passen. Schau dir die markierten Wörter noch einmal an.',
     rueckmeldungReveal: aufgabe.loesungserklaerung,
     aufgabe,
     ctx,
   })
+}
+
+// ---------------------------------------------------------------------------
+// menge - Einzahl und Mehrzahl
+// ---------------------------------------------------------------------------
+
+const UNBESTIMMT: Record<Genus, string> = { der: 'ein', die: 'eine', das: 'ein' }
+
+/**
+ * Alle Formen, die als richtige Antwort auf eine Mengen-Runde gelten.
+ *
+ * Bewusst grosszuegig bei allem, was NICHT der Lerngegenstand ist: ob das Kind
+ * "Das sind zwei Radiergummis." oder nur "zwei Radiergummis" schreibt, ob mit
+ * oder ohne Punkt, ob "ein" oder "eins" - all das ist hier nicht die Frage.
+ * Gefragt ist einzig: passt die Zahlform zur Menge im Bild?
+ */
+function mengenAkzeptiert(wort: Wort, anzahl: number, mitIstSind: boolean): string[] {
+  const formen = new Set<string>()
+
+  const kerne: string[] = []
+  if (anzahl === 1) {
+    kerne.push(wortMitArtikel(wort))
+    kerne.push(`${UNBESTIMMT[wort.genus]} ${wort.nomen}`)
+    if (wort.genus !== 'die') kerne.push(`eins ${wort.nomen}`)
+  } else {
+    kerne.push(`${zahlwort(anzahl)} ${pluralNomen(wort) ?? wort.nomen}`)
+    kerne.push(`${anzahl} ${pluralNomen(wort) ?? wort.nomen}`)
+  }
+
+  const verb = anzahl === 1 ? 'Das ist' : 'Das sind'
+  for (const kern of kerne) {
+    formen.add(kern)
+    formen.add(`${kern}.`)
+    formen.add(`${verb} ${kern}`)
+    formen.add(`${verb} ${kern}.`)
+  }
+
+  // Bei gekoppelter ist/sind-Uebung bleibt die Kurzform zwar akzeptiert, die
+  // Musterloesung nennt aber den vollen Satz - siehe mengenLoesung.
+  void mitIstSind
+  return [...formen]
+}
+
+/** Enthaelt die Antwort das richtige Nomen, egal in welcher Zahlform? */
+function nomenGetroffen(eingabe: string, wort: Wort): 'einzahl' | 'mehrzahl' | null {
+  const worte = eingabe.split(/[^\p{L}]+/u).filter(Boolean).map((w) => vergleichsform(w))
+  const einzahl = vergleichsform(wort.nomen)
+  const mehrzahl = vergleichsform(pluralNomen(wort) ?? wort.nomen)
+  // Mehrzahl zuerst pruefen: bei Woertern ohne Pluralaenderung ("die Fenster")
+  // sind beide Formen gleich, dann ist die Zahlform ohnehin nie der Fehler.
+  if (worte.includes(mehrzahl)) return 'mehrzahl'
+  if (worte.includes(einzahl)) return 'einzahl'
+  return null
+}
+
+function bewerteMengeRunde(
+  eingabeRoh: string,
+  wort: Wort,
+  anzahl: number,
+  mitIstSind: boolean,
+): Omit<TeilErgebnis, 'id'> {
+  const erwartet = mengenLoesung(wort, anzahl, mitIstSind)
+  const getrimmt = normalisiere(eingabeRoh)
+  const basis = { gegeben: getrimmt, erwartet }
+
+  if (getrimmt.length === 0) {
+    return { ...basis, bewertung: 'falsch', fehlerart: 'leer', rueckmeldung: 'Hier fehlt noch die Antwort.' }
+  }
+
+  const eingabeVergleich = vergleichsform(getrimmt)
+  const akzeptiert = mengenAkzeptiert(wort, anzahl, mitIstSind)
+  if (akzeptiert.some((form) => vergleichsform(form) === eingabeVergleich)) {
+    return { ...basis, bewertung: 'richtig', fehlerart: 'keine', rueckmeldung: 'Richtig – die Zahlform passt zum Bild.' }
+  }
+
+  const getroffen = nomenGetroffen(getrimmt, wort)
+  const erwarteteForm = anzahl === 1 ? 'einzahl' : 'mehrzahl'
+
+  if (getroffen !== null && getroffen !== erwarteteForm) {
+    return {
+      ...basis,
+      bewertung: 'fast',
+      fehlerart: 'numerus',
+      rueckmeldung:
+        anzahl === 1
+          ? 'Im Bild liegt nur ein Stück. Dann steht das Wort in der Einzahl.'
+          : `Im Bild liegen ${zahlwort(anzahl)} Stück. Nach Zahlen über eins steht das Wort in der Mehrzahl.`,
+    }
+  }
+
+  if (getroffen === erwarteteForm) {
+    // Nomen und Zahlform stimmen - dann fehlt der Artikel bzw. das Zahlwort.
+    return {
+      ...basis,
+      bewertung: 'fast',
+      fehlerart: anzahl === 1 ? 'genus' : 'numerus',
+      rueckmeldung:
+        anzahl === 1
+          ? `Das Wort stimmt. Es fehlt noch der Artikel: der, die oder das ${wort.nomen}?`
+          : 'Das Wort stimmt. Schreibe die Anzahl davor – als Wort, nicht als Ziffer.',
+    }
+  }
+
+  if (istRechtschreibNah(eingabeVergleich, vergleichsform(erwartet))) {
+    return {
+      ...basis,
+      bewertung: 'fast',
+      fehlerart: 'rechtschreibung',
+      rueckmeldung: 'Fast! Schau dir die Schreibweise noch einmal an.',
+    }
+  }
+
+  return {
+    ...basis,
+    bewertung: 'falsch',
+    fehlerart: 'verstaendnis',
+    rueckmeldung: 'Zähle noch einmal, wie viele Stücke im Bild liegen.',
+  }
+}
+
+function bewerteMenge(antwort: Antwort, aufgabe: AufgabeMenge, ctx: GraderKontext): GraderErgebnis {
+  const werte = antwort.werte ?? []
+
+  const teile: TeilErgebnis[] = aufgabe.runden.map((runde, i) => {
+    const wort = findeWort(ctx.modul, runde.wortId)
+    if (!wort) {
+      throw new Error(`bewerteMenge: Wort "${runde.wortId}" fehlt im Modul "${ctx.modul.id}".`)
+    }
+    return { id: runde.id, ...bewerteMengeRunde(werte[i] ?? '', wort, runde.anzahl, aufgabe.mitIstSind) }
+  })
+
+  const anteil = anteilRichtig(teile)
+  const bewertung = bewertungAusAnteil(anteil)
+
+  return abschliessen({
+    bewertung,
+    fehlerart: mehrheitsFehlerart(teile),
+    punkte: anteil,
+    teile,
+    rueckmeldungKnapp:
+      bewertung === 'richtig'
+        ? 'Richtig! Einzahl und Mehrzahl passen überall zum Bild.'
+        : 'Noch nicht überall. Zähle die Gegenstände und prüfe die Zahlform.',
+    rueckmeldungReveal: aufgabe.loesungserklaerung,
+    aufgabe,
+    ctx,
+  })
+}
+
+// ---------------------------------------------------------------------------
+// heft - Schreibauftrag ins Heft, von der App bewusst NICHT bewertet
+// ---------------------------------------------------------------------------
+
+/**
+ * Deckt nie eine Loesung auf und vergibt nie "richtig".
+ *
+ * Der Auftrag verlangt einen selbst formulierten Satz. Ob der stimmt, haengt
+ * an Rechtschreibung, Satzbau und Inhalt zugleich - das beurteilt eine
+ * Lehrperson, nicht ein Vergleich mit einer Musterzeile. Die App quittiert
+ * daher nur, dass der Auftrag erledigt ist, und meldet ihn im
+ * Lehrkraft-Bereich als offen zur Korrektur.
+ */
+function bewerteHeft(antwort: Antwort, aufgabe: AufgabeHeft): GraderErgebnis {
+  const bestaetigt = antwort.wert === 'erledigt'
+
+  if (!bestaetigt) {
+    return {
+      bewertung: 'offen',
+      punkte: 0,
+      fehlerart: 'leer',
+      rueckmeldung: 'Schreibe den Auftrag zuerst in dein Heft und setze dann das Häkchen.',
+      nochmal: true,
+      loesungZeigen: false,
+    }
+  }
+
+  return {
+    bewertung: 'offen',
+    punkte: 0,
+    fehlerart: 'keine',
+    rueckmeldung:
+      aufgabe.heft === 'vokabelheft'
+        ? 'Erledigt. Deine Lehrerin oder dein Lehrer schaut sich dein Vokabelheft an.'
+        : 'Erledigt. Diesen Auftrag korrigiert deine Lehrerin oder dein Lehrer im Heft – die App zeigt dir hier keine Lösung.',
+    nochmal: false,
+    loesungZeigen: false,
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -617,5 +810,31 @@ export const artikelGrader: Grader = {
       throw new Error(`artikelGrader kann Aufgabe vom Typ "${aufgabe.typ}" nicht bewerten.`)
     }
     return Promise.resolve(bewerteArtikel(antwort, aufgabe, ctx))
+  },
+}
+
+export const mengeGrader: Grader = {
+  id: 'menge-deterministisch-v1',
+  art: 'deterministisch',
+  typ: 'menge',
+  bewerte: (antwort, aufgabe, ctx) => {
+    if (aufgabe.typ !== 'menge') {
+      throw new Error(`mengeGrader kann Aufgabe vom Typ "${aufgabe.typ}" nicht bewerten.`)
+    }
+    return Promise.resolve(bewerteMenge(antwort, aufgabe, ctx))
+  },
+}
+
+export const heftGrader: Grader = {
+  // "keine-bewertung" statt einer Versionsnummer: Der Name soll im
+  // Lehrkraft-Bereich sofort sagen, dass hier nichts automatisch bewertet wird.
+  id: 'heft-keine-bewertung-v1',
+  art: 'deterministisch',
+  typ: 'heft',
+  bewerte: (antwort, aufgabe) => {
+    if (aufgabe.typ !== 'heft') {
+      throw new Error(`heftGrader kann Aufgabe vom Typ "${aufgabe.typ}" nicht bewerten.`)
+    }
+    return Promise.resolve(bewerteHeft(antwort, aufgabe))
   },
 }

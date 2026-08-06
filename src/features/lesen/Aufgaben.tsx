@@ -14,6 +14,8 @@ import type { Aufgabe, Modul, Niveaustufe, Verstehensebene } from '@/content/typ
 import { aufgabeSichtbar } from '@/content/types'
 import { bewerte } from '@/grading'
 import type { Antwort, GraderErgebnis, GraderKontext } from '@/grading/types'
+import { Melde, MeldeZeichen } from '@/components/Melde'
+import { KlassenzimmerSzene, ObjektBild } from '@/features/wortbild'
 import { anfangsAntwort, Eingabe } from './aufgabentypen'
 
 // ---------------------------------------------------------------------------
@@ -26,6 +28,12 @@ export interface AufgabenProps {
   onErgebnis: (aufgabeId: string, ergebnis: GraderErgebnis, versuch: number, hilfeGenutzt: boolean) => void
   /** Absatz-ID hervorheben (Musterloesung), oder null zum Entfernen der Markierung. */
   onBelegZeigen: (absatzId: string | null) => void
+  /**
+   * Welche Aufgaben gelaufen werden. Ohne Angabe die Aufgaben zum Lesetext -
+   * der Grammatikbereich reicht hier die Aufgaben seines Themas herein und
+   * nutzt damit denselben Ablauf mit Versuchslogik, Hilfen und Abschluss.
+   */
+  aufgaben?: Aufgabe[]
 }
 
 interface VerlaufEintrag {
@@ -34,10 +42,11 @@ interface VerlaufEintrag {
 }
 
 export function Aufgaben(props: AufgabenProps): ReactElement {
-  const { modul, stufe, onErgebnis, onBelegZeigen } = props
+  const { modul, stufe, onErgebnis, onBelegZeigen, aufgaben } = props
+  const quelle = aufgaben ?? modul.aufgaben
   const sichtbar = useMemo(
-    () => modul.aufgaben.filter((aufgabe) => aufgabeSichtbar(aufgabe, stufe)),
-    [modul, stufe],
+    () => quelle.filter((aufgabe) => aufgabeSichtbar(aufgabe, stufe)),
+    [quelle, stufe],
   )
   const [index, setIndex] = useState(0)
   const [verlauf, setVerlauf] = useState<VerlaufEintrag[]>([])
@@ -128,7 +137,7 @@ function AufgabeLauf(props: AufgabeLaufProps): ReactElement {
   async function pruefen(): Promise<void> {
     if (wirdGeprueft || ergebnis !== null) return
     setWirdGeprueft(true)
-    const kontext: GraderKontext = { versuch, maxVersuche: MAX_VERSUCHE, stufe }
+    const kontext: GraderKontext = { versuch, maxVersuche: MAX_VERSUCHE, stufe, modul }
     const resultat = await bewerte(antwort, aufgabe, kontext)
     setWirdGeprueft(false)
     setErgebnis(resultat)
@@ -170,6 +179,8 @@ function AufgabeLauf(props: AufgabeLaufProps): ReactElement {
         {aufgabe.frage}
       </h3>
 
+      <Bildstuetze aufgabe={aufgabe} />
+
       <Eingabe aufgabe={aufgabe} modul={modul} antwort={antwort} onChange={setAntwort} gesperrt={gesperrt} onEnter={pruefen} />
 
       {offeneHilfen.length > 0 && (
@@ -208,15 +219,54 @@ function AufgabeLauf(props: AufgabeLaufProps): ReactElement {
 
       <div aria-live="polite">
         {ergebnis && (
-          <div ref={meldeRef} tabIndex={-1} className={`melde melde--${ergebnis.bewertung}`}>
-            <p>{ergebnis.rueckmeldung}</p>
-            {ergebnis.loesungZeigen && <Musterloesung aufgabe={aufgabe} ergebnis={ergebnis} />}
-          </div>
+          <Melde
+            bewertung={ergebnis.bewertung}
+            bereichRef={meldeRef}
+            fokussierbar
+            fuss={ergebnis.loesungZeigen ? <Musterloesung aufgabe={aufgabe} ergebnis={ergebnis} /> : undefined}
+          >
+            {ergebnis.rueckmeldung}
+          </Melde>
         )}
       </div>
     </div>
   )
 }
+
+// ---------------------------------------------------------------------------
+// Bildstuetze
+//
+// Zwei Formen, ein Zweck: dem Kind das Nachsehen erlauben, statt es aus dem
+// Gedaechtnis raten zu lassen. `bildObjekt` zeigt einen einzelnen Gegenstand
+// gross, `bildSzene` die ganze Tischplatte als Vorlage fuer eigene Saetze.
+// ---------------------------------------------------------------------------
+
+function Bildstuetze({ aufgabe }: { aufgabe: Aufgabe }): ReactElement | null {
+  if (aufgabe.bildObjekt) {
+    return (
+      <figure className="lesen__bildstuetze lesen__bildstuetze--objekt">
+        <ObjektBild wortId={aufgabe.bildObjekt} />
+      </figure>
+    )
+  }
+
+  if (aufgabe.bildSzene) {
+    return (
+      <figure className="lesen__bildstuetze lesen__bildstuetze--szene">
+        <KlassenzimmerSzene
+          aktiv={null}
+          gefunden={LEERE_MENGE}
+          interaktiv={false}
+          ausschnitt={aufgabe.bildSzene}
+        />
+      </figure>
+    )
+  }
+
+  return null
+}
+
+const LEERE_MENGE: ReadonlySet<string> = new Set()
 
 // ---------------------------------------------------------------------------
 // Musterloesung
@@ -239,15 +289,30 @@ function einzelLoesungText(aufgabe: Aufgabe): string {
 function Musterloesung(props: { aufgabe: Aufgabe; ergebnis: GraderErgebnis }): ReactElement {
   const { aufgabe, ergebnis } = props
 
+  // Letzte Sicherung: Bei Heft-Auftraegen darf hier NIE etwas aufgedeckt
+  // werden. Der Grader setzt loesungZeigen zwar ohnehin nicht - aber diese
+  // Regel ist zu wichtig, um an genau einer Stelle zu haengen.
+  if (aufgabe.imHeft) {
+    return (
+      <div className="stapel lesen__loesung">
+        <p className="lesen__loesung-titel">Wird im Heft korrigiert</p>
+        <p>{aufgabe.loesungserklaerung}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="stapel lesen__loesung">
       <p className="lesen__loesung-titel">Musterlösung</p>
       {ergebnis.teile ? (
         <ul className="lesen__loesung-liste">
           {ergebnis.teile.map((teil) => (
-            <li key={teil.id}>
-              <span className="lesen__loesung-erwartet">{teil.erwartet}</span>
-              <span>{teil.rueckmeldung}</span>
+            <li key={teil.id} className="lesen__loesung-eintrag">
+              <MeldeZeichen bewertung={teil.bewertung} />
+              <span>
+                <span className="lesen__loesung-erwartet">{teil.erwartet}</span>
+                <span>{teil.rueckmeldung}</span>
+              </span>
             </li>
           ))}
         </ul>
@@ -284,8 +349,14 @@ function Abschluss(props: { sichtbar: Aufgabe[]; verlauf: VerlaufEintrag[] }): R
     ueberschriftRef.current?.focus()
   }, [])
 
+  // Heft-Auftraege bleiben aus der Selbsteinschaetzung heraus: Die App hat sie
+  // nicht gesehen und kann daher nicht sagen, ob sie "sitzen". Sie erscheinen
+  // stattdessen als eigene Zeile - offen, bis eine Lehrperson daraufgeschaut hat.
+  const bewertbar = sichtbar.filter((aufgabe) => aufgabe.typ !== 'heft')
+  const offeneHeftauftraege = verlauf.filter((eintrag) => eintrag.aufgabe.typ === 'heft')
+
   const ebenenReihenfolge: Verstehensebene[] = []
-  for (const aufgabe of sichtbar) {
+  for (const aufgabe of bewertbar) {
     if (!ebenenReihenfolge.includes(aufgabe.ebene)) ebenenReihenfolge.push(aufgabe.ebene)
   }
 
@@ -293,7 +364,9 @@ function Abschluss(props: { sichtbar: Aufgabe[]; verlauf: VerlaufEintrag[] }): R
   const imUeben: Verstehensebene[] = []
 
   for (const ebene of ebenenReihenfolge) {
-    const eintraege = verlauf.filter((eintrag) => eintrag.aufgabe.ebene === ebene)
+    const eintraege = verlauf.filter(
+      (eintrag) => eintrag.aufgabe.typ !== 'heft' && eintrag.aufgabe.ebene === ebene,
+    )
     const sicher =
       eintraege.length > 0 && eintraege.every((eintrag) => eintrag.ergebnis.bewertung === 'richtig' && !eintrag.ergebnis.loesungZeigen)
     if (sicher) gemeistert.push(ebene)
@@ -305,6 +378,17 @@ function Abschluss(props: { sichtbar: Aufgabe[]; verlauf: VerlaufEintrag[] }): R
       <h3 ref={ueberschriftRef} tabIndex={-1}>
         Das hast du bei diesem Text geschafft
       </h3>
+
+      {offeneHeftauftraege.length > 0 && (
+        <div className="stapel">
+          <p className="lesen__abschluss-zwischentitel">Das schaut sich deine Lehrperson an:</p>
+          <ul>
+            {offeneHeftauftraege.map((eintrag) => (
+              <li key={eintrag.aufgabe.id}>{eintrag.aufgabe.frage}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {gemeistert.length > 0 && (
         <div className="stapel">

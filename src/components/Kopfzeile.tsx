@@ -12,7 +12,7 @@ import type { ReactElement } from 'react'
 import type { Niveaustufe } from '@/content/types'
 import { STUFEN_ORDNUNG } from '@/content/types'
 
-export type ModulAnsicht = 'wortbild' | 'lesen' | 'lehrkraft'
+export type ModulAnsicht = 'wortbild' | 'grammatik' | 'lesen' | 'lehrkraft'
 
 interface ReiterEintrag {
   ansicht: ModulAnsicht
@@ -21,6 +21,7 @@ interface ReiterEintrag {
 
 const REITER: ReiterEintrag[] = [
   { ansicht: 'wortbild', label: 'Bilder & Wörter' },
+  { ansicht: 'grammatik', label: 'Grammatik' },
   { ansicht: 'lesen', label: 'Lesen & Verstehen' },
   { ansicht: 'lehrkraft', label: 'Für Lehrkräfte' },
 ]

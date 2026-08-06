@@ -13,8 +13,10 @@ Diese Demo enthält zwei Module:
 | **Im Klassenzimmer** | Schulsachen, Genus | gezeichnete SVG-Szene |
 | **Auf dem Wochenmarkt** | Einkaufen, Plural (fünf Typen) | illustriertes Bild |
 
-Jedes hat sieben Lernwörter mit Artikel, acht beschriftete Stützwörter, einen
-kurzen Lesetext und sieben gestufte Aufgaben.
+**Im Klassenzimmer** hat 13 Lernwörter mit Artikel in drei Lernpaketen, acht
+beschriftete Stützwörter, zwei Grammatikthemen mit Hefteintrag, einen kurzen
+Lesetext, gestufte Aufgaben und Schreibaufträge fürs Heft. **Auf dem
+Wochenmarkt** ist das schlankere Vergleichsmodul mit sieben Lernwörtern.
 
 Inhalte sind in dieser Plattform **Daten**, keine Komponenten (siehe
 `src/content/types.ts`). Das zweite Modul ist der Beleg dafür: Es besteht aus
@@ -55,11 +57,20 @@ ansehen).
 Jede Entscheidung hier ist bewusst und steht ausführlicher in
 [`docs/DIDAKTIK.md`](docs/DIDAKTIK.md).
 
-- **7 Lernwörter statt 15.** Das Bild zeigt 15 beschriftete Gegenstände,
-  geprüft werden nur 7. Das Arbeitsgedächtnis von Kindern dieses Alters
-  verarbeitet vier bis sieben neue Einheiten gleichzeitig (Miller 1956;
-  Cognitive Load Theory). Die restlichen acht Wörter geben der Szene und dem
-  Lesetext Kontext, ohne das Arbeitsgedächtnis zu belasten.
+- **Höchstens fünf Wörter je Durchgang – portioniert statt gekürzt.** Das
+  Klassenzimmer-Bild zeigt 21 beschriftete Gegenstände, 13 davon sind
+  Lernwörter. Alle auf einmal abzufragen würde das Arbeitsgedächtnis
+  überlaufen lassen (vier bis sieben neue Einheiten, Miller 1956; Cognitive
+  Load Theory). Die Antwort darauf ist nicht, Wörter wegzulassen – Bleistift,
+  Zirkel und Geodreieck braucht ein Kind täglich –, sondern sie in
+  **Lernpakete** zu teilen: geübt wird paketweise, das Bild bleibt vollständig.
+  Die acht Stützwörter geben Szene und Lesetext Kontext und werden nie geprüft.
+- **Nicht alles passiert am Bildschirm.** Merktexte, Vokabeln und eigene Sätze
+  gehören ins Heft. Grammatikthemen beginnen mit einem **Hefteintrag**, der
+  abgeschrieben wird, bevor die App-Übungen freischalten. Selbst formulierte
+  Sätze bewertet die App **bewusst nicht** – sie meldet sie im
+  Lehrkraft-Bereich als „wartet auf Korrektur“. Was ein Kind selbst schreibt,
+  kann nur ein Mensch beurteilen.
 - **Artikel-Farbkodierung blau/rot/grün plus Formcodierung.** *der* = blau/Kreis,
   *die* = rot/Raute, *das* = grün/Quadrat. Der ausgeschriebene Artikel steht
   dabei immer zusätzlich als Text – Farbe ist nach WCAG 1.4.1 nie der einzige

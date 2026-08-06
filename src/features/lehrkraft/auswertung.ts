@@ -16,7 +16,7 @@
  */
 
 import { aufgabeSichtbar, istLernwort } from '@/content/types'
-import type { Modul } from '@/content/types'
+import type { Aufgabe, Modul } from '@/content/types'
 import type { Fehlerart } from '@/grading/types'
 import type { AufgabenStand, Auswertung, Lernstand } from '@/state/types'
 
@@ -49,12 +49,36 @@ function hatFehlversuch(stand: AufgabenStand): boolean {
 // Die Auswertung
 // ---------------------------------------------------------------------------
 
+/**
+ * Alle Aufgaben eines Moduls - aus dem Leseweg, aus den Grammatikthemen und
+ * die freistehenden Heftauftraege.
+ *
+ * Ohne diese Zusammenfuehrung wuerde die Auswertung nur den Lesetext kennen
+ * und behaupten, ein Kind habe nichts gemacht, das eine Stunde lang Grammatik
+ * geuebt hat.
+ */
+export function alleAufgaben(modul: Modul): Aufgabe[] {
+  return [
+    ...modul.aufgaben,
+    ...(modul.grammatik ?? []).flatMap((thema) => thema.aufgaben),
+    ...(modul.heftauftraege ?? []),
+  ]
+}
+
 export function berechneAuswertung(lernstand: Lernstand, modul: Modul): Auswertung {
   // Nur Aufgaben, die auf der aktuellen Niveaustufe ueberhaupt gestellt
   // werden - alles andere waere fuer dieses Kind in dieser Sitzung nicht
   // erreichbar und wuerde "gesamt" verzerren (siehe aufgabeSichtbar in
   // content/types.ts).
-  const sichtbareAufgaben = modul.aufgaben.filter((aufgabe) => aufgabeSichtbar(aufgabe, lernstand.stufe))
+  //
+  // Heft-Auftraege bleiben aussen vor: Sie sind nie "richtig" oder "falsch",
+  // sondern offen, bis eine Lehrperson hineingeschaut hat. Sie in Quoten
+  // einzurechnen wuerde jede Kennzahl darunter verfaelschen - sie stehen
+  // stattdessen als eigene Arbeitsliste (offeneHeftauftraege) daneben.
+  const alle = alleAufgaben(modul)
+  const sichtbareAufgaben = alle.filter(
+    (aufgabe) => aufgabe.typ !== 'heft' && aufgabeSichtbar(aufgabe, lernstand.stufe),
+  )
 
   // Nur Aufgaben mit mindestens einem Versuch zaehlen als "bearbeitet" -
   // eine leere AufgabenStand-Karteikarte (durch fruehere Anlage) ist kein
@@ -110,6 +134,11 @@ export function berechneAuswertung(lernstand: Lernstand, modul: Modul): Auswertu
     .filter((wort) => (lernstand.woerter[wort.id]?.artikelFalsch ?? 0) > 0)
     .map((wort) => wort.id)
 
+  const offeneHeftauftraege = alle
+    .filter((aufgabe) => aufgabe.typ === 'heft')
+    .filter((aufgabe) => (lernstand.aufgaben[aufgabe.id]?.versuche.length ?? 0) > 0)
+    .map((aufgabe) => aufgabe.id)
+
   return {
     bearbeitet,
     gesamt,
@@ -120,5 +149,6 @@ export function berechneAuswertung(lernstand: Lernstand, modul: Modul): Auswertu
     hilfenGenutzt,
     aufgeloest,
     genusUnsicher,
+    offeneHeftauftraege,
   }
 }

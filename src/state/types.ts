@@ -76,6 +76,15 @@ export interface Auswertung {
   aufgeloest: string[]
   /** Lernwoerter mit mindestens einem Genusfehler. */
   genusUnsicher: string[]
+  /**
+   * Schreibauftraege, die das Kind als erledigt gemeldet hat und die jetzt
+   * eine Lehrperson im Heft ansehen muss.
+   *
+   * Bewusst KEINE Kennzahl, sondern eine Arbeitsliste: Die App hat diese
+   * Texte nie gesehen: sie kann nicht sagen, ob sie stimmen, nur dass sie
+   * geschrieben wurden.
+   */
+  offeneHeftauftraege: string[]
 }
 
 export const LEERER_LERNSTAND = (modulId: string, stufe: Niveaustufe): Lernstand => ({

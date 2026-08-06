@@ -384,7 +384,14 @@
 .objektbild--raster img {
   display: block;
   min-inline-size: 0;
+  inline-size: auto;
+  block-size: auto;
   max-inline-size: 100%;
-  max-block-size: 100%;
+  /* `inherit` und nicht `100%`: Die Umgebung begrenzt die Hoehe auf dem
+     .objektbild-Element selbst (z. B. 3rem im Hefteintrag). Ein Flex-Container
+     reicht so eine Begrenzung aber NICHT an seine Kinder weiter - er wuerde
+     sie nur beschneiden. Ohne dieses `inherit` erscheinen die Bilder in voller
+     Aufloesung und schieben sich uebereinander. */
+  max-block-size: inherit;
   object-fit: contain;
 }

@@ -120,15 +120,22 @@
   line-height: var(--zeile-normal);
 }
 
-/* Alle Bildchen im Eintrag bleiben klein und ruhig - sie erklaeren den Satz,
-   sie sind nicht der Inhalt. */
+/* Die Bildchen im Eintrag ordnen sich dem Satz unter - aber sie muessen
+   erkennbar bleiben. Bei 3rem war eine Schere nur noch ein graues Kreuz;
+   das handschriftliche Vorbild zeigt sie deutlich groesser als die Zeile. */
 .hefteintrag__bild {
   display: block;
   max-inline-size: 100%;
 }
 
 .hefteintrag__bild .objektbild {
-  max-block-size: 3rem;
+  max-block-size: 4.5rem;
+}
+
+/* In der Regelzeile stehen die Bildchen neben laufendem Text und bleiben
+   deshalb kleiner als in den Beispielspalten. */
+.hefteintrag__regel-bild .objektbild {
+  max-block-size: 3.25rem;
 }
 
 /* --- Regelzeile mit Pfeil --- */

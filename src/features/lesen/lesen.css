@@ -745,3 +745,9 @@
   color: var(--t-leise);
   font-size: var(--s-xs);
 }
+
+/* Einzelbild zur Aufgabe: ohne obere Schranke wuerde ein Rasterbild die
+   halbe Aufgabenkarte fuellen. */
+.lesen__bildstuetze--objekt .objektbild {
+  max-block-size: 9rem;
+}

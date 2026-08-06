@@ -35,11 +35,14 @@ kaputt aussieht, und Wort für Wort umstellen ist ausdrücklich vorgesehen.
 | | |
 |---|---|
 | Format | PNG mit **transparentem** Hintergrund |
-| Kantenlänge | 1024 px, Objekt zentriert mit etwas Luft am Rand |
+| Kantenlänge | höchstens 512 px, Objekt formatfüllend mit schmalem Rand |
 | Dateiname | die Wortschatz-`id`, klein geschrieben: `radiergummi.png` |
 
 Transparenz ist nicht optional: Die App hat einen Dunkelmodus. Ein Bild mit
 eingebranntem hellem Hintergrund steht dort als weißer Kasten in der Karte.
+
+Angezeigt werden die Bilder mit 50 bis 100 px. 1024 px wären also die
+siebenfache Datenmenge für nichts – deshalb der Deckel bei 512 px.
 
 ## Farben sind Inhalt, nicht Geschmack
 
@@ -73,6 +76,30 @@ laufenden Umgebung gesperrt. Freizugeben ist genau:
 ```
 d8j0ntlcm91z4.cloudfront.net   (HTTPS, Port 443)
 ```
+
+## Freistellen und Beschneiden
+
+Die Generierung liefert Bilder mit flächigem Hintergrund und viel Luft
+ringsum. Beides räumt ein Skript weg:
+
+```
+pip install Pillow                                  # einmalig
+python3 werkzeuge/objektbilder-freistellen.py
+```
+
+Es arbeitet **in place** über alle PNG in diesem Ordner und macht drei Dinge:
+Hintergrund transparent, auf das Objekt beschneiden, auf 512 px verkleinern.
+Beim ersten Durchlauf hat das die sechzehn Bilder von 6,8 MB auf 1,2 MB
+gebracht.
+
+Freigestellt wird per **Flutfüllung von den Bildrändern aus**, nicht über
+„alle Pixel in Hintergrundfarbe". Der Unterschied ist wichtig: Der
+Heft-Umschlag ist fast weiß und die Geodreieck-Fläche sehr blass – eine reine
+Farbprüfung würde beide durchlöchern.
+
+Das Skript ist idempotent im praktischen Sinn: Ein zweiter Lauf über bereits
+freigestellte Bilder findet nichts mehr zu tun (der Rand ist schon
+transparent) und verkleinert nicht weiter.
 
 ## Erzeugung
 

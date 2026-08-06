@@ -18,9 +18,28 @@
  * Lauf.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+/**
+ * Laedt eine Datei ueber `curl` statt ueber `fetch`.
+ *
+ * Der Umweg hat einen konkreten Grund: In Node 22 ignoriert das eingebaute
+ * `fetch` die Proxy-Umgebungsvariablen (HTTPS_PROXY, NO_PROXY). Hinter einem
+ * Unternehmens- oder Agentenproxy scheitert es deshalb mit einem 403, das
+ * aussieht, als waere die Domain gesperrt - obwohl sie erreichbar ist. `curl`
+ * beachtet dieselben Variablen wie der Rest der Werkzeugkette und ist auf
+ * jedem System vorhanden, auf dem dieses Repository sinnvoll laeuft.
+ */
+function laden(url, ziel) {
+  execFileSync(
+    'curl',
+    ['--fail', '--location', '--silent', '--show-error', '--max-time', '120', '--output', ziel, url],
+    { stdio: ['ignore', 'ignore', 'pipe'] },
+  )
+}
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), '..')
 const ordner = join(wurzel, 'public', 'objekte')
@@ -42,13 +61,14 @@ for (const [wortId, url] of Object.entries(manifest.bilder)) {
   }
 
   try {
-    const antwort = await fetch(url)
-    if (!antwort.ok) throw new Error(`HTTP ${antwort.status}`)
-    writeFileSync(ziel, Buffer.from(await antwort.arrayBuffer()))
-    console.log(`✓ ${wortId}.png`)
+    laden(url, ziel)
+    const groesse = statSync(ziel).size
+    if (groesse < 1024) throw new Error(`nur ${groesse} Byte - vermutlich eine Fehlerseite`)
+    console.log(`✓ ${wortId}.png (${Math.round(groesse / 1024)} kB)`)
     geholt += 1
   } catch (ursache) {
-    fehler.push({ wortId, grund: ursache.message })
+    const meldung = (ursache.stderr?.toString() || ursache.message).trim()
+    fehler.push({ wortId, grund: meldung })
   }
 }
 

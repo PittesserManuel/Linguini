@@ -94,15 +94,32 @@ function bewertungAusAnteil(anteil: number): Bewertung {
 
 /**
  * Zusatzregel zur Rechtschreib-Toleranz, ueber die reine Editierdistanz
- * hinaus: Eine Verschreibung durch ERSETZUNG oder Buchstabendreher (gleiche
- * Wortlaenge) wird immer toleriert, wenn sie innerhalb der Schwelle liegt.
- * Eine Verschreibung durch eine zusaetzlich EINGEFUEGTE Buchstabe wird nur
- * toleriert, wenn diese Buchstabe einen bereits vorhandenen Nachbarn
- * verdoppelt (typischer Tippfehler, z. B. "Scheere" statt "Schere" - doppeltes
- * e). Eine eingefuegte, NICHT verdoppelte Buchstabe wird nicht toleriert,
- * weil daraus zufaellig ein anderes echtes Wort entstehen kann
- * (z. B. "Schwere" statt "Schere" - ein eingefuegtes w ist kein Doppellaut).
- * Lieber ein "fast" zu wenig als ein falsches "richtig".
+ * hinaus. Ersetzung und Buchstabendreher (gleiche Wortlaenge) werden immer
+ * toleriert, solange sie innerhalb der Schwelle liegen. Bei
+ * Laengenunterschieden kommt es auf die RICHTUNG an:
+ *
+ * Ein Kind hat einen Buchstaben ZU VIEL geschrieben ("Scheere", "Schwere").
+ *   Toleriert nur, wenn der zusaetzliche Buchstabe einen Nachbarn
+ *   verdoppelt. Sonst kann daraus zufaellig ein anderes echtes Wort
+ *   entstehen: "Schwere" ist nicht "Schere", und ein eingefuegtes w ist
+ *   kein Doppellaut.
+ *
+ * Ein Kind hat einen Buchstaben ZU WENIG geschrieben ("Bleistif").
+ *   Immer toleriert, solange die Schwelle haelt. Das Argument von oben
+ *   greift hier gar nicht: Wer Buchstaben WEGLAESST, trifft damit kein
+ *   anderes gemeintes Wort - und faende er eines, stuende es in der
+ *   akzeptiert-Liste und waere schon vorher als Treffer erkannt worden.
+ *
+ * Der verschluckte Endkonsonant ist bei DaZ-Lernenden einer der
+ * haeufigsten Schreibfehler ueberhaupt (Auslautverhaertung: gehoert wird
+ * "Bleistif", geschrieben wird "Bleistif"). Ihn als falsches Wort zu
+ * behandeln und das Kind zurueck auf die Wortsuche zu schicken, ist
+ * fachlich verkehrt: Das Wort war richtig, die Schreibung nicht.
+ *
+ * Die Toleranz verschenkt dabei nichts, denn "fast" ist nicht "richtig" -
+ * es gibt keine Punkte und das Kind muss die Aufgabe noch einmal loesen.
+ * Der Unterschied liegt allein in der Rueckmeldung: "Schau dir die
+ * Schreibweise an" statt "such das passende Wort".
  */
 function istPlausibleVerschreibung(eingabe: string, erwartet: string): boolean {
   if (eingabe === erwartet) return true
@@ -111,21 +128,32 @@ function istPlausibleVerschreibung(eingabe: string, erwartet: string): boolean {
   const laengendifferenz = eingabe.length - erwartet.length
   if (Math.abs(laengendifferenz) !== 1) return true
 
-  const laenger = laengendifferenz > 0 ? eingabe : erwartet
-  const kuerzer = laengendifferenz > 0 ? erwartet : eingabe
+  // Zu wenig geschrieben: siehe oben, immer plausibel.
+  if (laengendifferenz < 0) return true
 
-  for (let i = 0; i < laenger.length; i++) {
-    const ohneZeichenI = laenger.slice(0, i) + laenger.slice(i + 1)
-    if (ohneZeichenI !== kuerzer) continue
-    const zeichen = laenger[i]
-    const davor = laenger[i - 1]
-    const danach = laenger[i + 1]
-    if (zeichen === davor || zeichen === danach) {
+  // Zu viel geschrieben: nur die Verdopplung eines Nachbarn geht durch.
+  for (let i = 0; i < eingabe.length; i++) {
+    const ohneZeichenI = eingabe.slice(0, i) + eingabe.slice(i + 1)
+    if (ohneZeichenI !== erwartet) continue
+    const zeichen = eingabe[i]
+    if (zeichen === eingabe[i - 1] || zeichen === eingabe[i + 1]) {
       return true
     }
   }
 
   return false
+}
+
+/**
+ * Wohin die Rueckmeldung verweist, wenn das Wort nicht getroffen wurde.
+ *
+ * Im Bild-Wort-Bereich gibt es keinen Lesetext - der pauschale Satz "Schau
+ * noch einmal in den Text" schickte das Kind dort ins Leere.
+ */
+function suchhinweis(aufgabe: AufgabeFreitext): string {
+  return aufgabe.stuetze === 'bild'
+    ? 'Noch nicht ganz. Schau dir den eingerahmten Gegenstand noch einmal genau an.'
+    : 'Noch nicht ganz. Schau noch einmal in den Text und suche das passende Wort.'
 }
 
 /** Kombiniert Editierdistanz-Schwelle und Plausibilitaets-Zusatzregel. */
@@ -296,7 +324,7 @@ function bewerteFreitextMitArtikel(
     bewertung: 'falsch',
     fehlerart: 'verstaendnis',
     punkte: 0,
-    rueckmeldungKnapp: 'Noch nicht ganz. Schau noch einmal in den Text und suche das passende Wort.',
+    rueckmeldungKnapp: suchhinweis(aufgabe),
     rueckmeldungReveal: loesungReveal,
     aufgabe,
     ctx,
@@ -336,7 +364,7 @@ function bewerteFreitextOhneArtikel(
     bewertung: 'falsch',
     fehlerart: 'verstaendnis',
     punkte: 0,
-    rueckmeldungKnapp: 'Noch nicht ganz. Schau noch einmal in den Text und suche das passende Wort.',
+    rueckmeldungKnapp: suchhinweis(aufgabe),
     rueckmeldungReveal: loesungReveal,
     aufgabe,
     ctx,

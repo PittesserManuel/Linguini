@@ -365,6 +365,8 @@ function schreibAufgabe(wort: Wort): AufgabeFreitext {
     // ausgehebelt - siehe bewerteFreitext().
     akzeptiert: [wortMitArtikel(wort)],
     artikelPflicht: true,
+    // Hier gibt es keinen Lesetext, auf den man verweisen koennte.
+    stuetze: 'bild',
     platzhalter: 'zum Beispiel: das Buch',
     hilfen: [
       'Schau dir den eingerahmten Gegenstand genau an.',

@@ -358,6 +358,34 @@ describe('freitextGrader', () => {
     expect(ergebnis.bewertung).toBe('richtig')
   })
 
+  it('verschluckter Endkonsonant zaehlt als Verschreibung, nicht als falsches Wort', async () => {
+    // Auslautverhaertung: gehoert wird "Bleistif". Das Wort war richtig
+    // gemeint, nur die Schreibung nicht - das Kind gehoert nicht zurueck
+    // auf die Wortsuche geschickt.
+    const aufgabe = baueFreitextAufgabe({ akzeptiert: ['der Bleistift'], artikelPflicht: true })
+    const ergebnis = await freitextGrader.bewerte({ wert: 'der Bleistif' }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('fast')
+    expect(ergebnis.fehlerart).toBe('rechtschreibung')
+  })
+
+  it('ein zusaetzlicher, nicht verdoppelter Buchstabe bleibt unplausibel', async () => {
+    // Die Gegenrichtung darf sich NICHT mitlockern: "Schwere" ist ein
+    // anderes echtes Wort, kein Vertipper von "Schere".
+    const aufgabe = baueFreitextAufgabe({ akzeptiert: ['Schere'], artikelPflicht: false })
+    const ergebnis = await freitextGrader.bewerte({ wert: 'Schwere' }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('falsch')
+  })
+
+  it('Freitext am Bild verweist nicht auf einen Text, den es dort nicht gibt', async () => {
+    const aufgabe: AufgabeFreitext = {
+      ...baueFreitextAufgabe({ akzeptiert: ['der Bleistift'], artikelPflicht: true }),
+      stuetze: 'bild',
+    }
+    const ergebnis = await freitextGrader.bewerte({ wert: 'der Kleber' }, aufgabe, ctx(1))
+    expect(ergebnis.rueckmeldung).not.toContain('Text')
+    expect(ergebnis.rueckmeldung).toContain('Gegenstand')
+  })
+
   describe('"Schere"-Testreihe (Rechtschreib-Toleranz, ohne Artikel-Rauschen)', () => {
     const aufgabe = baueFreitextAufgabe({ akzeptiert: ['Schere'], artikelPflicht: false })
 

@@ -230,6 +230,15 @@ export interface AufgabeFreitext extends AufgabeBasis {
   artikelPflicht: boolean
   /** Platzhalter im Eingabefeld. */
   platzhalter: string
+  /**
+   * Wo das Kind die Antwort suchen soll, wenn es danebenliegt.
+   *
+   * Steuert nur den Verweis in der Rueckmeldung, nicht die Bewertung. Ohne
+   * Angabe gilt 'text', weil die meisten Freitextaufgaben zum Lesetext
+   * gehoeren. Im Bild-Wort-Bereich gibt es aber gar keinen Text - dort
+   * stand "Schau noch einmal in den Text" ueber einem Bild.
+   */
+  stuetze?: 'text' | 'bild'
 }
 
 /** Lueckentext mit vorgegebener Wortbank. */

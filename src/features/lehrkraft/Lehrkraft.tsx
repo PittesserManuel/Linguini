@@ -402,13 +402,27 @@ function AuswertungsAnsicht(props: { modul: Modul; lernstand: Lernstand }): Reac
   const { modul, lernstand } = props
   const auswertung = useMemo(() => berechneAuswertung(lernstand, modul), [lernstand, modul])
 
+  // Leerzustand: Statt nur zu melden, dass nichts da ist, sagt er, WAS hier
+  // stehen wird. Wer diesen Bereich zum ersten Mal oeffnet - typischerweise
+  // eine Lehrkraft, die die App bewertet -, sieht sonst eine leere Seite und
+  // schliesst daraus, dass es nichts zu sehen gibt.
   if (auswertung.bearbeitet === 0) {
     return (
-      <div className="karte karte--ruhig lehrkraft__leerzustand">
+      <div className="karte lehrkraft__leerzustand stapel">
         <h3>Noch keine Auswertung</h3>
         <p>
-          Für dieses Modul liegen noch keine bearbeiteten Aufgaben vor. Die Auswertung erscheint hier
-          automatisch, sobald die erste Aufgabe abgeschlossen ist.
+          Für dieses Modul liegen noch keine bearbeiteten Aufgaben vor. Sobald die erste Aufgabe
+          abgeschlossen ist, steht hier:
+        </p>
+        <ul className="lehrkraft__leerzustand-liste">
+          <li>der Bearbeitungsstand über alle Aufgaben dieses Lernwegs,</li>
+          <li>das Fehlerprofil – nicht „wie viel Prozent“, sondern welche Fehlerart überwiegt,</li>
+          <li>die Selbstkorrekturquote: Was wurde nach einem Fehlversuch selbst richtiggestellt?</li>
+          <li>die Lernwörter, bei denen der Artikel noch unsicher sitzt,</li>
+          <li>die Schreibaufträge, die auf Ihre Korrektur im Heft warten.</li>
+        </ul>
+        <p className="lehrkraft__leerzustand-hinweis">
+          Die Daten entstehen ausschließlich in diesem Browser und verlassen das Gerät nicht.
         </p>
       </div>
     )

@@ -222,6 +222,15 @@
   pointer-events: auto;
 }
 
+/* Die Zustandsfarben AUF der Szene sind festgenagelt, nicht aus tokens.css:
+   Die Illustration ist in beiden Farbschemata hell (siehe Szene.tsx). Ein
+   Rahmen, der im Dunkelmodus mit aufhellt, waere darauf unsichtbar. */
+.wortbild__rahmen {
+  --szene-rahmen: #23201c;
+  --szene-treffer: #2e7d52;
+  --szene-daneben: #a8443c;
+}
+
 /* Schreiben: aktiv = der GESUCHTE Gegenstand. Hier wird die Zielflaeche
    sichtbar und rahmt ihn ein - das ist die Aufgabenstellung, nicht Deko.
    Ein Rechteck statt eines Schlagschattens, weil es unmissverstaendlich
@@ -230,30 +239,30 @@
    (Tafel) sichtbar bleibt. */
 .wortbild__rahmen[data-modus='schreiben'] .szene__objekt.ist-aktiv .szene__ziel {
   rx: 12px;
-  fill: var(--f-karte);
+  fill: #ffffff;
   fill-opacity: 0.14;
-  stroke: var(--t-stark);
+  stroke: var(--szene-rahmen);
   stroke-width: 5;
   paint-order: stroke;
 }
 
 .wortbild__rahmen[data-modus='schreiben'] .szene__objekt.ist-aktiv {
-  filter: drop-shadow(0 0 2px var(--f-karte));
+  filter: drop-shadow(0 0 2px #ffffff);
 }
 
 /* Zuordnen: aktiv = zuletzt FALSCH angeklicktes Objekt - roter Umriss statt
    Schlagschatten. Kein Wackeln (prefers-reduced-motion gilt fuer alle
    Bewegung, hier ist ohnehin keine - nur ein Filterwechsel). */
 .wortbild__rahmen[data-modus='zuordnen'] .szene__objekt.ist-aktiv {
-  filter: drop-shadow(1.5px 0 0 var(--r-falsch)) drop-shadow(-1.5px 0 0 var(--r-falsch))
-    drop-shadow(0 1.5px 0 var(--r-falsch)) drop-shadow(0 -1.5px 0 var(--r-falsch));
+  filter: drop-shadow(1.5px 0 0 var(--szene-daneben)) drop-shadow(-1.5px 0 0 var(--szene-daneben))
+    drop-shadow(0 1.5px 0 var(--szene-daneben)) drop-shadow(0 -1.5px 0 var(--szene-daneben));
 }
 
 /* Zuordnen und Schreiben: gefunden = bereits geschafftes Lernwort - bleibt
    dauerhaft mit gruenem Umriss markiert. */
 .szene__objekt.ist-gefunden {
-  filter: drop-shadow(2px 0 0 var(--r-richtig)) drop-shadow(-2px 0 0 var(--r-richtig))
-    drop-shadow(0 2px 0 var(--r-richtig)) drop-shadow(0 -2px 0 var(--r-richtig));
+  filter: drop-shadow(2px 0 0 var(--szene-treffer)) drop-shadow(-2px 0 0 var(--szene-treffer))
+    drop-shadow(0 2px 0 var(--szene-treffer)) drop-shadow(0 -2px 0 var(--szene-treffer));
 }
 
 /* Entdecken: sobald ein Objekt aktiv ist, alle anderen dezent abdunkeln -
@@ -387,11 +396,24 @@
  * dem Bild, statt auf engem Raum zu ueberlappen.
  * --------------------------------------------------------------------- */
 @media (max-width: 900px) {
+  /* Das Bild bleibt beim Durchscrollen der Liste stehen. Ohne das war der
+     Kern des Bereichs auf dem Handy verloren: Wer bei "Papierkorb" ganz
+     unten in der Liste tippt, hat das Bild laengst aus dem Blick - und
+     "Klicke auf ein Wort ODER auf einen Gegenstand im Bild" wird zur
+     leeren Behauptung. So sieht man, welcher Gegenstand aufleuchtet. */
+  .wortbild__rahmen {
+    position: sticky;
+    top: var(--r-3);
+    z-index: 1;
+  }
+
   .wortbild__beschriftungen {
     position: static;
     inset: auto;
-    display: flex;
-    flex-direction: column;
+    /* Zweispaltig: Einundzwanzig Woerter untereinander sind drei
+       Bildschirmlaengen Vokabelliste. Nebeneinander ist es eine. */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
     gap: var(--r-2);
     margin-block-start: var(--r-4);
     pointer-events: auto;
@@ -422,10 +444,32 @@
 }
 
 @media (max-width: 640px) {
+  /*
+   * Auf dem Handy holt sich das Bild den Seitenrand zurueck.
+   *
+   * Grund ist nicht Optik, sondern Trefferflaeche: Bei 390 px Bildschirm
+   * blieben dem Bild 342 px, und das Lineal war damit 21 px hoch - unter
+   * den 24 px, die WCAG 2.5.8 als Mindestmass fuer ein Ziel nennt. Mit den
+   * vollen 390 px sind es 24 px. Vierzehn Prozent klingen nach wenig, hier
+   * entscheiden sie ueber treffen und danebentippen.
+   *
+   * Der negative Rand ist genau der Innenabstand von .inhalt, deshalb
+   * derselbe Token - und kein 100vw-Kniff, der bei sichtbarer
+   * Bildlaufleiste waagrecht ueberliefe.
+   */
+  .wortbild__rahmen {
+    /* Ohne dies bleibt es bei width: 100% aus der Grundregel - der negative
+       Rand schoebe den Kasten dann nur nach links, statt ihn zu verbreitern. */
+    inline-size: auto;
+    margin-inline: calc(-1 * var(--r-5));
+    border-inline-width: 0;
+    border-radius: 0;
+  }
+
   .wortkarte {
-    width: 100vw;
-    max-height: 100vh;
-    height: 100vh;
+    inline-size: 100vw;
+    max-block-size: 100dvh;
+    block-size: 100dvh;
     border-radius: 0;
   }
 

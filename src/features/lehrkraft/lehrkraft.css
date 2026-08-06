@@ -157,8 +157,25 @@
 /* ---------------------------------------------------------------------
  * Reiter 3: Auswertung
  * --------------------------------------------------------------------- */
+/* Linksbuendig wie alles andere im Bereich: Eine zentrierte Karte mitten in
+   einer sonst linksbuendigen Oberflaeche liest sich wie ein Fehlerdialog.
+   Sie soll aber sagen "hier kommt gleich etwas", nicht "hier ist etwas
+   schiefgegangen". */
 .lehrkraft__leerzustand {
-  text-align: center;
+  max-inline-size: var(--breite-schmal);
+}
+
+.lehrkraft__leerzustand-liste {
+  display: grid;
+  gap: var(--r-2);
+  margin: 0;
+  padding-inline-start: var(--r-5);
+  color: var(--t-normal);
+}
+
+.lehrkraft__leerzustand-hinweis {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
 }
 
 .lehrkraft__fortschritt-text {

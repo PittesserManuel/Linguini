@@ -67,7 +67,7 @@ html {
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--f-papier);
   color: var(--t-normal);
   font-family: var(--schrift-text);

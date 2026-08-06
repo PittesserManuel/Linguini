@@ -175,6 +175,16 @@ export default function App(): ReactElement {
           <main id="inhalt" className="hauptbereich inhalt">
             <Start module={MODULE} onModulStarten={starteModul} />
           </main>
+          {/* Nur der Hinweis, ohne Schalter: Auf der Startseite gibt es noch
+              keinen Lernstand zu speichern oder zu loeschen - die Zusage
+              "keine Daten, kein Konto, keine Cookies" gehoert aber genau
+              hierher, wo man zuerst landet. */}
+          <Fusszeile
+            nurHinweis
+            speichernAktiv={false}
+            onSpeichernUmschalten={() => undefined}
+            onLernstandLoeschen={() => undefined}
+          />
         </>
       ) : (
         <ModulSitzung key={modul.id} modul={modul} ansicht={ansicht} onAnsichtWechseln={setAnsicht} />

@@ -2,7 +2,7 @@ import type { Modul } from './types'
 import { klassenzimmerJahrgaenge, textMs2 } from './klassenzimmer-jahrgaenge'
 
 /**
- * Demo-Modul "Im Klassenzimmer" - Deutsch als Zweitsprache, A2, Klasse 3/4.
+ * Demo-Modul "Im Klassenzimmer" - Deutsch als Zweitsprache, A2, Mittelschule.
  *
  * Redaktionelle Grundsatzentscheidungen (bewusst, mit Begruendung):
  *
@@ -39,7 +39,7 @@ export const modulKlassenzimmer: Modul = {
   titel: 'Im Klassenzimmer',
   untertitel: 'Wortschatz und Lesen rund um den Schultag',
   niveau: 'A2',
-  jahrgang: 'Klasse 3/4',
+  jahrgang: '1. bis 4. Klasse Mittelschule',
   dauerMinuten: 25,
 
   szene: { art: 'svg', komponente: 'klassenzimmer' },

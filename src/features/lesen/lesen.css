@@ -27,9 +27,16 @@
   .lesen__text-spalte {
     position: sticky;
     top: var(--r-5);
-    max-height: calc(100vh - var(--r-6));
+    /* dvh statt vh: Bei vh springt das Layout, sobald ein mobiler Browser
+       seine Adressleiste ein- oder ausblendet. */
+    max-block-size: calc(100dvh - var(--r-6));
     overflow-y: auto;
-    padding-right: var(--r-3);
+    padding-inline-end: var(--r-3);
+    /* Der Text laeuft am unteren Rand weich aus, statt hart abzuschneiden.
+       Das ist der einzige Hinweis darauf, dass die Spalte weitergeht -
+       eine Bildlaufleiste erscheint erst beim Scrollen und auf Trackpads
+       gar nicht. */
+    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--r-6)), transparent 100%);
   }
 }
 

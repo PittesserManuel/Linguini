@@ -27,7 +27,7 @@ export function Start(props: StartProps): ReactElement {
             <span className="chip">Niveau A2</span>
           </li>
           <li>
-            <span className="chip">Klasse 3/4</span>
+            <span className="chip">Mittelschule, 10 bis 14 Jahre</span>
           </li>
           <li>
             <span className="chip">Deutsch als Zweitsprache</span>
@@ -39,9 +39,9 @@ export function Start(props: StartProps): ReactElement {
         <article className="karte stapel">
           <h2>So lernt das Kind</h2>
           <p>
-            Das Kind entdeckt sieben neue Wörter direkt im Bild – jedes mit Artikel und Farbe. Danach liest es eine
-            kurze Geschichte und löst dazu Aufgaben, die mit der gewählten Stufe mitwachsen. Es gibt keine Punkte
-            oder Sternchen, nur ehrliches Feedback zur Aufgabe.
+            Das Kind entdeckt neue Wörter direkt im Bild – jedes mit Artikel und Farbe. Geübt wird portionsweise,
+            höchstens fünf Wörter auf einmal. Danach liest es eine Geschichte in der Fassung seines Jahrgangs und
+            löst dazu Aufgaben. Es gibt keine Punkte und keine Sternchen, nur ehrliches Feedback zur Aufgabe.
           </p>
         </article>
 

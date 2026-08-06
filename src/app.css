@@ -19,7 +19,7 @@
 
 #root {
   display: flex;
-  min-height: 100vh;
+  min-height: 100dvh;
   flex-direction: column;
 }
 
@@ -251,9 +251,20 @@
   max-width: var(--breite-inhalt);
 }
 
+/* Die Startseite ist die einzige Stelle mit Anspruch auf Praesenz - hier
+   darf die Marke gross stehen. Negative Laufweite, weil die Anzeigeschrift
+   bei dieser Groesse sonst auseinanderfaellt. */
+.start__kopf h1 {
+  font-size: var(--s-display);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
 .start__unterzeile {
-  color: var(--t-leise);
+  max-width: 34rem;
+  color: var(--t-normal);
   font-size: var(--s-lg);
+  text-wrap: balance;
 }
 
 .start__chips {
@@ -265,10 +276,20 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--r-5);
+  /* Ohne dies zieht das Raster alle drei Karten auf die Hoehe der laengsten.
+     Die kuerzeste bekam dadurch fast eine Textzeile Leerraum unter sich -
+     das sah nach vergessenem Inhalt aus, nicht nach Absicht. */
+  align-items: start;
 }
 
 .start__karten h2 {
   font-size: var(--s-h3);
+  /* Von den drei Ueberschriften bricht nur "Was Lehrkraefte bekommen" auf
+     zwei Zeilen um. Dadurch begann der Text dieser Karte eine Zeile tiefer
+     als links und rechts daneben - bei Karten, die nebeneinander stehen,
+     faellt genau so ein Versatz auf. Zwei Zeilen sind deshalb reserviert,
+     solange die Karten nebeneinander stehen. */
+  min-block-size: calc(2 * 1lh);
 }
 
 .start__einstieg {
@@ -289,6 +310,12 @@
 @media (max-width: 640px) {
   .start__karten {
     grid-template-columns: 1fr;
+  }
+
+  /* Untereinander gibt es keinen Nachbarn, an dem sich etwas ausrichten
+     muesste - die reservierte zweite Zeile waere nur ein Loch. */
+  .start__karten h2 {
+    min-block-size: 0;
   }
 }
 
@@ -313,6 +340,13 @@
 
 .start__modulkarte {
   flex: 1;
+}
+
+/* Die Modulkarten haben unterschiedlich lange Untertitel. Ohne diese Regel
+   sitzen die beiden Startknoepfe auf verschiedenen Hoehen und die Reihe
+   wirkt schief. */
+.start__modulkarte > div:last-child {
+  margin-block-start: auto;
 }
 
 .start__modulkarte h3 {

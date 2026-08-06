@@ -14,10 +14,20 @@ export interface FusszeileProps {
   speichernAktiv: boolean
   onSpeichernUmschalten: (aktiv: boolean) => void
   onLernstandLoeschen: () => void
+  /**
+   * Nur den Datenschutzhinweis zeigen, ohne Schalter und Loeschknopf.
+   *
+   * Fuer die Startseite: Dort gibt es noch keinen Lernstand, den man
+   * speichern oder loeschen koennte - der HINWEIS gehoert aber trotzdem
+   * dorthin. "Keine Daten, kein Konto, keine Cookies" ist das erste
+   * Argument, das eine Schule hoeren will, und es stand bisher ausgerechnet
+   * auf der Seite nicht, auf der man zuerst landet.
+   */
+  nurHinweis?: boolean
 }
 
 export function Fusszeile(props: FusszeileProps): ReactElement {
-  const { speichernAktiv, onSpeichernUmschalten, onLernstandLoeschen } = props
+  const { speichernAktiv, onSpeichernUmschalten, onLernstandLoeschen, nurHinweis } = props
   const [meldung, setMeldung] = useState<string | null>(null)
 
   function umschalten(aktiv: boolean): void {
@@ -37,20 +47,22 @@ export function Fusszeile(props: FusszeileProps): ReactElement {
   return (
     <footer className="fuss">
       <div className="fuss__inhalt inhalt stapel">
-        <div className="fuss__datenschutz reihe reihe--gestapelt">
-          <label className="fuss__schalter">
-            <input
-              type="checkbox"
-              checked={speichernAktiv}
-              onChange={(ereignis) => umschalten(ereignis.target.checked)}
-            />
-            Fortschritt in diesem Browser speichern
-          </label>
+        {!nurHinweis && (
+          <div className="fuss__datenschutz reihe reihe--gestapelt">
+            <label className="fuss__schalter">
+              <input
+                type="checkbox"
+                checked={speichernAktiv}
+                onChange={(ereignis) => umschalten(ereignis.target.checked)}
+              />
+              Fortschritt in diesem Browser speichern
+            </label>
 
-          <button type="button" className="knopf knopf--zweit" onClick={loeschen}>
-            Lernstand löschen
-          </button>
-        </div>
+            <button type="button" className="knopf knopf--zweit" onClick={loeschen}>
+              Lernstand löschen
+            </button>
+          </div>
+        )}
 
         <p className="fuss__hinweis">
           Voreinstellung: aus. Es werden keine personenbezogenen Daten erhoben – kein Name, kein Konto, keine

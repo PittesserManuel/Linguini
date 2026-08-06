@@ -16,9 +16,10 @@
  * laufen.
  *
  * Stil: flaechige Vektor-Illustration, keine Fotos, keine Emojis, keine
- * Menschen. Farben ausschliesslich ueber CSS-Variablen - die vorhandenen
- * Tokens aus tokens.css sowie eine kleine, am Wurzel-<svg> gesetzte Palette
- * fuer Farbtoene, die tokens.css nicht kennt (Holz, Metall, Himmel, ...).
+ * Menschen. Farben ausschliesslich ueber eine EIGENE, am Wurzel-<svg>
+ * gesetzte Palette (siehe SZENEN_PALETTE) - kein Token aus tokens.css. Die
+ * Szene macht den Dunkelmodus damit bewusst nicht mit: Ein gezeichneter Raum
+ * wechselt nicht die Tageszeit, weil jemand sein Betriebssystem umstellt.
  *
  * Zustaende (aktiv/gefunden) wirken NUR ueber CSS-Klassen; die Optik dazu
  * lebt in wortbild.css. Diese Datei setzt bewusst kein <style> und keine
@@ -204,8 +205,8 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     zeichnung: () => (
       <>
         <rect x="-282" y="-158" width="564" height="306" rx="12" fill="var(--szene-holz-dunkel)" />
-        <rect x="-262" y="-140" width="524" height="250" rx="6" fill="var(--m-petrol-tief)" />
-        <rect x="-262" y="76" width="524" height="34" rx="4" fill="var(--f-dunkel)" opacity="0.25" />
+        <rect x="-262" y="-140" width="524" height="250" rx="6" fill="var(--szene-tafel)" />
+        <rect x="-262" y="76" width="524" height="34" rx="4" fill="var(--szene-tinte)" opacity="0.25" />
         <text
           x="0"
           y="52"
@@ -213,14 +214,14 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
           fontFamily="var(--schrift-anzeige)"
           fontStyle="italic"
           fontSize="58"
-          fill="var(--t-invers)"
+          fill="var(--szene-kreide)"
         >
           Willkommen
         </text>
         <path
           d="M -150 86 Q -40 98 60 82 T 150 78"
           fill="none"
-          stroke="var(--t-invers)"
+          stroke="var(--szene-kreide)"
           strokeWidth="3"
           opacity="0.8"
           strokeLinecap="round"
@@ -236,7 +237,7 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     ziel: { breite: 140, hoehe: 140 },
     zeichnung: () => (
       <>
-        <circle r="56" fill="var(--f-karte)" stroke="var(--szene-holz-dunkel)" strokeWidth="6" />
+        <circle r="56" fill="var(--szene-weiss)" stroke="var(--szene-holz-dunkel)" strokeWidth="6" />
         <path
           d="M -46 20 A 46 46 0 0 0 46 20"
           fill="none"
@@ -251,7 +252,7 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
             y1="-56"
             x2="0"
             y2="-46"
-            stroke="var(--t-stark)"
+            stroke="var(--szene-tinte)"
             strokeWidth="4"
             strokeLinecap="round"
             transform={`rotate(${winkel})`}
@@ -262,7 +263,7 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
           y1="0"
           x2="0"
           y2="-26"
-          stroke="var(--t-stark)"
+          stroke="var(--szene-tinte)"
           strokeWidth="5"
           strokeLinecap="round"
           transform="rotate(245)"
@@ -272,12 +273,12 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
           y1="0"
           x2="0"
           y2="-40"
-          stroke="var(--t-stark)"
+          stroke="var(--szene-tinte)"
           strokeWidth="3.5"
           strokeLinecap="round"
           transform="rotate(60)"
         />
-        <circle r="6" fill="var(--t-stark)" />
+        <circle r="6" fill="var(--szene-tinte)" />
       </>
     ),
   },
@@ -303,11 +304,11 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     zeichnung: () => (
       <>
         <path d="M -28 -60 Q 0 -84 28 -60" fill="none" stroke="var(--szene-holz-dunkel)" strokeWidth="9" strokeLinecap="round" />
-        <rect x="-80" y="-58" width="160" height="115" rx="24" fill="var(--m-petrol)" />
-        <rect x="-80" y="37" width="160" height="20" rx="10" fill="var(--m-petrol-tief)" opacity="0.55" />
-        <rect x="-58" y="-8" width="116" height="55" rx="14" fill="var(--m-petrol-tief)" />
-        <rect x="-46" y="-50" width="10" height="95" fill="var(--m-ocker)" />
-        <rect x="36" y="-50" width="10" height="95" fill="var(--m-ocker)" />
+        <rect x="-80" y="-58" width="160" height="115" rx="24" fill="var(--szene-petrol)" />
+        <rect x="-80" y="37" width="160" height="20" rx="10" fill="var(--szene-tafel)" opacity="0.55" />
+        <rect x="-58" y="-8" width="116" height="55" rx="14" fill="var(--szene-tafel)" />
+        <rect x="-46" y="-50" width="10" height="95" fill="var(--szene-ocker)" />
+        <rect x="36" y="-50" width="10" height="95" fill="var(--szene-ocker)" />
         <rect x="-49" y="6" width="16" height="10" rx="2" fill="var(--szene-metall)" />
         <rect x="33" y="6" width="16" height="10" rx="2" fill="var(--szene-metall)" />
       </>
@@ -330,7 +331,7 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
           stroke="var(--szene-holz-dunkel)"
           strokeWidth="3"
         />
-        <rect x="-78" y="30" width="156" height="16" rx="4" fill="var(--t-stark)" opacity="0.12" />
+        <rect x="-78" y="30" width="156" height="16" rx="4" fill="var(--szene-tinte)" opacity="0.12" />
         <rect x="-22" y="6" width="44" height="14" rx="7" fill="var(--szene-metall-dunkel)" />
       </>
     ),
@@ -341,20 +342,20 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     skalierung: 1.25,
     zeichnung: () => (
       <>
-        <path d="M -55 -55 L 55 -55 L 40 65 L -40 65 Z" fill="var(--m-petrol)" />
-        <path d="M -40 30 L 40 30 L 32 65 L -32 65 Z" fill="var(--m-petrol-tief)" opacity="0.55" />
-        <line x1="-30" y1="-50" x2="-22" y2="60" stroke="var(--m-petrol-tief)" strokeWidth="3" opacity="0.5" />
-        <line x1="0" y1="-50" x2="0" y2="62" stroke="var(--m-petrol-tief)" strokeWidth="3" opacity="0.5" />
-        <line x1="30" y1="-50" x2="22" y2="60" stroke="var(--m-petrol-tief)" strokeWidth="3" opacity="0.5" />
-        <rect x="-60" y="-64" width="120" height="16" rx="6" fill="var(--m-petrol-tief)" />
+        <path d="M -55 -55 L 55 -55 L 40 65 L -40 65 Z" fill="var(--szene-petrol)" />
+        <path d="M -40 30 L 40 30 L 32 65 L -32 65 Z" fill="var(--szene-tafel)" opacity="0.55" />
+        <line x1="-30" y1="-50" x2="-22" y2="60" stroke="var(--szene-tafel)" strokeWidth="3" opacity="0.5" />
+        <line x1="0" y1="-50" x2="0" y2="62" stroke="var(--szene-tafel)" strokeWidth="3" opacity="0.5" />
+        <line x1="30" y1="-50" x2="22" y2="60" stroke="var(--szene-tafel)" strokeWidth="3" opacity="0.5" />
+        <rect x="-60" y="-64" width="120" height="16" rx="6" fill="var(--szene-tafel)" />
         <path
           d="M -20 -64 C -26 -84 -10 -92 4 -82 C 18 -92 30 -78 22 -64 C 10 -70 -8 -70 -20 -64 Z"
           fill="var(--szene-papier)"
-          stroke="var(--f-rand-stark)"
+          stroke="var(--szene-linie)"
           strokeWidth="1.5"
         />
-        <line x1="-10" y1="-76" x2="4" y2="-68" stroke="var(--f-rand-stark)" strokeWidth="1" />
-        <line x1="10" y1="-80" x2="0" y2="-70" stroke="var(--f-rand-stark)" strokeWidth="1" />
+        <line x1="-10" y1="-76" x2="4" y2="-68" stroke="var(--szene-linie)" strokeWidth="1" />
+        <line x1="10" y1="-80" x2="0" y2="-70" stroke="var(--szene-linie)" strokeWidth="1" />
       </>
     ),
   },
@@ -368,10 +369,10 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     zeichnung: () => (
       <>
         <rect x="-58" y="-34" width="124" height="76" rx="6" fill="var(--szene-papier)" />
-        <rect x="-65" y="-42" width="120" height="76" rx="6" fill="var(--m-ocker)" />
+        <rect x="-65" y="-42" width="120" height="76" rx="6" fill="var(--szene-ocker)" />
         <rect x="-65" y="-42" width="14" height="76" rx="6" fill="var(--szene-holz-dunkel)" opacity="0.7" />
-        <rect x="-38" y="-14" width="70" height="6" rx="3" fill="var(--m-ocker-hell)" />
-        <rect x="-38" y="2" width="50" height="6" rx="3" fill="var(--m-ocker-hell)" />
+        <rect x="-38" y="-14" width="70" height="6" rx="3" fill="var(--szene-ocker-hell)" />
+        <rect x="-38" y="2" width="50" height="6" rx="3" fill="var(--szene-ocker-hell)" />
       </>
     ),
   },
@@ -382,13 +383,13 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     skalierung: 1.45,
     zeichnung: () => (
       <>
-        <rect x="-55" y="-40" width="110" height="80" rx="4" fill="var(--szene-papier)" stroke="var(--f-rand-stark)" strokeWidth="2" />
-        <rect x="-55" y="28" width="110" height="12" fill="var(--f-rand-stark)" opacity="0.4" />
-        <rect x="-55" y="-40" width="16" height="80" fill="var(--m-petrol)" />
+        <rect x="-55" y="-40" width="110" height="80" rx="4" fill="var(--szene-papier)" stroke="var(--szene-linie)" strokeWidth="2" />
+        <rect x="-55" y="28" width="110" height="12" fill="var(--szene-linie)" opacity="0.4" />
+        <rect x="-55" y="-40" width="16" height="80" fill="var(--szene-petrol)" />
         {[-16, 0, 16].map((y) => (
-          <line key={y} x1="-28" y1={y} x2="44" y2={y} stroke="var(--f-rand)" strokeWidth="2" />
+          <line key={y} x1="-28" y1={y} x2="44" y2={y} stroke="var(--szene-linie-hell)" strokeWidth="2" />
         ))}
-        <rect x="-6" y="-30" width="50" height="18" rx="3" fill="none" stroke="var(--f-rand-stark)" strokeWidth="1.5" />
+        <rect x="-6" y="-30" width="50" height="18" rx="3" fill="none" stroke="var(--szene-linie)" strokeWidth="1.5" />
       </>
     ),
   },
@@ -443,9 +444,9 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     zeichnung: () => (
       <>
         <rect x="-35" y="-26" width="70" height="52" rx="10" fill="var(--szene-lila)" />
-        <rect x="-35" y="14" width="70" height="12" rx="6" fill="var(--t-stark)" opacity="0.16" />
+        <rect x="-35" y="14" width="70" height="12" rx="6" fill="var(--szene-tinte)" opacity="0.16" />
         <circle cx="0" cy="-2" r="15" fill="var(--szene-metall-dunkel)" />
-        <circle cx="0" cy="-2" r="9" fill="var(--f-dunkel)" />
+        <circle cx="0" cy="-2" r="9" fill="var(--szene-tinte)" />
         <path d="M 9 -11 L 20 -15 L 22 -6 L 11 -3 Z" fill="var(--szene-metall)" stroke="var(--szene-metall-dunkel)" strokeWidth="1" />
       </>
     ),
@@ -460,7 +461,7 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
         <line x1="-4" y1="4" x2="-16" y2="34" stroke="var(--szene-metall-dunkel)" strokeWidth="8" strokeLinecap="round" />
         <line x1="4" y1="4" x2="16" y2="34" stroke="var(--szene-metall-dunkel)" strokeWidth="8" strokeLinecap="round" />
         <circle cx="-20" cy="50" r="22" fill="none" stroke="var(--szene-lila)" strokeWidth="14" />
-        <circle cx="18" cy="48" r="22" fill="none" stroke="var(--m-ocker)" strokeWidth="14" />
+        <circle cx="18" cy="48" r="22" fill="none" stroke="var(--szene-ocker)" strokeWidth="14" />
         <path
           d="M 0 0 C -10 -18 -22 -40 -38 -66 C -42 -74 -38 -80 -30 -76 C -18 -54 -8 -30 -2 -6 Z"
           fill="var(--szene-metall)"
@@ -484,11 +485,11 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     skalierung: 1.4,
     zeichnung: () => (
       <>
-        <rect x="-20" y="-8" width="40" height="70" rx="8" fill="var(--szene-papier)" stroke="var(--f-rand-stark)" strokeWidth="2" />
-        <rect x="-20" y="48" width="40" height="14" rx="6" fill="var(--t-stark)" opacity="0.12" />
-        <rect x="-20" y="18" width="40" height="16" fill="var(--m-petrol)" />
+        <rect x="-20" y="-8" width="40" height="70" rx="8" fill="var(--szene-papier)" stroke="var(--szene-linie)" strokeWidth="2" />
+        <rect x="-20" y="48" width="40" height="14" rx="6" fill="var(--szene-tinte)" opacity="0.12" />
+        <rect x="-20" y="18" width="40" height="16" fill="var(--szene-petrol)" />
         <rect x="-23" y="-62" width="46" height="56" rx="10" fill="var(--szene-lila)" />
-        <line x1="-22" y1="-6" x2="22" y2="-6" stroke="var(--f-rand-stark)" strokeWidth="2" />
+        <line x1="-22" y1="-6" x2="22" y2="-6" stroke="var(--szene-linie)" strokeWidth="2" />
       </>
     ),
   },
@@ -503,11 +504,11 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     skalierung: 1.4,
     zeichnung: () => (
       <>
-        <rect x="-84" y="-10" width="58" height="20" rx="9" fill="var(--a-der)" />
-        <rect x="-70" y="-16" width="8" height="26" rx="3" fill="var(--a-der)" />
-        <rect x="-28" y="-10" width="86" height="20" fill="var(--szene-papier)" stroke="var(--f-rand-stark)" strokeWidth="1.5" />
-        <rect x="-28" y="2" width="86" height="8" fill="var(--f-rand-stark)" opacity="0.3" />
-        <path d="M 58 -10 L 78 0 L 58 10 Z" fill="var(--a-der)" />
+        <rect x="-84" y="-10" width="58" height="20" rx="9" fill="var(--szene-blau)" />
+        <rect x="-70" y="-16" width="8" height="26" rx="3" fill="var(--szene-blau)" />
+        <rect x="-28" y="-10" width="86" height="20" fill="var(--szene-papier)" stroke="var(--szene-linie)" strokeWidth="1.5" />
+        <rect x="-28" y="2" width="86" height="8" fill="var(--szene-linie)" opacity="0.3" />
+        <path d="M 58 -10 L 78 0 L 58 10 Z" fill="var(--szene-blau)" />
         <path d="M 74 -3 L 84 0 L 74 3 Z" fill="var(--szene-metall-dunkel)" />
       </>
     ),
@@ -529,7 +530,7 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
         <rect x="-54" y="-11" width="108" height="6" fill="var(--szene-gelb-hell)" />
         <rect x="-54" y="5" width="108" height="6" fill="var(--szene-holz-dunkel)" opacity="0.3" />
         <path d="M 54 -11 L 80 0 L 54 11 Z" fill="var(--szene-holz-hell)" stroke="var(--szene-holz-dunkel)" strokeWidth="1" />
-        <path d="M 73 -3 L 82 0 L 73 3 Z" fill="var(--f-dunkel)" />
+        <path d="M 73 -3 L 82 0 L 73 3 Z" fill="var(--szene-tinte)" />
       </>
     ),
   },
@@ -542,11 +543,11 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
     skalierung: 1.4,
     zeichnung: () => (
       <>
-        <rect x="-78" y="-11" width="132" height="22" rx="3" fill="var(--a-die)" />
+        <rect x="-78" y="-11" width="132" height="22" rx="3" fill="var(--szene-rot)" />
         <rect x="-78" y="-11" width="132" height="6" fill="var(--szene-rot-hell)" />
-        <rect x="-78" y="5" width="132" height="6" fill="var(--f-dunkel)" opacity="0.2" />
+        <rect x="-78" y="5" width="132" height="6" fill="var(--szene-tinte)" opacity="0.2" />
         <path d="M 54 -11 L 80 0 L 54 11 Z" fill="var(--szene-holz-hell)" stroke="var(--szene-holz-dunkel)" strokeWidth="1" />
-        <path d="M 72 -4 L 82 0 L 72 4 Z" fill="var(--a-die)" />
+        <path d="M 72 -4 L 82 0 L 72 4 Z" fill="var(--szene-rot)" />
       </>
     ),
   },
@@ -600,7 +601,7 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
         <circle cx="0" cy="-60" r="8" fill="var(--szene-metall-dunkel)" />
         <path d="M -34 62 L -22 66 L -30 88 Z" fill="var(--szene-metall-dunkel)" />
         <path d="M 22 66 L 34 62 L 32 82 L 24 80 Z" fill="var(--szene-gelb)" />
-        <path d="M 24 80 L 32 82 L 29 92 Z" fill="var(--f-dunkel)" />
+        <path d="M 24 80 L 32 82 L 29 92 Z" fill="var(--szene-tinte)" />
       </>
     ),
   },
@@ -609,12 +610,38 @@ const DARSTELLUNGEN: Record<string, Darstellung> = {
 // ---------------------------------------------------------------------------
 // Farbpalette der Szene
 //
-// Kleine, harmonische Zusatzpalette fuer Toene, die tokens.css nicht kennt
-// (Holz, Metall, Himmel, Laub, Radiergummi, Kunststoff, Glas). Alle anderen
-// Farben im Bild sind bestehende Tokens aus tokens.css.
+// Die vollstaendige Palette der Szene. Sie ist bewusst geschlossen: Kein
+// Token aus tokens.css kommt hier vor, damit die Illustration in beiden
+// Farbschemata identisch aussieht (siehe Begruendung unten).
 // ---------------------------------------------------------------------------
 
 const SZENEN_PALETTE = {
+  /* Die Szene ist eine ILLUSTRATION, keine Oberflaeche. Sie steht deshalb
+     vollstaendig auf eigenen Farben und macht den Dunkelmodus NICHT mit.
+
+     Vorher tat sie das teilweise, weil sie sich aus tokens.css bediente - mit
+     dem Ergebnis, dass die Tafel im Dunkelmodus hellblau wurde und die Wand
+     fast schwarz. Beides ist sachlich falsch: Eine Tafel ist dunkel, das sagt
+     sogar die Wortkarte ("die grosse dunkle Flaeche vorne in der Klasse").
+     Ein gezeichneter Raum wechselt nicht die Tageszeit, weil jemand sein
+     Betriebssystem umstellt. Die Bedienelemente drumherum tun es weiterhin.
+
+     Die Werte hier sind exakt die Hellmodus-Werte aus tokens.css - die Szene
+     sieht am Tag also unveraendert aus. */
+  '--szene-wand': '#f7f4ed',
+  '--szene-wand-tief': '#f0ebe0',
+  '--szene-weiss': '#fffdf9',
+  '--szene-linie': '#c9bda6',
+  '--szene-linie-hell': '#e2dacb',
+  '--szene-tinte': '#23201c',
+  '--szene-kreide': '#f7f4ed',
+  '--szene-tafel': '#17545f',
+  '--szene-petrol': '#1f6f84',
+  '--szene-petrol-hell': '#dceef2',
+  '--szene-ocker': '#b8651c',
+  '--szene-ocker-hell': '#fbeedd',
+  '--szene-blau': '#2563a8',
+  '--szene-rot': '#c2453d',
   '--szene-holz': '#c98f4e',
   '--szene-holz-dunkel': '#a06b34',
   '--szene-holz-hell': '#e0ab6e',
@@ -788,8 +815,8 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
 
       <defs>
         <linearGradient id={gradWand} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="var(--f-papier)" />
-          <stop offset="100%" stopColor="var(--f-karte-tief)" />
+          <stop offset="0%" stopColor="var(--szene-wand)" />
+          <stop offset="100%" stopColor="var(--szene-wand-tief)" />
         </linearGradient>
         <linearGradient id={gradBoden} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="var(--szene-boden)" />
@@ -810,8 +837,8 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
       <g aria-hidden="true">
         <rect x="0" y="0" width={BREITE} height="558" fill={`url(#${gradWand})`} />
         {/* Wandleiste auf Brusthoehe - bricht die grosse leere Flaeche. */}
-        <line x1="0" y1="356" x2={BREITE} y2="356" stroke="var(--f-rand)" strokeWidth="3" />
-        <line x1="0" y1="362" x2={BREITE} y2="362" stroke="var(--f-rand)" strokeWidth="1.5" opacity="0.6" />
+        <line x1="0" y1="356" x2={BREITE} y2="356" stroke="var(--szene-linie-hell)" strokeWidth="3" />
+        <line x1="0" y1="362" x2={BREITE} y2="362" stroke="var(--szene-linie-hell)" strokeWidth="1.5" opacity="0.6" />
         {/* Lichtkeil vom Fenster her - schraeg, sehr blass. */}
         <path d="M 60 300 L 470 300 L 700 558 L 130 558 Z" fill="var(--szene-papier)" opacity="0.22" />
         <rect x="0" y="550" width={BREITE} height="16" fill="var(--szene-holz-dunkel)" />
@@ -837,11 +864,11 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
           <rect x="-96" y="-70" width="192" height="140" rx="6" fill="var(--szene-holz-dunkel)" />
           <rect x="-86" y="-60" width="172" height="120" rx="3" fill="#c4b49a" />
           <rect x="-66" y="-42" width="60" height="44" rx="2" fill="var(--szene-papier)" transform="rotate(-4)" />
-          <rect x="8" y="-46" width="52" height="38" rx="2" fill="var(--m-petrol-hell)" transform="rotate(3)" />
-          <rect x="-48" y="12" width="72" height="34" rx="2" fill="var(--m-ocker-hell)" transform="rotate(2)" />
-          <circle cx="-36" cy="-44" r="4" fill="var(--m-ocker)" />
-          <circle cx="34" cy="-48" r="4" fill="var(--a-die)" />
-          <circle cx="-12" cy="10" r="4" fill="var(--a-der)" />
+          <rect x="8" y="-46" width="52" height="38" rx="2" fill="var(--szene-petrol-hell)" transform="rotate(3)" />
+          <rect x="-48" y="12" width="72" height="34" rx="2" fill="var(--szene-ocker-hell)" transform="rotate(2)" />
+          <circle cx="-36" cy="-44" r="4" fill="var(--szene-ocker)" />
+          <circle cx="34" cy="-48" r="4" fill="var(--szene-rot)" />
+          <circle cx="-12" cy="10" r="4" fill="var(--szene-blau)" />
         </g>
 
         {/* Tischplatte (heller, oben) und Schuerze (Vorderseite, dunkler).
@@ -849,7 +876,7 @@ export function KlassenzimmerSzene(props: SzeneProps): ReactElement {
             Papierkorb dort STEHEN kann statt in der Luft zu schweben. */}
         <rect x="176" y="430" width="1216" height="264" rx="4" fill={`url(#${gradPlatte})`} />
         <rect x="176" y="430" width="1216" height="6" fill="var(--szene-papier)" opacity="0.5" />
-        <rect x="176" y="684" width="1216" height="10" fill="var(--t-stark)" opacity="0.08" />
+        <rect x="176" y="684" width="1216" height="10" fill="var(--szene-tinte)" opacity="0.08" />
         <line x1="192" y1="694" x2="1376" y2="694" stroke="var(--szene-holz-dunkel)" strokeWidth="3" />
         <rect x="192" y="694" width="1184" height="168" fill="var(--szene-holz)" />
         <rect x="200" y="862" width="30" height="36" fill="var(--szene-holz-dunkel)" />

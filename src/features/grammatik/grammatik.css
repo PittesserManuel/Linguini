@@ -82,6 +82,26 @@
   outline-offset: 4px;
 }
 
+/*
+ * Die Aufgabenkarte kommt aus dem Lesen-Modul. Dort steht sie in einer
+ * schmalen Spalte NEBEN dem Text, deshalb ihre Breitenbegrenzung. Hier
+ * steht sie allein unter dem breiten Merktext - und endete bei zwei
+ * Dritteln, sodass rechts daneben eine leere Spalte stehenblieb, als waere
+ * die Seite kaputt. Die Begrenzung gehoert zum Ort, nicht zur Karte.
+ */
+.grammatik__uebungen .lesen__aufgabe {
+  max-width: none;
+}
+
+/*
+ * Der Kasten selbst darf die Spalte fuellen, der Fliesstext darin nicht:
+ * eine Frage ueber die ganze Breite ist schlechter zu lesen, nicht besser.
+ */
+.grammatik__uebungen .lesen__aufgabe > h3,
+.grammatik__uebungen .lesen__aufgabe > p {
+  max-inline-size: var(--breite-schmal);
+}
+
 /* ---------------------------------------------------------------------
  * Der Hefteintrag
  * --------------------------------------------------------------------- */

@@ -314,10 +314,10 @@ function LernzieleUndLehrplan(props: { modul: Modul }): ReactElement {
         </dl>
         <p className="lehrkraft__einordnung">
           Der Text hat im Schnitt {kennzahlen.woerterProSatzDurchschnitt} Wörter pro Satz. Das liegt bewusst
-          unter dem für Klasse 4 üblichen Richtwert von 13 bis 15 Wörtern pro Satz – dieser Richtwert gilt
-          für Kinder mit Deutsch als Erstsprache. Die Zielgruppe dieses Moduls lernt Deutsch als Zweitsprache
-          auf Niveau {modul.niveau}. Sprachliche Komplexität entsteht hier bewusst über die Aufgaben, nicht
-          über die Satzlänge.
+          unter dem für die Sekundarstufe I üblichen Richtwert von 13 bis 16 Wörtern pro Satz – dieser
+          Richtwert gilt für Jugendliche mit Deutsch als Erstsprache. Die Zielgruppe dieses Moduls lernt
+          Deutsch als Zweitsprache auf Niveau {modul.niveau}. Sprachliche Komplexität entsteht hier bewusst
+          über die Aufgaben, nicht über die Satzlänge.
         </p>
       </div>
 

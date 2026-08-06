@@ -20,11 +20,11 @@ import type { Jahrgangstext } from './types'
  * die tragende Groesse, nicht die Textlaenge:
  *
  *   1. Klasse  nur Praesens, nur Hauptsaetze                    Ø 4,3 W/Satz
- *   2. Klasse  Praesens, erste Konnektoren (aber, und)          Ø 6,2 W/Satz
+ *   2. Klasse  Praesens, erste Konnektoren (aber, und)          Ø 6,3 W/Satz
  *   3. Klasse  Perfekt, Nebensaetze mit weil/dass               Ø 7,7 W/Satz
  *   4. Klasse  Praeteritum, Relativsaetze, indirekte Rede       Ø 9,6 W/Satz
  *
- * Dass die Texte dabei NICHT deutlich laenger werden (68 / 149 / 139 / 153
+ * Dass die Texte dabei NICHT deutlich laenger werden (68 / 151 / 139 / 153
  * Woerter), ist Absicht. Ein DaZ-Lernender in der vierten Klasse liest nicht
  * mehr Zeilen als einer in der zweiten - er liest dichtere. Laenge zu
  * steigern waere die bequeme, aber wirkungslose Variante.
@@ -54,9 +54,9 @@ export const textMs2: Jahrgangstext = {
         {
           id: 'a1',
           saetze: [
-            'Mala ist neu in der Klasse 4b.',
+            'Mala ist neu in der Klasse 2b.',
             'Sie kommt aus Syrien.',
-            'Heute ist ihr erster Schultag in Deutschland.',
+            'Heute ist ihr erster Schultag an der neuen Schule.',
           ],
         },
         {
@@ -105,7 +105,7 @@ export const textMs2: Jahrgangstext = {
           ],
         },
       ],
-      kennzahlen: { woerter: 149, saetze: 24, woerterProSatzDurchschnitt: 6.2, langstesWort: 'Deutschland' },
+      kennzahlen: { woerter: 151, saetze: 24, woerterProSatzDurchschnitt: 6.3, langstesWort: 'Schultasche' },
   },
 
   aufgaben: [
@@ -252,7 +252,7 @@ export const textMs2: Jahrgangstext = {
         ebene: 'reorganisierend',
         abStufe: 'standard',
         schritte: [
-          { id: 's1', text: 'Mala kommt neu in die Klasse 4b.' },
+          { id: 's1', text: 'Mala kommt neu in die Klasse 2b.' },
           { id: 's2', text: 'Mala merkt, dass ihre Schultasche fast leer ist.' },
           { id: 's3', text: 'Nuri legt seine Sachen auf Malas Tisch.' },
           { id: 's4', text: 'Mala malt einen Baum mit Vögeln.' },

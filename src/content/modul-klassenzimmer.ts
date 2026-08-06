@@ -708,30 +708,50 @@ export const modulKlassenzimmer: Modul = {
     'Sie schreiben eigene einfache Aussagesätze über Gegenstände und halten sie schriftlich fest.',
   ],
 
+  /*
+   * Die Bezuege gelten der MITTELSCHULE, nicht der Grundschule.
+   *
+   * Hier stand urspruenglich viermal "LehrplanPLUS Bayern, Deutsch 3/4"
+   * und "KMK-Bildungsstandards, Primarbereich" - also die Primarstufe, bei
+   * einem Modul fuer Zehn- bis Vierzehnjaehrige. Fuer eine Lehrkraft ist
+   * das die erste Stelle, an der sie prueft, ob das Material zu ihrem
+   * Unterricht passt; ein Grundschulbezug disqualifiziert es dort sofort.
+   *
+   * Oesterreich steht voran, weil das Material dort entsteht und
+   * eingesetzt wird. Bayern bleibt als zweite Zeile stehen, damit die
+   * Demo auch an deutschen Mittelschulen vorzeigbar ist. Der GER-Bezug
+   * ist ohnehin laenderunabhaengig und traegt die Niveaustufe.
+   */
   kompetenzen: [
     {
-      quelle: 'KMK-Bildungsstandards Deutsch, Primarbereich',
-      bereich: 'Lesen – mit Texten und Medien umgehen',
+      quelle: 'Lehrplan der Mittelschule (Österreich), Deutsch, 5.–8. Schulstufe',
+      bereich: 'Lesen – Texte erschließen',
       formulierung:
-        'Die Kinder entnehmen Texten gezielt Informationen und geben zentrale Aussagen wieder.',
+        'Die Schülerinnen und Schüler entnehmen altersgemäßen Texten gezielt Informationen, geben zentrale Aussagen wieder und erschließen Inhalte, die nicht wörtlich genannt sind.',
     },
     {
-      quelle: 'LehrplanPLUS Bayern, Deutsch 3/4',
-      bereich: 'Lesen – mit Texten und weiteren Medien umgehen',
+      quelle: 'Lehrplan der Mittelschule (Österreich), Deutsch, 5.–8. Schulstufe',
+      bereich: 'Sprachbewusstsein – Sprache betrachten',
       formulierung:
-        'Die Schülerinnen und Schüler verstehen kurze, altersgemäße und bildgestützte Texte, erkennen bekannte Wörter wieder und erschließen wesentliche Inhalte.',
+        'Die Schülerinnen und Schüler verwenden Nomen mit dem passenden Begleiter, bilden Singular- und Pluralformen und wenden sie nach Zahlwörtern richtig an.',
     },
     {
-      quelle: 'LehrplanPLUS Bayern, Deutsch 3/4',
-      bereich: 'Sprachgebrauch untersuchen und reflektieren',
+      quelle: 'Lehrplan-Zusatz „Deutsch als Zweitsprache“ (Österreich), Deutschförderklassen',
+      bereich: 'Aufbau eines Grundwortschatzes',
       formulierung:
-        'Die Schülerinnen und Schüler verwenden Nomen mit dem passenden Begleiter und bilden Singular- und Pluralformen.',
+        'Die Schülerinnen und Schüler benennen Gegenstände des schulischen Alltags mit dem korrekten Artikel und verwenden sie in einfachen Aussagesätzen. Die Einstufung erfolgt über MIKA-D.',
     },
     {
-      quelle: 'LehrplanPLUS Bayern, Deutsch 3/4',
-      bereich: 'Schreiben – Texte planen und verfassen',
+      quelle: 'LehrplanPLUS Bayern, Mittelschule Deutsch 5/6',
+      bereich: 'Schreiben – Texte planen und schreiben',
       formulierung:
         'Die Schülerinnen und Schüler verfassen kurze eigene Texte zu Bildern und Anlässen aus dem Schulalltag.',
+    },
+    {
+      quelle: 'KMK-Bildungsstandards Deutsch, Erster Schulabschluss',
+      bereich: 'Lesen – mit Texten und Medien umgehen',
+      formulierung:
+        'Die Schülerinnen und Schüler entnehmen Texten gezielt Informationen und geben zentrale Aussagen wieder.',
     },
     {
       quelle: 'Gemeinsamer Europäischer Referenzrahmen (GER)',

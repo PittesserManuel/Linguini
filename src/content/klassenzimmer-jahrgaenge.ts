@@ -433,6 +433,44 @@ export const textMs1: Jahrgangstext = {
       loesungserklaerung: 'Im Text steht: „Auf dem Tisch liegt ein Heft. Daneben liegt ein Bleistift.“',
     },
     {
+      id: 'm1-5',
+      typ: 'freitext',
+      frage: 'Was nimmt Mala vom Tisch? Schreibe das Wort mit Artikel.',
+      ebene: 'literal',
+      abStufe: 'standard',
+      belegAbsatz: 'e3',
+      bildObjekt: 'bleistift',
+      akzeptiert: ['der Bleistift', 'den Bleistift'],
+      artikelPflicht: true,
+      platzhalter: 'zum Beispiel: das Heft',
+      hilfen: [
+        'Lies den dritten Absatz noch einmal.',
+        'Der letzte Satz sagt es dir: „Mala nimmt den …“',
+      ],
+      loesungserklaerung:
+        'Im Text steht: „Mala nimmt den Bleistift.“ Beide Formen sind richtig – „der Bleistift“ und „den Bleistift“.',
+    },
+    {
+      id: 'm1-6',
+      typ: 'auswahl',
+      frage: 'Warum hängt Nuri das Bild an die Tafel?',
+      ebene: 'inferentiell',
+      abStufe: 'anspruchsvoll',
+      belegAbsatz: 'e5',
+      optionen: [
+        { id: 'm1-6a', text: 'Weil Frau Berger es gesagt hat.' },
+        { id: 'm1-6b', text: 'Weil er sich über das Bild freut.' },
+        { id: 'm1-6c', text: 'Weil die Tafel leer ist.' },
+      ],
+      richtig: 'm1-6b',
+      hilfen: [
+        'Der Grund steht nicht wörtlich im Text. Du musst ihn selbst finden.',
+        'Für wen ist das Bild? Was macht Nuri damit?',
+      ],
+      loesungserklaerung:
+        'Im Text steht nur: „Das Bild ist für Nuri. Nuri hängt das Bild an die Tafel.“ Warum er das tut, musst du selbst überlegen: Er freut sich und will das Bild zeigen. Solche Fragen heißen „zwischen den Zeilen lesen“.',
+    },
+    {
       id: 'm1-4',
       typ: 'heft',
       heft: 'vokabelheft',
@@ -602,6 +640,49 @@ export const textMs3: Jahrgangstext = {
       ],
       loesungserklaerung:
         'Die Geschichte läuft von vorne nach hinten: Aufgabe an der Tafel, fehlender Zirkel, Nuris Hilfe, misslungener Versuch, gelungener Versuch.',
+    },
+    {
+      id: 'm3-6',
+      typ: 'wahrheit',
+      frage: 'Schau dir den Zirkel an. Stimmen die Sätze?',
+      ebene: 'literal',
+      abStufe: 'einfach',
+      bildObjekt: 'zirkel',
+      nurRichtigFalsch: true,
+      aussagen: [
+        {
+          id: 'm3-6a',
+          text: 'Der Zirkel hat zwei Beine.',
+          richtig: 'richtig',
+          begruendung: 'Im Bild siehst du die zwei Beine: eines mit der Spitze, eines mit der Mine.',
+        },
+        {
+          id: 'm3-6b',
+          text: 'Mit dem Zirkel schneidest du Papier.',
+          richtig: 'falsch',
+          begruendung: 'Papier schneidest du mit der Schere. Mit dem Zirkel zeichnest du einen Kreis.',
+        },
+      ],
+      hilfen: ['Sieh dir zuerst nur das Bild an.', 'Lies dann jeden Satz einzeln.'],
+      loesungserklaerung:
+        'Für diese Aufgabe brauchst du den Text nicht. Der erste Satz steht im Bild, beim zweiten geht es darum, wozu man den Zirkel benutzt.',
+    },
+    {
+      id: 'm3-7',
+      typ: 'luecken',
+      frage: 'Setze die richtigen Wörter ein.',
+      ebene: 'literal',
+      abStufe: 'einfach',
+      belegAbsatz: 'z2',
+      teile: ['Mala hat ein ', null, ' und ein ', null, ' gefunden, aber keinen ', null, '.'],
+      loesungen: ['Lineal', 'Geodreieck', 'Zirkel'],
+      wortbank: ['Lineal', 'Geodreieck', 'Zirkel', 'Radiergummi', 'Spitzer'],
+      hilfen: [
+        'Lies den zweiten Absatz noch einmal.',
+        'Die drei Wörter stehen alle in einem Satz.',
+      ],
+      loesungserklaerung:
+        'Im Text steht: „Sie hat ein Lineal und ein Geodreieck gefunden, aber keinen Zirkel.“',
     },
     {
       id: 'm3-5',
@@ -775,6 +856,66 @@ export const textMs4: Jahrgangstext = {
       ],
       loesungserklaerung:
         'Im zweiten Absatz sagt Frau Berger, man müsse nicht fragen und nicht erklären, warum. Am Ende kann niemand mehr zuordnen, wem was gehört hat – genau dadurch fällt niemand mehr auf. Das ist der Sinn.',
+    },
+    {
+      id: 'm4-6',
+      typ: 'wahrheit',
+      frage: 'Schau dir den Buntstift an. Stimmen die Sätze?',
+      ebene: 'literal',
+      abStufe: 'einfach',
+      bildObjekt: 'buntstift',
+      nurRichtigFalsch: true,
+      aussagen: [
+        {
+          id: 'm4-6a',
+          text: 'Mit dem Buntstift malst du in Farbe.',
+          richtig: 'richtig',
+          begruendung: 'Deshalb heißt er Buntstift: Er malt bunt, nicht grau.',
+        },
+        {
+          id: 'm4-6b',
+          text: 'Der Buntstift ist aus Metall.',
+          richtig: 'falsch',
+          begruendung: 'Der Buntstift ist aus Holz. Aus Metall ist zum Beispiel der Zirkel.',
+        },
+      ],
+      hilfen: ['Sieh dir zuerst nur das Bild an.', 'Lies dann jeden Satz einzeln.'],
+      loesungserklaerung:
+        'Für diese Aufgabe brauchst du den Text nicht. Es geht um das Material und darum, wozu man den Buntstift benutzt.',
+    },
+    {
+      id: 'm4-7',
+      typ: 'auswahl',
+      frage: 'Was lag am Montag in der Kiste?',
+      ebene: 'literal',
+      abStufe: 'einfach',
+      belegAbsatz: 'k1',
+      optionen: [
+        { id: 'm4-7a', text: 'Bücher und Hefte' },
+        { id: 'm4-7b', text: 'Bleistifte, Radiergummis, Lineale, Zirkel und ein Geodreieck' },
+        { id: 'm4-7c', text: 'Nichts, die Kiste war leer' },
+      ],
+      richtig: 'm4-7b',
+      hilfen: ['Lies den ersten Absatz.', 'Der letzte Satz zählt alles auf.'],
+      loesungserklaerung:
+        'Im Text steht: „Darin lagen Bleistifte, Radiergummis, Lineale, zwei Zirkel und ein Geodreieck.“',
+    },
+    {
+      id: 'm4-8',
+      typ: 'luecken',
+      frage: 'Setze die richtigen Wörter ein.',
+      ebene: 'literal',
+      abStufe: 'einfach',
+      belegAbsatz: 'k4',
+      teile: ['Nuri legte zwei ', null, ' hinein. Mala legte einen ', null, ' dazu.'],
+      loesungen: ['Buntstifte', 'Spitzer'],
+      wortbank: ['Buntstifte', 'Spitzer', 'Lineale', 'Radiergummi'],
+      hilfen: [
+        'Lies den vierten Absatz noch einmal.',
+        'Achte darauf: Bei „zwei“ steht das Wort in der Mehrzahl.',
+      ],
+      loesungserklaerung:
+        'Im Text steht: „In der zweiten Woche legte Nuri zwei Buntstifte hinein. […] Mala legte einen Spitzer dazu.“ Nach „zwei“ steht die Mehrzahl, nach „einen“ die Einzahl.',
     },
     {
       id: 'm4-5',

@@ -17,7 +17,10 @@ import type { Modul, Niveaustufe, Verstehensebene } from '@/content/types'
 import { findeWort, istLernwort, wortMitArtikel } from '@/content/types'
 import type { Fehlerart } from '@/grading/types'
 import type { Lernstand } from '@/state/types'
-import { berechneAuswertung } from './auswertung'
+import { AUSSAGEKRAEFTIG_AB, alleAufgaben, berechneAuswertung } from './auswertung'
+import { ELTERNBRIEF_SPRACHEN, fuelle } from './elternbrief-sprachen'
+import type { SprachCode } from './elternbrief-sprachen'
+import { Uebergabe } from './Uebergabe'
 import { Wortkarten } from './Wortkarten'
 import './lehrkraft.css'
 
@@ -48,6 +51,7 @@ const EBENEN_LABEL: Record<Verstehensebene, { titel: string; erklaerung: string 
 const FEHLERART_LABEL: Record<Fehlerart, string> = {
   keine: 'Kein Fehler',
   genus: 'Artikel (der/die/das)',
+  numerus: 'Einzahl / Mehrzahl',
   rechtschreibung: 'Schreibweise',
   wortwahl: 'Wortwahl',
   verstaendnis: 'Textverständnis',
@@ -119,12 +123,13 @@ function SchlossIcon(): ReactElement {
 // Reiter-Rahmen (WAI-ARIA APG "Tabs", automatische Aktivierung)
 // ---------------------------------------------------------------------------
 
-type ReiterId = 'lernziele' | 'differenzierung' | 'auswertung' | 'eltern'
+type ReiterId = 'lernziele' | 'differenzierung' | 'auswertung' | 'uebergabe' | 'eltern'
 
 const REITER: { id: ReiterId; label: string }[] = [
   { id: 'lernziele', label: 'Lernziele & Lehrplan' },
   { id: 'differenzierung', label: 'Differenzierung' },
   { id: 'auswertung', label: 'Auswertung' },
+  { id: 'uebergabe', label: 'Übergabe ans Heft' },
   { id: 'eltern', label: 'Für Eltern' },
 ]
 
@@ -227,6 +232,18 @@ export function Lehrkraft(props: { modul: Modul; lernstand: Lernstand }): ReactE
         </div>
       )}
 
+      {aktiv === 'uebergabe' && (
+        <div
+          id={`${basisId}-panel-uebergabe`}
+          role="tabpanel"
+          aria-labelledby={`${basisId}-reiter-uebergabe`}
+          tabIndex={0}
+          className="lehrkraft__panel"
+        >
+          <UebergabeAnsicht modul={modul} lernstand={lernstand} />
+        </div>
+      )}
+
       {aktiv === 'eltern' && (
         <div
           id={`${basisId}-panel-eltern`}
@@ -313,10 +330,10 @@ function LernzieleUndLehrplan(props: { modul: Modul }): ReactElement {
         </dl>
         <p className="lehrkraft__einordnung">
           Der Text hat im Schnitt {kennzahlen.woerterProSatzDurchschnitt} Wörter pro Satz. Das liegt bewusst
-          unter dem für Klasse 4 üblichen Richtwert von 13 bis 15 Wörtern pro Satz – dieser Richtwert gilt
-          für Kinder mit Deutsch als Erstsprache. Die Zielgruppe dieses Moduls lernt Deutsch als Zweitsprache
-          auf Niveau {modul.niveau}. Sprachliche Komplexität entsteht hier bewusst über die Aufgaben, nicht
-          über die Satzlänge.
+          unter dem für die Sekundarstufe I üblichen Richtwert von 13 bis 16 Wörtern pro Satz – dieser
+          Richtwert gilt für Jugendliche mit Deutsch als Erstsprache. Die Zielgruppe dieses Moduls lernt
+          Deutsch als Zweitsprache auf Niveau {modul.niveau}. Sprachliche Komplexität entsteht hier bewusst
+          über die Aufgaben, nicht über die Satzlänge.
         </p>
       </div>
 
@@ -401,13 +418,27 @@ function AuswertungsAnsicht(props: { modul: Modul; lernstand: Lernstand }): Reac
   const { modul, lernstand } = props
   const auswertung = useMemo(() => berechneAuswertung(lernstand, modul), [lernstand, modul])
 
+  // Leerzustand: Statt nur zu melden, dass nichts da ist, sagt er, WAS hier
+  // stehen wird. Wer diesen Bereich zum ersten Mal oeffnet - typischerweise
+  // eine Lehrkraft, die die App bewertet -, sieht sonst eine leere Seite und
+  // schliesst daraus, dass es nichts zu sehen gibt.
   if (auswertung.bearbeitet === 0) {
     return (
-      <div className="karte karte--ruhig lehrkraft__leerzustand">
+      <div className="karte lehrkraft__leerzustand stapel">
         <h3>Noch keine Auswertung</h3>
         <p>
-          Für dieses Modul liegen noch keine bearbeiteten Aufgaben vor. Die Auswertung erscheint hier
-          automatisch, sobald die erste Aufgabe abgeschlossen ist.
+          Für dieses Modul liegen noch keine bearbeiteten Aufgaben vor. Sobald die erste Aufgabe
+          abgeschlossen ist, steht hier:
+        </p>
+        <ul className="lehrkraft__leerzustand-liste">
+          <li>der Bearbeitungsstand über alle Aufgaben dieses Lernwegs,</li>
+          <li>das Fehlerprofil – nicht „wie viel Prozent“, sondern welche Fehlerart überwiegt,</li>
+          <li>die Selbstkorrekturquote: Was wurde nach einem Fehlversuch selbst richtiggestellt?</li>
+          <li>die Lernwörter, bei denen der Artikel noch unsicher sitzt,</li>
+          <li>die Schreibaufträge, die auf Ihre Korrektur im Heft warten.</li>
+        </ul>
+        <p className="lehrkraft__leerzustand-hinweis">
+          Die Daten entstehen ausschließlich in diesem Browser und verlassen das Gerät nicht.
         </p>
       </div>
     )
@@ -441,55 +472,83 @@ function AuswertungsAnsicht(props: { modul: Modul; lernstand: Lernstand }): Reac
         </div>
       </div>
 
-      <div className="lehrkraft__kennzahlen-reihe">
-        <div className="karte lehrkraft__kennzahl-karte">
-          <p className="lehrkraft__kennzahl-wert">
-            {auswertung.ersterVersuchRichtig} von {auswertung.bearbeitet}
+      {!auswertung.aussagekraeftig ? (
+        /*
+         * Unter fuenf bearbeiteten Aufgaben stand hier "0 von 1", "0 %" und
+         * ein Fehlerbalken ueber die volle Breite. Das ist kein Befund, das
+         * sieht nur aus wie einer - und zwar wie ein Alarm. Eine Quote aus
+         * einem einzigen Versuch ist Rauschen; sie zu zeigen, laedt zu einem
+         * Urteil ein, das die Daten nicht hergeben.
+         *
+         * Der Bearbeitungsstand darueber bleibt sichtbar, denn der stimmt ab
+         * der ersten Aufgabe.
+         */
+        <div className="karte karte--ruhig stapel">
+          <h3>Noch zu wenige Aufgaben für eine Aussage</h3>
+          <p>
+            Kennzahlen und Fehlerprofil erscheinen ab {AUSSAGEKRAEFTIG_AB} bearbeiteten Aufgaben.
+            Bisher sind es {auswertung.bearbeitet}. Aus einzelnen Versuchen lässt sich keine Quote
+            bilden, die etwas über das Kind aussagt – ein „0 %“ nach einer Aufgabe wäre nur eine Zahl,
+            die falsch aussieht.
           </p>
-          <p className="lehrkraft__kennzahl-label">Im ersten Anlauf richtig</p>
-        </div>
-        <div className="karte lehrkraft__kennzahl-karte">
-          <p className="lehrkraft__kennzahl-wert">
-            {selbstkorrekturProzent !== null ? `${selbstkorrekturProzent} %` : '–'}
+          <p className="lehrkraft__einordnung">
+            Was schon jetzt zählt, steht weiter unten: die Wörter mit unsicherem Artikel und die
+            Schreibaufträge, die auf Ihre Korrektur im Heft warten.
           </p>
-          <p className="lehrkraft__kennzahl-label">Nach einem Fehler selbst korrigiert</p>
         </div>
-        <div className="karte lehrkraft__kennzahl-karte">
-          <p className="lehrkraft__kennzahl-wert">{auswertung.versucheBisLoesungMedian ?? '–'}</p>
-          <p className="lehrkraft__kennzahl-label">Versuche bis zur Lösung (Median)</p>
-        </div>
-        <div className="karte lehrkraft__kennzahl-karte">
-          <p className="lehrkraft__kennzahl-wert">{auswertung.hilfenGenutzt}</p>
-          <p className="lehrkraft__kennzahl-label">Hilfen genutzt</p>
-        </div>
-      </div>
-      <p className="lehrkraft__einordnung">
-        Die Selbstkorrekturquote ist der aussagekräftigste Wert auf dieser Seite: Sie zeigt, ob ein Kind
-        einen eigenen Fehler erkennt und behebt – genau die Fähigkeit, die beim echten Sprechen und
-        Schreiben zählt, nicht ein fehlerfreier erster Versuch.
-      </p>
+      ) : (
+        <>
+          <div className="lehrkraft__kennzahlen-reihe">
+            <div className="karte lehrkraft__kennzahl-karte">
+              <p className="lehrkraft__kennzahl-wert">
+                {auswertung.ersterVersuchRichtig} von {auswertung.bearbeitet}
+              </p>
+              <p className="lehrkraft__kennzahl-label">Im ersten Anlauf richtig</p>
+            </div>
+            <div className="karte lehrkraft__kennzahl-karte">
+              <p className="lehrkraft__kennzahl-wert">
+                {selbstkorrekturProzent !== null ? `${selbstkorrekturProzent} %` : '–'}
+              </p>
+              <p className="lehrkraft__kennzahl-label">Nach einem Fehler selbst korrigiert</p>
+            </div>
+            <div className="karte lehrkraft__kennzahl-karte">
+              <p className="lehrkraft__kennzahl-wert">{auswertung.versucheBisLoesungMedian ?? '–'}</p>
+              <p className="lehrkraft__kennzahl-label">Versuche bis zur Lösung (Median)</p>
+            </div>
+            <div className="karte lehrkraft__kennzahl-karte">
+              <p className="lehrkraft__kennzahl-wert">{auswertung.hilfenGenutzt}</p>
+              <p className="lehrkraft__kennzahl-label">Hilfen genutzt</p>
+            </div>
+          </div>
+          <p className="lehrkraft__einordnung">
+            Die Selbstkorrekturquote ist der aussagekräftigste Wert auf dieser Seite: Sie zeigt, ob ein
+            Kind einen eigenen Fehler erkennt und behebt – genau die Fähigkeit, die beim echten Sprechen
+            und Schreiben zählt, nicht ein fehlerfreier erster Versuch.
+          </p>
 
-      <div className="karte stapel">
-        <h3>Fehlerprofil</h3>
-        {auswertung.fehlerprofil.length === 0 ? (
-          <p>Bisher ist keine wiederkehrende Fehlerart aufgetreten.</p>
-        ) : (
-          <ul className="lehrkraft__balken-liste">
-            {auswertung.fehlerprofil.map((eintrag) => (
-              <li key={eintrag.art} className="lehrkraft__balken-zeile">
-                <span className="lehrkraft__balken-label">{FEHLERART_LABEL[eintrag.art]}</span>
-                <div className="fortschritt lehrkraft__fehler-spur" aria-hidden="true">
-                  <div
-                    className="fortschritt__balken lehrkraft__fehler-balken"
-                    style={{ width: `${maxFehler > 0 ? (eintrag.anzahl / maxFehler) * 100 : 0}%` }}
-                  />
-                </div>
-                <span className="lehrkraft__balken-wert">{eintrag.anzahl}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+          <div className="karte stapel">
+            <h3>Fehlerprofil</h3>
+            {auswertung.fehlerprofil.length === 0 ? (
+              <p>Bisher ist keine wiederkehrende Fehlerart aufgetreten.</p>
+            ) : (
+              <ul className="lehrkraft__balken-liste">
+                {auswertung.fehlerprofil.map((eintrag) => (
+                  <li key={eintrag.art} className="lehrkraft__balken-zeile">
+                    <span className="lehrkraft__balken-label">{FEHLERART_LABEL[eintrag.art]}</span>
+                    <div className="fortschritt lehrkraft__fehler-spur" aria-hidden="true">
+                      <div
+                        className="fortschritt__balken lehrkraft__fehler-balken"
+                        style={{ width: `${maxFehler > 0 ? (eintrag.anzahl / maxFehler) * 100 : 0}%` }}
+                      />
+                    </div>
+                    <span className="lehrkraft__balken-wert">{eintrag.anzahl}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
 
       <div className="karte stapel">
         <h3>Wortschatz mit Unsicherheit beim Artikel</h3>
@@ -522,10 +581,44 @@ function AuswertungsAnsicht(props: { modul: Modul; lernstand: Lernstand }): Reac
         ) : (
           <ul>
             {auswertung.aufgeloest.map((aufgabeId) => {
-              const aufgabe = modul.aufgaben.find((a) => a.id === aufgabeId)
+              const aufgabe = alleAufgaben(modul).find((a) => a.id === aufgabeId)
               return <li key={aufgabeId}>{aufgabe?.frage ?? aufgabeId}</li>
             })}
           </ul>
+        )}
+      </div>
+
+      {/* Die einzige Liste hier, die eine HANDLUNG verlangt: Diese Texte hat
+          die App nie gesehen. Sie kann nur melden, dass sie geschrieben
+          wurden - beurteilen muss sie ein Mensch. */}
+      <div className="karte stapel">
+        <h3>Wartet auf Ihre Korrektur im Heft</h3>
+        {auswertung.offeneHeftauftraege.length === 0 ? (
+          <p>Derzeit ist kein Schreibauftrag als erledigt gemeldet.</p>
+        ) : (
+          <>
+            <ul className="lehrkraft__heftliste">
+              {auswertung.offeneHeftauftraege.map((aufgabeId) => {
+                const aufgabe = alleAufgaben(modul).find((a) => a.id === aufgabeId)
+                const heft = aufgabe?.typ === 'heft' ? aufgabe.heft : undefined
+                return (
+                  <li key={aufgabeId}>
+                    {heft && (
+                      <span className="chip">
+                        {heft === 'vokabelheft' ? 'Vokabelheft' : 'Linguini-Heft'}
+                      </span>
+                    )}{' '}
+                    {aufgabe?.frage ?? aufgabeId}
+                  </li>
+                )
+              })}
+            </ul>
+            <p className="lehrkraft__hinweis">
+              Diese Aufträge werden absichtlich nicht automatisch bewertet. Es geht um selbst
+              formulierte Sätze – dort zählt neben dem Inhalt die Schreibrichtigkeit, und beides
+              zusammen kann nur eine Lehrperson beurteilen.
+            </p>
+          </>
         )}
       </div>
 
@@ -548,14 +641,57 @@ function AuswertungsAnsicht(props: { modul: Modul; lernstand: Lernstand }): Reac
 // Reiter 4: Für Eltern
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Uebergabe ans Heft - der Zettel, der die Sitzung mit der Korrektur verbindet
+// ---------------------------------------------------------------------------
+
+function UebergabeAnsicht(props: { modul: Modul; lernstand: Lernstand }): ReactElement {
+  const { modul, lernstand } = props
+  const auswertung = useMemo(() => berechneAuswertung(lernstand, modul), [lernstand, modul])
+
+  return (
+    <>
+      <div className="lehrkraft__eltern-kopf reihe reihe--gestapelt">
+        <p className="lehrkraft__einordnung">
+          Am Ende der Stunde ausdrucken, Namen eintragen und ins Heft kleben. Es werden keine Daten
+          übertragen – der Zettel entsteht in diesem Browser und geht auf Papier weiter.
+        </p>
+        <button
+          type="button"
+          className="knopf knopf--zweit lehrkraft__drucken-knopf"
+          onClick={() => window.print()}
+        >
+          <DruckenIcon />
+          Zettel drucken
+        </button>
+      </div>
+
+      <Uebergabe
+        modul={modul}
+        auswertung={auswertung}
+        stufe={lernstand.stufe}
+        jahrgang={lernstand.jahrgang}
+      />
+    </>
+  )
+}
+
 function FuerEltern(props: { modul: Modul; lernstand: Lernstand }): ReactElement {
   const { modul, lernstand } = props
   const auswertung = useMemo(() => berechneAuswertung(lernstand, modul), [lernstand, modul])
   const lernwoerter = useMemo(() => modul.wortschatz.filter(istLernwort), [modul])
+  const [sprachCode, setSprachCode] = useState<SprachCode>('de')
 
-  function drucken(): void {
-    window.print()
-  }
+  const texte = ELTERNBRIEF_SPRACHEN.find((s) => s.code === sprachCode) ?? ELTERNBRIEF_SPRACHEN[0]!
+
+  // Die Wortlisten bleiben deutsch - sie sind der Gegenstand des Briefs.
+  // "der Radiergummi" soll zu Hause auf Deutsch gesagt werden.
+  const neueWoerter = lernwoerter.map((wort) => wortMitArtikel(wort)).join(', ')
+  const unsichereWoerter = auswertung.genusUnsicher
+    .map((wortId) => findeWort(modul, wortId))
+    .filter((wort): wort is NonNullable<typeof wort> => wort !== undefined)
+    .map((wort) => wortMitArtikel(wort))
+    .join(', ')
 
   return (
     <>
@@ -563,76 +699,105 @@ function FuerEltern(props: { modul: Modul; lernstand: Lernstand }): ReactElement
         <p className="lehrkraft__einordnung">
           Dieser Brief ist bereits fertig formuliert. Er kann direkt ausgedruckt werden.
         </p>
-        <button type="button" className="knopf knopf--zweit lehrkraft__drucken-knopf" onClick={drucken}>
+        <button
+          type="button"
+          className="knopf knopf--zweit lehrkraft__drucken-knopf"
+          onClick={() => window.print()}
+        >
           <DruckenIcon />
           Diese Seite drucken
         </button>
       </div>
 
-      <article className="karte lehrkraft__brief stapel" aria-label="Elternbrief">
-        <p>Liebe Eltern,</p>
+      {/*
+        Die Sprachwahl steht ueber dem Brief und wird nicht mitgedruckt.
+        Der Eigenname zuerst ("Türkçe"), der deutsche Name klein darunter:
+        Wer die Sprache braucht, erkennt sie am Eigennamen; die Lehrkraft
+        beim Auswaehlen am deutschen.
+      */}
+      <fieldset className="lehrkraft__sprachwahl">
+        <legend className="lehrkraft__sprachwahl-legende">Sprache des Briefs</legend>
+        <div className="lehrkraft__sprachwahl-optionen">
+          {ELTERNBRIEF_SPRACHEN.map((sprache) => (
+            <label
+              key={sprache.code}
+              className={`lehrkraft__sprache${sprachCode === sprache.code ? ' ist-gewaehlt' : ''}`}
+            >
+              <input
+                type="radio"
+                name="elternbrief-sprache"
+                value={sprache.code}
+                checked={sprachCode === sprache.code}
+                onChange={() => setSprachCode(sprache.code)}
+              />
+              <span lang={sprache.code === 'bks' ? 'bs' : sprache.code} dir={sprache.richtung}>
+                {sprache.eigenname}
+              </span>
+              {sprache.code !== 'de' && (
+                <span className="lehrkraft__sprache-deutsch">{sprache.deutsch}</span>
+              )}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <article
+        className="karte lehrkraft__brief stapel"
+        aria-label="Elternbrief"
+        lang={texte.code === 'bks' ? 'bs' : texte.code}
+        dir={texte.richtung}
+      >
+        <p>{texte.anrede}</p>
 
         <section className="stapel lehrkraft__brief-abschnitt">
-          <h3>Was Ihr Kind heute geübt hat</h3>
-          <p>
-            Ihr Kind hat zum Thema „{modul.titel}“ gearbeitet. Es hat diese neuen Wörter gelernt:{' '}
-            {lernwoerter.map((wort) => wortMitArtikel(wort)).join(', ')}. Danach hat es einen kurzen Text
-            gelesen und dazu Fragen beantwortet.
-          </p>
+          <h3>{texte.titelGeuebt}</h3>
+          <p>{fuelle(texte.satzGeuebt, { thema: modul.titel, woerter: neueWoerter })}</p>
         </section>
 
         <section className="stapel lehrkraft__brief-abschnitt">
-          <h3>Was schon gut klappt</h3>
-          {auswertung.bearbeitet === 0 ? (
-            <p>Ihr Kind steht noch am Anfang mit diesem Thema. Bald gibt es hier mehr zu berichten.</p>
+          <h3>{texte.titelKlappt}</h3>
+          {/*
+            Bewusst ohne Zahlen. Frueher stand hier "Ihr Kind hat 3 Aufgaben
+            bearbeitet, 1 davon gleich richtig" - eine Quote aus einer
+            Handvoll Versuchen, die im Elterngespraech ein Gewicht bekommt,
+            das sie nicht tragen kann. Dieselbe Ueberlegung wie bei der
+            Kennzahlenschwelle in der Auswertung. Wer Zahlen braucht, findet
+            sie dort; dieser Brief soll etwas anderes leisten.
+          */}
+          {!auswertung.aussagekraeftig ? (
+            <p>{texte.satzAnfang}</p>
           ) : (
             <p>
-              Ihr Kind hat {auswertung.bearbeitet} Aufgaben bearbeitet. {auswertung.ersterVersuchRichtig}{' '}
-              davon hat es gleich beim ersten Mal richtig gemacht.
+              {texte.satzArbeitet}
               {auswertung.selbstkorrekturQuote !== null && auswertung.selbstkorrekturQuote > 0
-                ? ' Wenn etwas nicht sofort richtig war, hat Ihr Kind oft selbst die richtige Antwort gefunden. Das ist eine sehr gute Fähigkeit.'
+                ? ` ${texte.satzSelbstkorrektur}`
                 : ''}
             </p>
           )}
         </section>
 
         <section className="stapel lehrkraft__brief-abschnitt">
-          <h3>Woran wir weiter arbeiten</h3>
-          {auswertung.genusUnsicher.length > 0 ? (
-            <p>
-              Wir üben weiter, welches kleine Wort vor einem Nomen steht: der, die oder das. Das üben wir
-              zum Beispiel bei diesen Wörtern:{' '}
-              {auswertung.genusUnsicher
-                .map((wortId) => findeWort(modul, wortId))
-                .filter((wort): wort is NonNullable<typeof wort> => wort !== undefined)
-                .map((wort) => wortMitArtikel(wort))
-                .join(', ')}
-              .
-            </p>
+          <h3>{texte.titelWeiter}</h3>
+          {unsichereWoerter.length > 0 ? (
+            <p>{fuelle(texte.satzArtikel, { woerter: unsichereWoerter })}</p>
           ) : (
-            <p>Wir üben weiter das Lesen und Verstehen von kurzen Texten.</p>
+            <p>{texte.satzLesen}</p>
           )}
         </section>
 
         <section className="stapel lehrkraft__brief-abschnitt">
-          <h3>Wie Sie zu Hause helfen können</h3>
+          <h3>{texte.titelHilfe}</h3>
           <ul>
-            <li>
-              Benennen Sie zusammen Dinge zu Hause auf Deutsch, zum Beispiel: der Tisch, die Tür, das
-              Fenster.
-            </li>
-            <li>
-              Lassen Sie Ihr Kind laut vorlesen. Das ist wichtig, auch wenn nicht jedes Wort verstanden
-              wird.
-            </li>
-            <li>Fragen Sie nach der Schule: „Was hast du heute gelernt?“ Auch eine kurze Antwort hilft.</li>
+            {texte.hilfen.map((hilfe, i) => (
+              <li key={i}>{hilfe}</li>
+            ))}
           </ul>
         </section>
 
-        <p>Vielen Dank für Ihre Unterstützung!</p>
-        <p>Mit freundlichen Grüßen</p>
+        <p>{texte.dank}</p>
+        <p>{texte.gruss}</p>
         <div className="lehrkraft__unterschrift-linie" aria-hidden="true" />
-        <p className="lehrkraft__brief-signatur-label">Unterschrift der Lehrkraft</p>
+        <p className="lehrkraft__brief-signatur-label">{texte.unterschrift}</p>
       </article>
 
       <div className="karte">

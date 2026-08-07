@@ -156,6 +156,50 @@
   line-height: var(--zeile-normal);
 }
 
+/* Zeichen und Text stehen nebeneinander, das Zeichen oben ausgerichtet -
+   bei mehrzeiliger Rueckmeldung soll es an der ersten Zeile kleben. */
+.melde__kopf {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r-3);
+}
+
+.melde__text {
+  margin: 0;
+}
+
+.melde__zeichen {
+  display: block;
+  flex: none;
+  /* Waechst mit der Schriftgroesse mit, statt fix in Pixeln zu stehen. */
+  inline-size: 1.5em;
+  block-size: 1.5em;
+  /* Optischer Ausgleich: Ein Kreis wirkt neben Text sonst leicht zu hoch. */
+  margin-block-start: -0.05em;
+}
+
+.melde__zeichen svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.melde__zeichen--richtig {
+  color: var(--r-richtig);
+}
+
+.melde__zeichen--fast {
+  color: var(--r-fast);
+}
+
+.melde__zeichen--falsch {
+  color: var(--r-falsch);
+}
+
+.melde__zeichen--offen {
+  color: var(--t-leise);
+}
+
 .melde--richtig {
   background-color: var(--r-richtig-flaeche);
   border-left-color: var(--r-richtig);
@@ -169,6 +213,23 @@
 .melde--falsch {
   background-color: var(--r-falsch-flaeche);
   border-left-color: var(--r-falsch);
+}
+
+/* "offen" bleibt bewusst neutral: kein Gruen, kein Rot. Es ist kein Urteil,
+   sondern ein Hinweis, dass noch jemand draufschauen muss. */
+.melde--offen {
+  background-color: var(--f-karte-tief);
+  border-left-color: var(--f-rand-stark);
+}
+
+/* ---------------------------------------------------------------------
+ * Einzelbild eines Gegenstands aus der Szene
+ * --------------------------------------------------------------------- */
+.objektbild {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  max-block-size: 100%;
 }
 
 /* ---------------------------------------------------------------------
@@ -307,4 +368,30 @@
   .reihe--gestapelt > .knopf {
     width: 100%;
   }
+}
+
+/* Rasterfassung: mehrere Stueck stehen nebeneinander in einer Zeile.
+   Der Vektorpfad legt sie im SVG selbst nebeneinander - beim Rasterbild
+   uebernimmt das Flexbox, damit die Einzeldatei unveraendert bleiben kann. */
+.objektbild--raster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--r-2);
+  inline-size: 100%;
+}
+
+.objektbild--raster img {
+  display: block;
+  min-inline-size: 0;
+  inline-size: auto;
+  block-size: auto;
+  max-inline-size: 100%;
+  /* `inherit` und nicht `100%`: Die Umgebung begrenzt die Hoehe auf dem
+     .objektbild-Element selbst (z. B. 3rem im Hefteintrag). Ein Flex-Container
+     reicht so eine Begrenzung aber NICHT an seine Kinder weiter - er wuerde
+     sie nur beschneiden. Ohne dieses `inherit` erscheinen die Bilder in voller
+     Aufloesung und schieben sich uebereinander. */
+  max-block-size: inherit;
+  object-fit: contain;
 }

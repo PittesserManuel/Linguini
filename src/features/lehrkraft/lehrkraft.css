@@ -157,8 +157,25 @@
 /* ---------------------------------------------------------------------
  * Reiter 3: Auswertung
  * --------------------------------------------------------------------- */
+/* Linksbuendig wie alles andere im Bereich: Eine zentrierte Karte mitten in
+   einer sonst linksbuendigen Oberflaeche liest sich wie ein Fehlerdialog.
+   Sie soll aber sagen "hier kommt gleich etwas", nicht "hier ist etwas
+   schiefgegangen". */
 .lehrkraft__leerzustand {
-  text-align: center;
+  max-inline-size: var(--breite-schmal);
+}
+
+.lehrkraft__leerzustand-liste {
+  display: grid;
+  gap: var(--r-2);
+  margin: 0;
+  padding-inline-start: var(--r-5);
+  color: var(--t-normal);
+}
+
+.lehrkraft__leerzustand-hinweis {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
 }
 
 .lehrkraft__fortschritt-text {
@@ -371,8 +388,79 @@
  * durch eine Karte umbrechen; der Elternbrief bricht sauber zwischen den
  * Abschnitten um.
  * --------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------
+ * Sprachwahl fuer den Elternbrief
+ *
+ * Optisch die Niveaustufenwahl aus der Kopfzeile: Beides sind Schalter,
+ * die den Inhalt darunter austauschen. Gleiche Funktion, gleiche Form.
+ * --------------------------------------------------------------------- */
+.lehrkraft__sprachwahl {
+  padding: 0;
+  border: none;
+}
+
+.lehrkraft__sprachwahl-legende {
+  padding: 0;
+  margin-bottom: var(--r-2);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+  font-weight: 700;
+}
+
+.lehrkraft__sprachwahl-optionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+}
+
+.lehrkraft__sprache {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-2);
+  min-height: var(--ziel-min);
+  padding: var(--r-2) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border: 2px solid transparent;
+  border-radius: var(--e-rund);
+  color: var(--t-normal);
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--tempo) var(--kurve);
+}
+
+.lehrkraft__sprache:has(:focus-visible) {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 2px;
+}
+
+.lehrkraft__sprache.ist-gewaehlt {
+  border-color: var(--m-petrol);
+  background-color: var(--m-petrol-hell);
+  color: var(--m-petrol-tief);
+}
+
+.lehrkraft__sprache input {
+  width: var(--r-4);
+  height: var(--r-4);
+  accent-color: var(--m-petrol);
+}
+
+/* Der deutsche Name klein daneben - fuer die Lehrkraft beim Auswaehlen.
+   Wer die Sprache braucht, erkennt sie am Eigennamen davor. */
+.lehrkraft__sprache-deutsch {
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+  font-weight: 400;
+}
+
 @media print {
+  /* Der Kopf ueber Elternbrief und Uebergabezettel enthaelt nur eine
+     Bildschirmanweisung ("kann direkt ausgedruckt werden") und den
+     Druckknopf selbst - beides auf dem Ausdruck sinnlos. Die Sprachwahl
+     ebenso: Auf Papier steht genau eine Sprache. */
   .lehrkraft__reiter,
+  .lehrkraft__eltern-kopf,
+  .lehrkraft__sprachwahl,
   .lehrkraft__drucken-knopf {
     display: none;
   }
@@ -397,5 +485,150 @@
 
   .wortkarten-bogen__raster {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---------------------------------------------------------------------
+ * Uebergabezettel
+ *
+ * Wird gedruckt und von Hand ausgefuellt. Deshalb: grosszuegige Zeilen,
+ * echte Linien statt Eingabefelder, und Kaestchen, die man ankreuzen
+ * kann. Auf dem Bildschirm sieht das schon aus wie auf Papier - was man
+ * dort sieht, kommt so aus dem Drucker.
+ * --------------------------------------------------------------------- */
+.uebergabe__untertitel {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.uebergabe__zeilen {
+  display: grid;
+  gap: var(--r-4);
+}
+
+/* Beschriftung links, Linie fuellt den Rest - die Linie ist das Feld. */
+.uebergabe__linie {
+  display: flex;
+  align-items: baseline;
+  gap: var(--r-3);
+}
+
+.uebergabe__linie-label {
+  color: var(--t-leise);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.uebergabe__linie-strich {
+  flex: 1;
+  border-block-end: 1px solid var(--f-rand-stark);
+  /* Hoch genug, dass eine Handschrift daruebersteht, ohne den Strich zu
+     treffen. Zwei Zeilen Abstand waeren Verschwendung, eine zu eng. */
+  block-size: 1.5rem;
+}
+
+.uebergabe__modul {
+  padding-block: var(--r-3);
+  border-block: 1px solid var(--f-rand);
+  color: var(--t-normal);
+  font-size: var(--s-sm);
+}
+
+.uebergabe__block h4 {
+  margin-block-end: var(--r-3);
+  font-size: var(--s-md);
+}
+
+.uebergabe__block + .uebergabe__block {
+  margin-block-start: var(--r-5);
+}
+
+.uebergabe__kaestchen-liste {
+  display: grid;
+  gap: var(--r-3);
+  padding: 0;
+  list-style: none;
+}
+
+.uebergabe__kaestchen-liste li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r-3);
+}
+
+/* Ein echtes Quadrat zum Ankreuzen. Kein <input type="checkbox">: Der
+   Haken kommt von Hand, nicht vom Browser - und ein angeklicktes Kaestchen
+   waere ein Zustand, den niemand speichert und der beim Drucken fehlt. */
+.uebergabe__kaestchen {
+  flex: none;
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+  margin-block-start: 0.15rem;
+  border: 1.5px solid var(--f-rand-stark);
+  border-radius: 3px;
+}
+
+.uebergabe__heftmarke {
+  padding: 0.1em 0.5em;
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-sm);
+  font-size: var(--s-xs);
+  font-weight: 700;
+}
+
+.uebergabe__wortzeile {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+  padding: 0;
+  list-style: none;
+}
+
+.uebergabe__wort {
+  padding: 0.2em 0.6em;
+  border-radius: var(--e-sm);
+  font-weight: 700;
+}
+
+.uebergabe__leer {
+  color: var(--t-leise);
+}
+
+.uebergabe__korrektur {
+  padding-block-start: var(--r-4);
+  border-block-start: 1px solid var(--f-rand);
+}
+
+.uebergabe__korrektur-titel {
+  margin-block-end: var(--r-2);
+  color: var(--t-leise);
+  font-weight: 700;
+}
+
+/* Vier Schreibzeilen aus einem Verlauf - genug fuer einen Satz Rueckmeldung,
+   zu wenig fuer einen Aufsatz. Das ist Absicht. */
+.uebergabe__korrektur-feld {
+  display: block;
+  block-size: 6rem;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(1.5rem - 1px),
+    var(--f-rand) calc(1.5rem - 1px),
+    var(--f-rand) 1.5rem
+  );
+}
+
+@media print {
+  /* Der Zettel ist eine Seite. Bricht er um, ist die Rueckmeldung von der
+     Aufgabe getrennt, auf die sie sich bezieht. */
+  .uebergabe {
+    break-inside: avoid;
+    border: none;
+    box-shadow: none;
+  }
+
+  .uebergabe__untertitel {
+    display: none;
   }
 }

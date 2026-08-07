@@ -1,5 +1,5 @@
 import type { Fehlerart, Bewertung } from '@/grading/types'
-import type { Niveaustufe } from '@/content/types'
+import type { Jahrgangsstufe, Niveaustufe } from '@/content/types'
 
 /**
  * Lernstand einer Sitzung.
@@ -40,11 +40,37 @@ export interface WortStand {
   /** Artikel richtig zugeordnet. */
   artikelRichtig: number
   artikelFalsch: number
+  /**
+   * Das Wort in der Erstsprache des Kindes, selbst eingetragen.
+   *
+   * In der DaZ-Wortschatzarbeit ist die Erstsprache kein Umweg, sondern der
+   * kuerzeste Weg zur Bedeutung: Wer "Radiergummi" nicht kennt, dem hilft
+   * eine Erklaerung aus fuenf weiteren deutschen Woertern wenig. Der
+   * Heftauftrag verlangt diese Uebersetzung ohnehin ("uebersetze sie in
+   * deine Sprache") - die App hatte dafuer nur keinen Platz.
+   *
+   * Bewusst ein freies Textfeld ohne Sprachauswahl und ohne
+   * Uebersetzungsdienst: Es wird nichts erkannt, nichts gesendet, nichts
+   * geprueft. Der Eintrag folgt exakt dem Speichern-Schalter (Voreinstellung
+   * aus, dann nur fuer die Sitzung) und taucht in keiner Auswertung und in
+   * keinem Elternbrief auf.
+   */
+  eigeneSprache?: string
 }
 
 export interface Lernstand {
   modulId: string
   stufe: Niveaustufe
+  /**
+   * Gewaehlte Jahrgangsfassung des Lesetexts, oder null bei Modulen ohne
+   * Fassungen.
+   *
+   * Gehoert in den Lernstand und nicht in eine lokale Komponente, weil die
+   * Auswertung ihn braucht: Ohne ihn wuesste sie nicht, WELCHE Aufgaben in
+   * diesem Lernweg ueberhaupt erreichbar waren, und wuerde "bearbeitet 6 von
+   * 25" melden, wo 6 von 9 richtig waere.
+   */
+  jahrgang: Jahrgangsstufe | null
   aufgaben: Record<string, AufgabenStand>
   woerter: Record<string, WortStand>
   /** Beginn der Sitzung als ISO-String - nur fuer die Dauer-Anzeige. */
@@ -62,6 +88,17 @@ export interface Lernstand {
 export interface Auswertung {
   bearbeitet: number
   gesamt: number
+  /**
+   * Reichen die Daten fuer eine Aussage ueber das Kind?
+   *
+   * Unter einer Handvoll bearbeiteter Aufgaben sind Quoten Rauschen: "0 von
+   * 1 richtig" und "0 %" mit einem Fehlerbalken ueber die volle Breite sieht
+   * nach Alarm aus, obwohl nichts gemessen wurde. Der Lehrkraft-Bereich
+   * blendet die Kennzahlen darunter aus und sagt stattdessen, dass es noch
+   * zu frueh ist. Der Bearbeitungsstand bleibt sichtbar - der stimmt ab der
+   * ersten Aufgabe.
+   */
+  aussagekraeftig: boolean
   /** Im ersten Anlauf geloest. */
   ersterVersuchRichtig: number
   /** Nach einem Fehlversuch selbst korrigiert - starker Lernindikator. */
@@ -76,11 +113,21 @@ export interface Auswertung {
   aufgeloest: string[]
   /** Lernwoerter mit mindestens einem Genusfehler. */
   genusUnsicher: string[]
+  /**
+   * Schreibauftraege, die das Kind als erledigt gemeldet hat und die jetzt
+   * eine Lehrperson im Heft ansehen muss.
+   *
+   * Bewusst KEINE Kennzahl, sondern eine Arbeitsliste: Die App hat diese
+   * Texte nie gesehen: sie kann nicht sagen, ob sie stimmen, nur dass sie
+   * geschrieben wurden.
+   */
+  offeneHeftauftraege: string[]
 }
 
 export const LEERER_LERNSTAND = (modulId: string, stufe: Niveaustufe): Lernstand => ({
   modulId,
   stufe,
+  jahrgang: null,
   aufgaben: {},
   woerter: {},
   begonnen: null,

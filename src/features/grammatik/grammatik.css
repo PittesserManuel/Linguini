@@ -1,0 +1,443 @@
+/**
+ * Grammatikbereich und Hefteintrag.
+ *
+ * Ausschliesslich Tokens aus tokens.css, keine hartkodierten Farben, Groessen,
+ * Radien oder Abstaende. Muss NACH base.css und komponenten.css geladen werden
+ * (nutzt .karte, .knopf, .marke--*, .chip, .reiter, .stapel daraus).
+ *
+ * Gestaltungsleitgedanke: Der Hefteintrag am Bildschirm soll AUSSEHEN wie das,
+ * was gleich ins Heft geschrieben wird - Linien, umrandete Kaesten, farbige
+ * Schluesselwoerter. Wer abschreibt, findet die Zeile wieder, die er gerade
+ * geschrieben hat. Das ist kein Dekor, das ist Orientierung.
+ */
+
+.grammatik__vorspann {
+  color: var(--t-leise);
+  font-size: var(--s-md);
+}
+
+/* ---------------------------------------------------------------------
+ * Ablaufanzeige: erst Heft, dann Uebung
+ * --------------------------------------------------------------------- */
+.grammatik__schritte {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.grammatik__schritt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-2);
+  padding: var(--r-2) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-rund);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.grammatik__schritt-nummer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.6em;
+  block-size: 1.6em;
+  background-color: var(--f-rand-stark);
+  border-radius: var(--e-rund);
+  color: var(--f-karte);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.grammatik__schritt.ist-aktiv {
+  background-color: var(--m-petrol-hell);
+  color: var(--t-stark);
+  font-weight: 600;
+}
+
+.grammatik__schritt.ist-aktiv .grammatik__schritt-nummer,
+.grammatik__schritt.ist-erledigt .grammatik__schritt-nummer {
+  background-color: var(--m-petrol);
+}
+
+.grammatik__anleitung {
+  color: var(--t-normal);
+  font-size: var(--s-md);
+}
+
+.grammatik__nachschlagen-titel {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.grammatik__uebungen:focus {
+  outline: none;
+}
+
+.grammatik__uebungen:focus-visible {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 4px;
+}
+
+/*
+ * Die Aufgabenkarte kommt aus dem Lesen-Modul. Dort steht sie in einer
+ * schmalen Spalte NEBEN dem Text, deshalb ihre Breitenbegrenzung. Hier
+ * steht sie allein unter dem breiten Merktext - und endete bei zwei
+ * Dritteln, sodass rechts daneben eine leere Spalte stehenblieb, als waere
+ * die Seite kaputt. Die Begrenzung gehoert zum Ort, nicht zur Karte.
+ */
+.grammatik__uebungen .lesen__aufgabe {
+  max-width: none;
+}
+
+/*
+ * Der Kasten selbst darf die Spalte fuellen, der Fliesstext darin nicht:
+ * eine Frage ueber die ganze Breite ist schlechter zu lesen, nicht besser.
+ */
+.grammatik__uebungen .lesen__aufgabe > h3,
+.grammatik__uebungen .lesen__aufgabe > p {
+  max-inline-size: var(--breite-schmal);
+}
+
+/* ---------------------------------------------------------------------
+ * Der Hefteintrag
+ * --------------------------------------------------------------------- */
+.hefteintrag {
+  display: grid;
+  gap: var(--r-5);
+  padding: var(--r-5);
+  background-color: var(--f-karte);
+  border: 1px solid var(--f-rand);
+  border-radius: var(--e-lg);
+  box-shadow: var(--schatten-sm);
+}
+
+.hefteintrag__kopf {
+  text-align: center;
+}
+
+.hefteintrag__titel {
+  display: inline-block;
+  padding-block-end: var(--r-1);
+  border-block-end: 3px solid var(--m-petrol);
+  color: var(--m-petrol-tief);
+  font-family: var(--schrift-anzeige);
+  font-size: var(--s-h2);
+}
+
+.hefteintrag__untertitel {
+  margin-block-start: var(--r-2);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.hefteintrag__satz {
+  color: var(--t-stark);
+  font-size: var(--s-md);
+  line-height: var(--zeile-normal);
+}
+
+/* Die Bildchen im Eintrag ordnen sich dem Satz unter - aber sie muessen
+   erkennbar bleiben. Bei 3rem war eine Schere nur noch ein graues Kreuz;
+   das handschriftliche Vorbild zeigt sie deutlich groesser als die Zeile. */
+.hefteintrag__bild {
+  display: block;
+  max-inline-size: 100%;
+}
+
+.hefteintrag__bild .objektbild {
+  max-block-size: 4.5rem;
+}
+
+/* In der Regelzeile stehen die Bildchen neben laufendem Text und bleiben
+   deshalb kleiner als in den Beispielspalten. */
+.hefteintrag__regel-bild .objektbild {
+  max-block-size: 3.25rem;
+}
+
+/* --- Regelzeile mit Pfeil --- */
+.hefteintrag__regel {
+  display: grid;
+  gap: var(--r-3);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  padding: var(--r-3) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-md);
+}
+
+.hefteintrag__pfeil {
+  display: block;
+  inline-size: 1.4em;
+  block-size: 1.4em;
+  margin-block-start: 0.1em;
+}
+
+.hefteintrag__pfeil svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.hefteintrag__regel--einzahl .hefteintrag__pfeil {
+  color: var(--a-der);
+}
+
+.hefteintrag__regel--mehrzahl .hefteintrag__pfeil {
+  color: var(--a-das);
+}
+
+.hefteintrag__regel-text {
+  color: var(--t-stark);
+  font-size: var(--s-md);
+  line-height: var(--zeile-normal);
+}
+
+.hefteintrag__schluesselwort {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.hefteintrag__regel--einzahl .hefteintrag__schluesselwort {
+  color: var(--a-der);
+}
+
+.hefteintrag__regel--mehrzahl .hefteintrag__schluesselwort {
+  color: var(--a-das);
+}
+
+.hefteintrag__regel-bild {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+  grid-column: 2;
+}
+
+/* --- Umrandeter Regelkasten --- */
+.hefteintrag__kasten {
+  display: grid;
+  gap: var(--r-2);
+  padding: var(--r-4);
+  border: 2px solid var(--a-der);
+  border-radius: var(--e-md);
+}
+
+.hefteintrag__kasten-titel {
+  color: var(--a-der);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.hefteintrag__kasten-zeile {
+  color: var(--t-stark);
+  font-size: var(--s-md);
+  line-height: var(--zeile-normal);
+}
+
+/* --- Gegenueberstellung Einzahl / Mehrzahl --- */
+.hefteintrag__gegen-titel {
+  margin-block-end: var(--r-3);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.hefteintrag__gegen-liste {
+  display: grid;
+  gap: var(--r-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hefteintrag__gegen-zeile {
+  display: grid;
+  gap: var(--r-4);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 40rem) {
+  .hefteintrag__gegen-zeile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Die gestrichelte Trennlinie zwischen Einzahl und Mehrzahl - genau wie im
+     handschriftlichen Vorbild. */
+  .hefteintrag__gegen-spalte--mehrzahl {
+    padding-inline-start: var(--r-4);
+    border-inline-start: 2px dashed var(--f-rand-stark);
+  }
+}
+
+.hefteintrag__gegen-spalte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-2);
+}
+
+.hefteintrag__gegen-spalte--einzahl .hefteintrag__satz::before,
+.hefteintrag__gegen-spalte--mehrzahl .hefteintrag__satz::before {
+  content: '•';
+  margin-inline-end: 0.4em;
+}
+
+.hefteintrag__gegen-spalte--einzahl .hefteintrag__satz::before {
+  color: var(--a-der);
+}
+
+.hefteintrag__gegen-spalte--mehrzahl .hefteintrag__satz::before {
+  color: var(--a-das);
+}
+
+/* --- Drei Genus-Spalten --- */
+.hefteintrag__spalten {
+  display: grid;
+  gap: var(--r-4);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hefteintrag__spalte {
+  display: grid;
+  gap: var(--r-3);
+  align-content: start;
+  padding: var(--r-4);
+  border: 2px solid;
+  border-radius: var(--e-md);
+}
+
+.hefteintrag__spalte--der {
+  border-color: var(--a-der);
+  background-color: var(--a-der-flaeche);
+}
+
+.hefteintrag__spalte--die {
+  border-color: var(--a-die);
+  background-color: var(--a-die-flaeche);
+}
+
+.hefteintrag__spalte--das {
+  border-color: var(--a-das);
+  background-color: var(--a-das-flaeche);
+}
+
+.hefteintrag__spalte-kopf {
+  display: flex;
+  align-items: baseline;
+  gap: var(--r-2);
+}
+
+.hefteintrag__spalte-marke {
+  font-size: var(--s-lg);
+}
+
+.hefteintrag__spalte-bezeichnung {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.hefteintrag__spalte-regel {
+  color: var(--t-normal);
+  font-size: var(--s-md);
+  font-weight: 600;
+}
+
+.hefteintrag__spalte-beispiele {
+  display: grid;
+  gap: var(--r-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hefteintrag__spalte-beispiele li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-1);
+}
+
+/* --- Merke-Kasten --- */
+.hefteintrag__merke {
+  display: grid;
+  gap: var(--r-3);
+  padding: var(--r-4);
+  border: 2px solid var(--m-ocker);
+  border-radius: var(--e-md);
+}
+
+.hefteintrag__merke-titel {
+  display: flex;
+  align-items: center;
+  gap: var(--r-2);
+  color: var(--m-ocker);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.hefteintrag__stern {
+  display: block;
+  inline-size: 1.2em;
+  block-size: 1.2em;
+}
+
+.hefteintrag__stern svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.hefteintrag__merke-liste {
+  display: grid;
+  gap: var(--r-2);
+  margin: 0;
+  padding-inline-start: var(--r-5);
+}
+
+.hefteintrag__merke-liste li {
+  font-size: var(--s-md);
+}
+
+/* --- Wichtig-Zeile --- */
+.hefteintrag__wichtig {
+  display: grid;
+  gap: var(--r-2);
+  padding-inline-start: var(--r-4);
+  border-inline-start: 4px solid var(--a-die);
+}
+
+.hefteintrag__wichtig-text {
+  font-size: var(--s-md);
+  line-height: var(--zeile-normal);
+}
+
+.hefteintrag__wichtig-text strong {
+  color: var(--a-die);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.hefteintrag__wichtig-beispiele {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2) var(--r-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: var(--t-normal);
+  font-size: var(--s-sm);
+}
+
+/* Das gesteigerte s in "zwei Radiergummis" ist der eigentliche Merkpunkt -
+   die Zeile zeigt die Reihe ein / zwei / drei nebeneinander. */
+.hefteintrag__wichtig-beispiele li + li::before {
+  content: '→';
+  margin-inline-end: 0.4em;
+  color: var(--t-leise);
+}

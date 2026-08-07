@@ -212,19 +212,57 @@
   filter: drop-shadow(var(--schatten-lg));
 }
 
-/* Ueben: aktiv = zuletzt FALSCH angeklicktes Objekt - roter Umriss statt
-   Schlagschatten. Kein Wackeln (prefers-reduced-motion gilt fuer alle
-   Bewegung, hier ist ohnehin keine - nur ein Filterwechsel). */
-.wortbild__rahmen[data-modus='ueben'] .szene__objekt.ist-aktiv {
-  filter: drop-shadow(1.5px 0 0 var(--r-falsch)) drop-shadow(-1.5px 0 0 var(--r-falsch))
-    drop-shadow(0 1.5px 0 var(--r-falsch)) drop-shadow(0 -1.5px 0 var(--r-falsch));
+/* Die Zielflaeche ist normalerweise unsichtbar - sie ist nur das grosszuegige
+   Tippziel. Ohne Interaktion nimmt sie keine Klicks an. */
+.szene__ziel {
+  pointer-events: none;
 }
 
-/* Ueben: gefunden = bereits richtig zugeordnetes Lernwort - bleibt
+.szene__objekt[role='button'] .szene__ziel {
+  pointer-events: auto;
+}
+
+/* Die Zustandsfarben AUF der Szene sind festgenagelt, nicht aus tokens.css:
+   Die Illustration ist in beiden Farbschemata hell (siehe Szene.tsx). Ein
+   Rahmen, der im Dunkelmodus mit aufhellt, waere darauf unsichtbar. */
+.wortbild__rahmen {
+  --szene-rahmen: #23201c;
+  --szene-treffer: #2e7d52;
+  --szene-daneben: #a8443c;
+}
+
+/* Schreiben: aktiv = der GESUCHTE Gegenstand. Hier wird die Zielflaeche
+   sichtbar und rahmt ihn ein - das ist die Aufgabenstellung, nicht Deko.
+   Ein Rechteck statt eines Schlagschattens, weil es unmissverstaendlich
+   sagt "dieses Ding hier" und nicht "dieses Ding leuchtet". Die helle
+   Aussenlinie sorgt dafuer, dass der Rahmen auch auf dunklem Untergrund
+   (Tafel) sichtbar bleibt. */
+.wortbild__rahmen[data-modus='schreiben'] .szene__objekt.ist-aktiv .szene__ziel {
+  rx: 12px;
+  fill: #ffffff;
+  fill-opacity: 0.14;
+  stroke: var(--szene-rahmen);
+  stroke-width: 5;
+  paint-order: stroke;
+}
+
+.wortbild__rahmen[data-modus='schreiben'] .szene__objekt.ist-aktiv {
+  filter: drop-shadow(0 0 2px #ffffff);
+}
+
+/* Zuordnen: aktiv = zuletzt FALSCH angeklicktes Objekt - roter Umriss statt
+   Schlagschatten. Kein Wackeln (prefers-reduced-motion gilt fuer alle
+   Bewegung, hier ist ohnehin keine - nur ein Filterwechsel). */
+.wortbild__rahmen[data-modus='zuordnen'] .szene__objekt.ist-aktiv {
+  filter: drop-shadow(1.5px 0 0 var(--szene-daneben)) drop-shadow(-1.5px 0 0 var(--szene-daneben))
+    drop-shadow(0 1.5px 0 var(--szene-daneben)) drop-shadow(0 -1.5px 0 var(--szene-daneben));
+}
+
+/* Zuordnen und Schreiben: gefunden = bereits geschafftes Lernwort - bleibt
    dauerhaft mit gruenem Umriss markiert. */
 .szene__objekt.ist-gefunden {
-  filter: drop-shadow(2px 0 0 var(--r-richtig)) drop-shadow(-2px 0 0 var(--r-richtig))
-    drop-shadow(0 2px 0 var(--r-richtig)) drop-shadow(0 -2px 0 var(--r-richtig));
+  filter: drop-shadow(2px 0 0 var(--szene-treffer)) drop-shadow(-2px 0 0 var(--szene-treffer))
+    drop-shadow(0 2px 0 var(--szene-treffer)) drop-shadow(0 -2px 0 var(--szene-treffer));
 }
 
 /* Entdecken: sobald ein Objekt aktiv ist, alle anderen dezent abdunkeln -
@@ -315,6 +353,18 @@
   font-weight: 700;
 }
 
+/* Das Objektbild steht zwischen Ueberschrift und Erklaerung: erst sehen,
+   dann lesen. Links ausgerichtet statt zentriert, damit es in der Spalte
+   mit dem Text steht und nicht als Deko daneben. Die Hoehe ist gedeckelt,
+   weil die Karte auf dem Handy die ganze Hoehe fuellt - ein 512er Bild
+   wuerde die Artikel-Uebung darunter aus dem Bild schieben. */
+.wortkarte__bild {
+  align-self: flex-start;
+  max-block-size: 7rem;
+  max-inline-size: 100%;
+  object-fit: contain;
+}
+
 .wortkarte__erklaerung {
   font-size: var(--s-lg);
   line-height: var(--zeile-normal);
@@ -332,6 +382,23 @@
   padding-block-start: var(--r-4);
   border: none;
   border-block-start: 1px solid var(--f-rand);
+}
+
+/* Die Erstsprache steht unten und ruhig: Sie wird nicht geprueft, nicht
+   bewertet und nicht gemeldet. Kein Rahmen um den Block, keine Marke,
+   keine Farbe - das Feld gehoert dem Kind, nicht der Aufgabe. */
+.wortkarte__eigene-sprache {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--r-2) var(--r-3);
+  padding-block-start: var(--r-4);
+  border-block-start: 1px solid var(--f-rand);
+}
+
+.wortkarte__eigene-sprache input {
+  flex: 1 1 10rem;
+  min-inline-size: 0;
 }
 
 .wortkarte__uebung legend {
@@ -358,11 +425,24 @@
  * dem Bild, statt auf engem Raum zu ueberlappen.
  * --------------------------------------------------------------------- */
 @media (max-width: 900px) {
+  /* Das Bild bleibt beim Durchscrollen der Liste stehen. Ohne das war der
+     Kern des Bereichs auf dem Handy verloren: Wer bei "Papierkorb" ganz
+     unten in der Liste tippt, hat das Bild laengst aus dem Blick - und
+     "Klicke auf ein Wort ODER auf einen Gegenstand im Bild" wird zur
+     leeren Behauptung. So sieht man, welcher Gegenstand aufleuchtet. */
+  .wortbild__rahmen {
+    position: sticky;
+    top: var(--r-3);
+    z-index: 1;
+  }
+
   .wortbild__beschriftungen {
     position: static;
     inset: auto;
-    display: flex;
-    flex-direction: column;
+    /* Zweispaltig: Einundzwanzig Woerter untereinander sind drei
+       Bildschirmlaengen Vokabelliste. Nebeneinander ist es eine. */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
     gap: var(--r-2);
     margin-block-start: var(--r-4);
     pointer-events: auto;
@@ -393,10 +473,32 @@
 }
 
 @media (max-width: 640px) {
+  /*
+   * Auf dem Handy holt sich das Bild den Seitenrand zurueck.
+   *
+   * Grund ist nicht Optik, sondern Trefferflaeche: Bei 390 px Bildschirm
+   * blieben dem Bild 342 px, und das Lineal war damit 21 px hoch - unter
+   * den 24 px, die WCAG 2.5.8 als Mindestmass fuer ein Ziel nennt. Mit den
+   * vollen 390 px sind es 24 px. Vierzehn Prozent klingen nach wenig, hier
+   * entscheiden sie ueber treffen und danebentippen.
+   *
+   * Der negative Rand ist genau der Innenabstand von .inhalt, deshalb
+   * derselbe Token - und kein 100vw-Kniff, der bei sichtbarer
+   * Bildlaufleiste waagrecht ueberliefe.
+   */
+  .wortbild__rahmen {
+    /* Ohne dies bleibt es bei width: 100% aus der Grundregel - der negative
+       Rand schoebe den Kasten dann nur nach links, statt ihn zu verbreitern. */
+    inline-size: auto;
+    margin-inline: calc(-1 * var(--r-5));
+    border-inline-width: 0;
+    border-radius: 0;
+  }
+
   .wortkarte {
-    width: 100vw;
-    max-height: 100vh;
-    height: 100vh;
+    inline-size: 100vw;
+    max-block-size: 100dvh;
+    block-size: 100dvh;
     border-radius: 0;
   }
 
@@ -486,4 +588,160 @@
     border-color: transparent;
     background-color: transparent;
   }
+}
+
+/* ---------------------------------------------------------------------
+ * Paketwahl - welche Portion Wortschatz wird gerade geuebt?
+ *
+ * Optisch bewusst wie die Niveaustufenwahl in der Kopfzeile: Beides sind
+ * Schalter, die den Umfang der Uebung bestimmen. Gleiche Funktion, gleiche
+ * Form.
+ * --------------------------------------------------------------------- */
+.wortbild__paketwahl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--r-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.wortbild__paketwahl-legende {
+  padding: 0;
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.wortbild__paketwahl-optionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+}
+
+.wortbild__paket-option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-2);
+  min-height: var(--ziel-min);
+  padding: var(--r-2) var(--r-4);
+  background-color: var(--f-karte);
+  border: 2px solid var(--f-rand-stark);
+  border-radius: var(--e-rund);
+  color: var(--t-normal);
+  cursor: pointer;
+  font-size: var(--s-sm);
+}
+
+.wortbild__paket-option input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.wortbild__paket-option:has(input:focus-visible) {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 2px;
+}
+
+.wortbild__paket-option.ist-gewaehlt {
+  background-color: var(--m-petrol);
+  border-color: var(--m-petrol);
+  color: var(--t-invers);
+  font-weight: 600;
+}
+
+.wortbild__paket-anzahl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 1.6em;
+  padding: 0 0.35em;
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-rund);
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.wortbild__paket-option.ist-gewaehlt .wortbild__paket-anzahl {
+  background-color: var(--m-petrol-tief);
+  color: var(--t-invers);
+}
+
+.wortbild__paket-marke {
+  align-self: flex-start;
+}
+
+/* ---------------------------------------------------------------------
+ * Schreiben-Modus
+ * --------------------------------------------------------------------- */
+.wortbild__schreiben-frage {
+  gap: var(--r-3);
+}
+
+.wortbild__schreiben-reihe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-3);
+  align-items: stretch;
+}
+
+.wortbild__schreiben-reihe .feld {
+  flex: 1 1 14rem;
+  inline-size: auto;
+}
+
+.wortbild__schreiben-loesung {
+  color: var(--t-normal);
+  font-size: var(--s-md);
+}
+
+/* ---------------------------------------------------------------------
+ * Heftauftraege im Entdecken-Bereich
+ * --------------------------------------------------------------------- */
+.wortbild__heft-titel {
+  font-size: var(--s-h3);
+}
+
+.wortbild__heft-vorspann {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.wortbild__heft-liste {
+  display: grid;
+  gap: var(--r-4);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wortbild__heft-eintrag {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-2);
+  padding: var(--r-4);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-md);
+  /* Die liniierte Anmutung eines Heftes - drei Pixel Farbe statt eines Bildes. */
+  border-left: 3px solid var(--m-ocker);
+}
+
+.wortbild__heft-marke {
+  align-self: flex-start;
+}
+
+.wortbild__heft-auftrag {
+  color: var(--t-stark);
+  font-size: var(--s-md);
+}
+
+.wortbild__heft-umfang,
+.wortbild__heft-muster {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
 }

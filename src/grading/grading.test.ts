@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import type { AufgabenTyp, Aufgabe, AufgabeFreitext } from '@/content/types'
+import type { AufgabenTyp, Aufgabe, AufgabeFreitext, AufgabeHeft, AufgabeMenge } from '@/content/types'
 import { modulKlassenzimmer } from '@/content/modul-klassenzimmer'
+import { modulWochenmarkt } from '@/content/modul-wochenmarkt'
 import type { Antwort, GraderKontext } from './types'
 import { damerauLevenshtein, schwelleFuer } from './distance'
 import { faltUmlaute, istNomenGross, normalisiere, teileArtikelNomen } from './normalize'
@@ -8,7 +9,9 @@ import {
   artikelGrader,
   auswahlGrader,
   freitextGrader,
+  heftGrader,
   lueckenGrader,
+  mengeGrader,
   reihenfolgeGrader,
   wahrheitGrader,
 } from './graders'
@@ -19,7 +22,7 @@ import { bewerte, damerauLevenshtein as dlAusIndex, faltUmlaute as faltUmlauteAu
 // ---------------------------------------------------------------------------
 
 function ctx(versuch: number, maxVersuche = 3): GraderKontext {
-  return { versuch, maxVersuche, stufe: 'standard' }
+  return { versuch, maxVersuche, stufe: 'standard', modul: modulKlassenzimmer }
 }
 
 /** Holt eine Aufgabe aus dem echten Modul und prueft ihren Typ zur Laufzeit. */
@@ -251,9 +254,15 @@ describe('freitextGrader', () => {
     expect(ergebnis.nochmal).toBe(false)
   })
 
-  it('akzeptiert das blosse Nomen ohne Artikel (im Modul explizit erlaubt)', async () => {
+  it('das blosse Nomen ist bei Artikelpflicht NICHT richtig, sondern fast', async () => {
+    // Die Aufgabe fragt woertlich nach dem Artikel. Frueher stand
+    // "Radiergummi" mit in der akzeptiert-Liste und die Liste wird VOR der
+    // Artikelpruefung ausgewertet - damit war die Artikeluebung genau die
+    // Uebung, in der der Artikel nichts galt.
     const ergebnis = await freitextGrader.bewerte({ wert: 'Radiergummi' }, f4, ctx(1))
-    expect(ergebnis.bewertung).toBe('richtig')
+    expect(ergebnis.bewertung).toBe('fast')
+    expect(ergebnis.fehlerart).toBe('genus')
+    expect(ergebnis.rueckmeldung).toContain('Artikel')
   })
 
   it('akzeptiert die Praepositionalform aus dem Beispielsatz', async () => {
@@ -261,11 +270,34 @@ describe('freitextGrader', () => {
     expect(ergebnis.bewertung).toBe('richtig')
   })
 
+  it('akzeptiert die Dativform, weil sie einen Artikel traegt', async () => {
+    const ergebnis = await freitextGrader.bewerte({ wert: 'dem Radiergummi' }, f4, ctx(1))
+    expect(ergebnis.bewertung).toBe('richtig')
+  })
+
+  it('ohne Artikelpflicht bleibt das blosse Nomen richtig', async () => {
+    // Die Verschaerfung gilt nur dort, wo die Aufgabe den Artikel verlangt.
+    const aufgabe = baueFreitextAufgabe({ akzeptiert: ['Radiergummi'], artikelPflicht: false })
+    const ergebnis = await freitextGrader.bewerte({ wert: 'Radiergummi' }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('richtig')
+  })
+
   it('Grossschreibung: kleingeschriebenes Nomen bleibt richtig, aber mit Hinweis', async () => {
-    const ergebnis = await freitextGrader.bewerte({ wert: 'radiergummi' }, f4, ctx(1))
+    // MIT Artikel, sonst ueberdeckt der fehlende Artikel den Befund: Wer
+    // "radiergummi" schreibt, hat zwei Maengel, und der fehlende Artikel
+    // wiegt in dieser Aufgabe schwerer. Hier soll allein die
+    // Grossschreibung geprueft werden.
+    const ergebnis = await freitextGrader.bewerte({ wert: 'der radiergummi' }, f4, ctx(1))
     expect(ergebnis.bewertung).toBe('richtig')
     expect(ergebnis.fehlerart).toBe('grossschreibung')
-    expect(ergebnis.rueckmeldung.toLowerCase()).toContain('gross')
+    expect(ergebnis.rueckmeldung.toLowerCase()).toContain('groß')
+  })
+
+  it('Grossschreibung bleibt auch ohne Artikelpflicht nur ein Hinweis, kein Fehler', async () => {
+    const aufgabe = baueFreitextAufgabe({ akzeptiert: ['Radiergummi'], artikelPflicht: false })
+    const ergebnis = await freitextGrader.bewerte({ wert: 'radiergummi' }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('richtig')
+    expect(ergebnis.fehlerart).toBe('grossschreibung')
   })
 
   it('Nomen richtig + Artikel falsch -> fast, Fehlerart genus', async () => {
@@ -324,6 +356,34 @@ describe('freitextGrader', () => {
     const aufgabe = baueFreitextAufgabe({ akzeptiert: ['Füße'], artikelPflicht: false })
     const ergebnis = await freitextGrader.bewerte({ wert: 'Fuesse' }, aufgabe, ctx(1))
     expect(ergebnis.bewertung).toBe('richtig')
+  })
+
+  it('verschluckter Endkonsonant zaehlt als Verschreibung, nicht als falsches Wort', async () => {
+    // Auslautverhaertung: gehoert wird "Bleistif". Das Wort war richtig
+    // gemeint, nur die Schreibung nicht - das Kind gehoert nicht zurueck
+    // auf die Wortsuche geschickt.
+    const aufgabe = baueFreitextAufgabe({ akzeptiert: ['der Bleistift'], artikelPflicht: true })
+    const ergebnis = await freitextGrader.bewerte({ wert: 'der Bleistif' }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('fast')
+    expect(ergebnis.fehlerart).toBe('rechtschreibung')
+  })
+
+  it('ein zusaetzlicher, nicht verdoppelter Buchstabe bleibt unplausibel', async () => {
+    // Die Gegenrichtung darf sich NICHT mitlockern: "Schwere" ist ein
+    // anderes echtes Wort, kein Vertipper von "Schere".
+    const aufgabe = baueFreitextAufgabe({ akzeptiert: ['Schere'], artikelPflicht: false })
+    const ergebnis = await freitextGrader.bewerte({ wert: 'Schwere' }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('falsch')
+  })
+
+  it('Freitext am Bild verweist nicht auf einen Text, den es dort nicht gibt', async () => {
+    const aufgabe: AufgabeFreitext = {
+      ...baueFreitextAufgabe({ akzeptiert: ['der Bleistift'], artikelPflicht: true }),
+      stuetze: 'bild',
+    }
+    const ergebnis = await freitextGrader.bewerte({ wert: 'der Kleber' }, aufgabe, ctx(1))
+    expect(ergebnis.rueckmeldung).not.toContain('Text')
+    expect(ergebnis.rueckmeldung).toContain('Gegenstand')
   })
 
   describe('"Schere"-Testreihe (Rechtschreib-Toleranz, ohne Artikel-Rauschen)', () => {
@@ -652,5 +712,160 @@ describe('Re-Exports aus index.ts (Pflicht-Export fuer andere Agenten)', () => {
   it('exportiert damerauLevenshtein und schwelleFuer identisch zu distance.ts', () => {
     expect(dlAusIndex('Schere', 'Scheere')).toBe(damerauLevenshtein('Schere', 'Scheere'))
     expect(schwelleFuerAusIndex(6)).toBe(schwelleFuer(6))
+  })
+})
+
+// ---------------------------------------------------------------------------
+// menge - Einzahl und Mehrzahl
+// ---------------------------------------------------------------------------
+
+/** Die Mengen-Aufgabe steht im Grammatikthema, nicht im Leseweg. */
+function holeMengenAufgabe(): AufgabeMenge {
+  const thema = modulKlassenzimmer.grammatik?.find((t) => t.id === 'ist-sind')
+  const aufgabe = thema?.aufgaben.find((a) => a.id === 'g1-menge')
+  if (!aufgabe || aufgabe.typ !== 'menge') {
+    throw new Error('Mengen-Aufgabe "g1-menge" wurde im Testmodul nicht gefunden.')
+  }
+  return aufgabe
+}
+
+describe('mengeGrader - Einzahl und Mehrzahl', () => {
+  const aufgabe = holeMengenAufgabe()
+  // Reihenfolge im Modul: 2 Radiergummis, 1 Bleistift, 3 Zirkel, 4 Geodreiecke
+  const alleRichtig = [
+    'Das sind zwei Radiergummis.',
+    'Das ist der Bleistift.',
+    'Das sind drei Zirkel.',
+    'Das sind vier Geodreiecke.',
+  ]
+
+  it('erkennt alle vier Musterloesungen als richtig', async () => {
+    const ergebnis = await mengeGrader.bewerte({ werte: alleRichtig }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('richtig')
+    expect(ergebnis.punkte).toBe(1)
+    expect(ergebnis.fehlerart).toBe('keine')
+  })
+
+  it('akzeptiert die Kurzform ohne "Das ist" / "Das sind" und ohne Punkt', async () => {
+    const ergebnis = await mengeGrader.bewerte(
+      { werte: ['zwei Radiergummis', 'der Bleistift', 'drei Zirkel', 'vier Geodreiecke'] },
+      aufgabe,
+      ctx(1),
+    )
+    expect(ergebnis.bewertung).toBe('richtig')
+  })
+
+  it('akzeptiert bei der Einzahl auch den unbestimmten Artikel', async () => {
+    const ergebnis = await mengeGrader.bewerte(
+      { werte: [...alleRichtig.slice(0, 1), 'Das ist ein Bleistift.', ...alleRichtig.slice(2)] },
+      aufgabe,
+      ctx(1),
+    )
+    expect(ergebnis.bewertung).toBe('richtig')
+  })
+
+  it('meldet Einzahl statt Mehrzahl als Fehlerart "numerus", nicht als "falsch"', async () => {
+    const ergebnis = await mengeGrader.bewerte(
+      { werte: ['Das ist der Radiergummi.', ...alleRichtig.slice(1)] },
+      aufgabe,
+      ctx(1),
+    )
+    expect(ergebnis.bewertung).toBe('fast')
+    expect(ergebnis.teile?.[0]?.fehlerart).toBe('numerus')
+  })
+
+  it('meldet Mehrzahl statt Einzahl ebenfalls als "numerus"', async () => {
+    const ergebnis = await mengeGrader.bewerte(
+      { werte: [alleRichtig[0]!, 'Das sind zwei Bleistifte.', ...alleRichtig.slice(2)] },
+      aufgabe,
+      ctx(1),
+    )
+    expect(ergebnis.teile?.[1]?.fehlerart).toBe('numerus')
+  })
+
+  it('wertet die Ziffer statt des Zahlworts nicht als Fehler - Zahlwoerter sind Uebungsziel, Ziffern kein Fehler', async () => {
+    const ergebnis = await mengeGrader.bewerte(
+      { werte: ['Das sind 2 Radiergummis.', ...alleRichtig.slice(1)] },
+      aufgabe,
+      ctx(1),
+    )
+    expect(ergebnis.teile?.[0]?.bewertung).toBe('richtig')
+  })
+
+  it('meldet eine leere Runde als "leer" und nicht als Verstaendnisfehler', async () => {
+    const ergebnis = await mengeGrader.bewerte({ werte: ['', ...alleRichtig.slice(1)] }, aufgabe, ctx(1))
+    expect(ergebnis.teile?.[0]?.fehlerart).toBe('leer')
+  })
+
+  it('deckt die Loesung erst beim Versuchslimit auf', async () => {
+    const daneben = { werte: ['völlig daneben', '', '', ''] }
+    const frueh = await mengeGrader.bewerte(daneben, aufgabe, ctx(1, 3))
+    expect(frueh.loesungZeigen).toBe(false)
+    expect(frueh.nochmal).toBe(true)
+
+    const spaet = await mengeGrader.bewerte(daneben, aufgabe, ctx(3, 3))
+    expect(spaet.loesungZeigen).toBe(true)
+    expect(spaet.nochmal).toBe(false)
+    expect(spaet.teile?.[0]?.erwartet).toBe('Das sind zwei Radiergummis.')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// heft - Schreibauftrag ohne Bewertung
+// ---------------------------------------------------------------------------
+
+function holeHeftAufgabe(): AufgabeHeft {
+  const aufgabe = modulKlassenzimmer.heftauftraege?.find((a) => a.id === 'h-tisch-saetze')
+  if (!aufgabe) throw new Error('Heftauftrag "h-tisch-saetze" wurde im Testmodul nicht gefunden.')
+  return aufgabe
+}
+
+describe('heftGrader - was ins Heft geht, bewertet die App nicht', () => {
+  const aufgabe = holeHeftAufgabe()
+
+  it('vergibt niemals "richtig" - auch nicht nach Bestaetigung', async () => {
+    const ergebnis = await heftGrader.bewerte({ wert: 'erledigt' }, aufgabe, ctx(1))
+    expect(ergebnis.bewertung).toBe('offen')
+  })
+
+  it('deckt NIE eine Loesung auf, auch nicht beim Versuchslimit', async () => {
+    const ohne = await heftGrader.bewerte({ wert: '' }, aufgabe, ctx(3, 3))
+    const mit = await heftGrader.bewerte({ wert: 'erledigt' }, aufgabe, ctx(3, 3))
+    expect(ohne.loesungZeigen).toBe(false)
+    expect(mit.loesungZeigen).toBe(false)
+  })
+
+  it('schliesst die Aufgabe erst ab, wenn das Kind sie als erledigt meldet', async () => {
+    const offen = await heftGrader.bewerte({ wert: '' }, aufgabe, ctx(1))
+    expect(offen.nochmal).toBe(true)
+
+    const fertig = await heftGrader.bewerte({ wert: 'erledigt' }, aufgabe, ctx(1))
+    expect(fertig.nochmal).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Modulbezug der Grader
+// ---------------------------------------------------------------------------
+
+describe('Modulbezug - Grader schlagen im Modul aus dem Kontext nach', () => {
+  it('bewertet eine Artikel-Aufgabe des Wochenmarkt-Moduls gegen dessen eigenen Wortschatz', async () => {
+    const aufgabe = modulWochenmarkt.aufgaben.find((a) => a.typ === 'artikel')
+    if (!aufgabe || aufgabe.typ !== 'artikel') throw new Error('Wochenmarkt hat keine Artikel-Aufgabe.')
+
+    const zuordnung: Record<string, string> = {}
+    for (const wortId of aufgabe.woerter) {
+      const wort = modulWochenmarkt.wortschatz.find((w) => w.id === wortId)
+      if (!wort) throw new Error(`Wort "${wortId}" fehlt im Wochenmarkt-Modul.`)
+      zuordnung[wortId] = wort.genus
+    }
+
+    const ergebnis = await artikelGrader.bewerte({ zuordnung }, aufgabe, {
+      versuch: 1,
+      maxVersuche: 3,
+      stufe: 'standard',
+      modul: modulWochenmarkt,
+    })
+    expect(ergebnis.bewertung).toBe('richtig')
   })
 })

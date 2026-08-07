@@ -10,7 +10,7 @@
  */
 
 import { useCallback, useEffect, useReducer, useState } from 'react'
-import type { Niveaustufe } from '@/content/types'
+import type { Jahrgangsstufe, Niveaustufe } from '@/content/types'
 import type { GraderErgebnis } from '@/grading/types'
 import type { AufgabenStand, Lernstand, Versuch, WortStand } from './types'
 import { LEERER_LERNSTAND } from './types'
@@ -60,6 +60,7 @@ function leseGespeichertenLernstand(modulId: string): Lernstand | null {
     return {
       modulId,
       stufe: geparst.stufe ?? 'standard',
+      jahrgang: geparst.jahrgang ?? null,
       aufgaben: geparst.aufgaben ?? {},
       woerter: geparst.woerter ?? {},
       begonnen: geparst.begonnen ?? null,
@@ -93,7 +94,9 @@ type Aktion =
   | { typ: 'ERGEBNIS_GEMELDET'; aufgabeId: string; ergebnis: GraderErgebnis; versuch: number; hilfeGenutzt: boolean }
   | { typ: 'WORT_ANGESEHEN'; wortId: string }
   | { typ: 'ARTIKEL_ANTWORT'; wortId: string; richtig: boolean }
+  | { typ: 'EIGENE_SPRACHE_GESETZT'; wortId: string; text: string }
   | { typ: 'STUFE_GESETZT'; stufe: Niveaustufe }
+  | { typ: 'JAHRGANG_GESETZT'; jahrgang: Jahrgangsstufe }
   | { typ: 'ZURUECKGESETZT' }
 
 function leererAufgabenStand(aufgabeId: string): AufgabenStand {
@@ -164,8 +167,26 @@ function reducer(stand: Lernstand, aktion: Aktion): Lernstand {
       }
     }
 
+    case 'EIGENE_SPRACHE_GESETZT': {
+      const bisheriger = stand.woerter[aktion.wortId] ?? leererWortStand(aktion.wortId)
+      const getrimmt = aktion.text.trim()
+      return {
+        ...stand,
+        // Absichtlich OHNE mitBegonnen(): Eine Uebersetzung ist kein
+        // Aufgabenereignis. Sie soll die Sitzungsdauer im Lehrkraft-Bereich
+        // nicht starten und nicht verlaengern.
+        woerter: {
+          ...stand.woerter,
+          [aktion.wortId]: { ...bisheriger, eigeneSprache: getrimmt.length > 0 ? getrimmt : undefined },
+        },
+      }
+    }
+
     case 'STUFE_GESETZT':
       return { ...stand, stufe: aktion.stufe }
+
+    case 'JAHRGANG_GESETZT':
+      return { ...stand, jahrgang: aktion.jahrgang }
 
     case 'ZURUECKGESETZT':
       return LEERER_LERNSTAND(stand.modulId, stand.stufe)
@@ -213,8 +234,16 @@ export function useLernstand(modulId: string, anfangsStufe: Niveaustufe) {
     dispatch({ typ: 'ARTIKEL_ANTWORT', wortId, richtig })
   }, [])
 
+  const meldeEigeneSprache = useCallback((wortId: string, text: string): void => {
+    dispatch({ typ: 'EIGENE_SPRACHE_GESETZT', wortId, text })
+  }, [])
+
   const setzeStufe = useCallback((stufe: Niveaustufe): void => {
     dispatch({ typ: 'STUFE_GESETZT', stufe })
+  }, [])
+
+  const setzeJahrgang = useCallback((jahrgang: Jahrgangsstufe): void => {
+    dispatch({ typ: 'JAHRGANG_GESETZT', jahrgang })
   }, [])
 
   /** Loescht den Lernstand - im Speicher UND, falls vorhanden, in localStorage. */
@@ -235,7 +264,9 @@ export function useLernstand(modulId: string, anfangsStufe: Niveaustufe) {
     meldeErgebnis,
     meldeWortAngesehen,
     meldeArtikelAntwort,
+    meldeEigeneSprache,
     setzeStufe,
+    setzeJahrgang,
     zuruecksetzen,
     speichernAktiv,
     setzeSpeichernAktiv,

@@ -16,7 +16,7 @@
  */
 
 import { aufgabeSichtbar, istLernwort } from '@/content/types'
-import type { Modul } from '@/content/types'
+import type { Aufgabe, Jahrgangsstufe, Modul } from '@/content/types'
 import type { Fehlerart } from '@/grading/types'
 import type { AufgabenStand, Auswertung, Lernstand } from '@/state/types'
 
@@ -49,12 +49,74 @@ function hatFehlversuch(stand: AufgabenStand): boolean {
 // Die Auswertung
 // ---------------------------------------------------------------------------
 
+/**
+ * Alle Aufgaben eines Moduls - aus dem Leseweg, aus den Grammatikthemen und
+ * die freistehenden Heftauftraege.
+ *
+ * Ohne diese Zusammenfuehrung wuerde die Auswertung nur den Lesetext kennen
+ * und behaupten, ein Kind habe nichts gemacht, das eine Stunde lang Grammatik
+ * geuebt hat.
+ */
+export function alleAufgaben(modul: Modul): Aufgabe[] {
+  const gesehen = new Set<string>()
+  const alle = [
+    ...modul.aufgaben,
+    // Jede Jahrgangsfassung bringt eigene Aufgaben mit. Die mittlere Fassung
+    // ist zugleich `modul.aufgaben`, ihre Aufgaben stehen also doppelt in der
+    // Liste - deshalb die Deduplizierung ueber die ID.
+    ...(modul.jahrgangstexte ?? []).flatMap((fassung) => fassung.aufgaben),
+    ...(modul.grammatik ?? []).flatMap((thema) => thema.aufgaben),
+    ...(modul.heftauftraege ?? []),
+  ]
+  return alle.filter((aufgabe) => {
+    if (gesehen.has(aufgabe.id)) return false
+    gesehen.add(aufgabe.id)
+    return true
+  })
+}
+
+/**
+ * Die Aufgaben, die in DIESEM Lernweg erreichbar waren.
+ *
+ * Unterschied zu `alleAufgaben`: Dort stehen alle Aufgaben des Moduls, damit
+ * sich zu jeder gespeicherten ID ein Fragetext finden laesst. Hier steht nur,
+ * was das Kind tatsaechlich vorgelegt bekam - genau eine Jahrgangsfassung,
+ * nicht alle vier. Nur damit ergibt "bearbeitet 6 von 9" einen Sinn.
+ */
+export function aufgabenImLernweg(modul: Modul, jahrgang: Jahrgangsstufe | null): Aufgabe[] {
+  const fassungen = modul.jahrgangstexte ?? []
+  const gewaehlt = fassungen.find((f) => f.jahrgang === jahrgang) ?? fassungen[1] ?? fassungen[0]
+  return [
+    ...(gewaehlt ? gewaehlt.aufgaben : modul.aufgaben),
+    ...(modul.grammatik ?? []).flatMap((thema) => thema.aufgaben),
+    ...(modul.heftauftraege ?? []),
+  ]
+}
+
+/**
+ * Ab wie vielen bearbeiteten Aufgaben Quoten gezeigt werden.
+ *
+ * Fuenf ist keine statistische Groesse, sondern eine paedagogische: Es ist
+ * die kleinste Zahl, bei der ein Muster ueberhaupt zweimal auftreten kann.
+ * Darunter zeigt der Lehrkraft-Bereich lieber gar nichts als eine Zahl, die
+ * nach Befund aussieht.
+ */
+export const AUSSAGEKRAEFTIG_AB = 5
+
 export function berechneAuswertung(lernstand: Lernstand, modul: Modul): Auswertung {
   // Nur Aufgaben, die auf der aktuellen Niveaustufe ueberhaupt gestellt
   // werden - alles andere waere fuer dieses Kind in dieser Sitzung nicht
   // erreichbar und wuerde "gesamt" verzerren (siehe aufgabeSichtbar in
   // content/types.ts).
-  const sichtbareAufgaben = modul.aufgaben.filter((aufgabe) => aufgabeSichtbar(aufgabe, lernstand.stufe))
+  //
+  // Heft-Auftraege bleiben aussen vor: Sie sind nie "richtig" oder "falsch",
+  // sondern offen, bis eine Lehrperson hineingeschaut hat. Sie in Quoten
+  // einzurechnen wuerde jede Kennzahl darunter verfaelschen - sie stehen
+  // stattdessen als eigene Arbeitsliste (offeneHeftauftraege) daneben.
+  const alle = aufgabenImLernweg(modul, lernstand.jahrgang)
+  const sichtbareAufgaben = alle.filter(
+    (aufgabe) => aufgabe.typ !== 'heft' && aufgabeSichtbar(aufgabe, lernstand.stufe),
+  )
 
   // Nur Aufgaben mit mindestens einem Versuch zaehlen als "bearbeitet" -
   // eine leere AufgabenStand-Karteikarte (durch fruehere Anlage) ist kein
@@ -110,9 +172,15 @@ export function berechneAuswertung(lernstand: Lernstand, modul: Modul): Auswertu
     .filter((wort) => (lernstand.woerter[wort.id]?.artikelFalsch ?? 0) > 0)
     .map((wort) => wort.id)
 
+  const offeneHeftauftraege = alle
+    .filter((aufgabe) => aufgabe.typ === 'heft')
+    .filter((aufgabe) => (lernstand.aufgaben[aufgabe.id]?.versuche.length ?? 0) > 0)
+    .map((aufgabe) => aufgabe.id)
+
   return {
     bearbeitet,
     gesamt,
+    aussagekraeftig: bearbeitet >= AUSSAGEKRAEFTIG_AB,
     ersterVersuchRichtig,
     selbstkorrekturQuote,
     versucheBisLoesungMedian,
@@ -120,5 +188,6 @@ export function berechneAuswertung(lernstand: Lernstand, modul: Modul): Auswertu
     hilfenGenutzt,
     aufgeloest,
     genusUnsicher,
+    offeneHeftauftraege,
   }
 }

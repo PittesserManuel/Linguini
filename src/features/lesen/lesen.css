@@ -27,9 +27,16 @@
   .lesen__text-spalte {
     position: sticky;
     top: var(--r-5);
-    max-height: calc(100vh - var(--r-6));
+    /* dvh statt vh: Bei vh springt das Layout, sobald ein mobiler Browser
+       seine Adressleiste ein- oder ausblendet. */
+    max-block-size: calc(100dvh - var(--r-6));
     overflow-y: auto;
-    padding-right: var(--r-3);
+    padding-inline-end: var(--r-3);
+    /* Der Text laeuft am unteren Rand weich aus, statt hart abzuschneiden.
+       Das ist der einzige Hinweis darauf, dass die Spalte weitergeht -
+       eine Bildlaufleiste erscheint erst beim Scrollen und auf Trackpads
+       gar nicht. */
+    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--r-6)), transparent 100%);
   }
 }
 
@@ -514,4 +521,240 @@
   .lesen__reihenfolge-knoepfe > .knopf {
     flex: 1 1 0;
   }
+}
+
+/* ---------------------------------------------------------------------
+ * Bildstuetze zur Aufgabe
+ *
+ * Fuer Kinder mit wenig Deutschkontakt ist das der Unterschied zwischen
+ * "nicht loesbar" und "loesbar": Sie muessen die Aussage nicht aus dem
+ * Gedaechtnis pruefen, sondern koennen hinsehen.
+ * --------------------------------------------------------------------- */
+.lesen__bildstuetze {
+  margin: 0;
+  padding: var(--r-4);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-md);
+}
+
+.lesen__bildstuetze--objekt {
+  max-inline-size: 18rem;
+}
+
+.lesen__bildstuetze--szene {
+  aspect-ratio: 1280 / 340;
+  padding: 0;
+  overflow: hidden;
+}
+
+.lesen__bildstuetze--szene svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+/* ---------------------------------------------------------------------
+ * Ausgearbeitetes Beispiel (Worked Example)
+ * --------------------------------------------------------------------- */
+.lesen__beispiel-titel {
+  margin-block-end: var(--r-3);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lesen__beispiel-liste {
+  display: grid;
+  gap: var(--r-3);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lesen__beispiel-zeile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-2);
+}
+
+.lesen__beispiel-zeile .objektbild {
+  max-block-size: 4.5rem;
+  object-fit: contain;
+}
+
+.lesen__beispiel-satz {
+  color: var(--t-stark);
+  font-size: var(--s-md);
+}
+
+/* ---------------------------------------------------------------------
+ * Einzahl / Mehrzahl
+ * --------------------------------------------------------------------- */
+.lesen__mengen-liste {
+  display: grid;
+  gap: var(--r-5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lesen__mengen-runde {
+  display: grid;
+  gap: var(--r-3);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+}
+
+@media (min-width: 40rem) {
+  .lesen__mengen-runde {
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  }
+}
+
+.lesen__mengen-bild {
+  padding: var(--r-3);
+  background-color: var(--f-karte-tief);
+  border-radius: var(--e-md);
+}
+
+.lesen__mengen-bild .objektbild {
+  max-block-size: 5.5rem;
+}
+
+.lesen__mengen-eingabe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-2);
+}
+
+.lesen__mengen-hinweis {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+/* ---------------------------------------------------------------------
+ * Heft-Auftraege im Aufgabenlauf
+ * --------------------------------------------------------------------- */
+.lesen__heft-marke {
+  align-self: flex-start;
+}
+
+.lesen__heft-vorlage-titel {
+  margin-block-end: var(--r-2);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+  font-weight: 600;
+}
+
+.lesen__heft-zeilen {
+  display: grid;
+  gap: var(--r-1);
+  margin: 0;
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+/* Zeilen wie im linierten Heft - das ist die Vorlage zum Abschreiben. */
+.lesen__heft-zeilen li {
+  padding-block: var(--r-2);
+  border-block-end: 1px solid var(--f-rand);
+  font-size: var(--s-md);
+}
+
+.lesen__heft-zeilen--muster li {
+  font-style: italic;
+}
+
+.lesen__heft-hinweis,
+.lesen__heft-umfang {
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.lesen__heft-haken {
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------
+ * Musterloesung: Teilergebnisse mit Zeichen
+ * --------------------------------------------------------------------- */
+.lesen__loesung-eintrag {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--r-2);
+}
+
+/* ---------------------------------------------------------------------
+ * Jahrgangswahl
+ *
+ * Bewusst anders gestaltet als die Niveaustufenwahl in der Kopfzeile:
+ * eckige Reiter statt runder Pillen. Die beiden Schalter stehen inhaltlich
+ * nebeneinander (wie alt / wie sicher) und duerfen deshalb nicht gleich
+ * aussehen - sonst greift man zum falschen.
+ * --------------------------------------------------------------------- */
+.lesen__jahrgangswahl {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lesen__jahrgangswahl-legende {
+  padding: 0;
+  margin-block-end: var(--r-2);
+  color: var(--t-leise);
+  font-size: var(--s-sm);
+}
+
+.lesen__jahrgangswahl-optionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--r-2);
+}
+
+.lesen__jahrgang-option {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ziel-min);
+  padding: var(--r-2) var(--r-4);
+  background-color: var(--f-karte-tief);
+  border: 1px solid var(--f-rand-stark);
+  border-radius: var(--e-md);
+  color: var(--t-normal);
+  cursor: pointer;
+  font-size: var(--s-sm);
+  font-weight: 600;
+}
+
+.lesen__jahrgang-option input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.lesen__jahrgang-option:has(input:focus-visible) {
+  outline: var(--fokus-breite) solid var(--fokus-farbe);
+  outline-offset: 2px;
+}
+
+.lesen__jahrgang-option.ist-gewaehlt {
+  background-color: var(--m-ocker-hell);
+  border-color: var(--m-ocker);
+  color: var(--t-stark);
+}
+
+.lesen__jahrgangswahl-hinweis {
+  margin-block-start: var(--r-2);
+  color: var(--t-leise);
+  font-size: var(--s-xs);
+}
+
+/* Einzelbild zur Aufgabe: ohne obere Schranke wuerde ein Rasterbild die
+   halbe Aufgabenkarte fuellen. */
+.lesen__bildstuetze--objekt .objektbild {
+  max-block-size: 9rem;
 }

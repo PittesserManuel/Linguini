@@ -9,11 +9,12 @@
  */
 
 import { Component } from 'react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { MODULE, STANDARD_MODUL_ID, findeModul } from '@/content/module'
 import type { Modul } from '@/content/types'
 import { Wortbild } from '@/features/wortbild'
+import { Grammatik } from '@/features/grammatik'
 import { Lesen } from '@/features/lesen'
 import { Lehrkraft } from '@/features/lehrkraft'
 import { useLernstand } from '@/state/lernstand'
@@ -93,11 +94,23 @@ function ModulSitzung({
     meldeErgebnis,
     meldeWortAngesehen,
     meldeArtikelAntwort,
+    meldeEigeneSprache,
     setzeStufe,
+    setzeJahrgang,
     zuruecksetzen,
     speichernAktiv,
     setzeSpeichernAktiv,
   } = useLernstand(modul.id, 'standard')
+
+  // Die Uebersetzungen liegen im Lernstand (je Wort), die Wortkarte braucht
+  // sie flach nach Wort-ID. Nur ableiten, nicht doppelt halten.
+  const eigeneSprachen = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.values(lernstand.woerter).map((stand) => [stand.wortId, stand.eigeneSprache]),
+      ),
+    [lernstand.woerter],
+  )
 
   return (
     <>
@@ -115,12 +128,24 @@ function ModulSitzung({
           {ansicht === 'wortbild' && (
             <Wortbild
               modul={modul}
+              stufe={lernstand.stufe}
               onWortAngesehen={meldeWortAngesehen}
               onArtikelAntwort={meldeArtikelAntwort}
+              eigeneSprachen={eigeneSprachen}
+              onEigeneSprache={meldeEigeneSprache}
             />
           )}
+          {ansicht === 'grammatik' && (
+            <Grammatik modul={modul} stufe={lernstand.stufe} onErgebnis={meldeErgebnis} />
+          )}
           {ansicht === 'lesen' && (
-            <Lesen modul={modul} stufe={lernstand.stufe} onErgebnis={meldeErgebnis} />
+            <Lesen
+              modul={modul}
+              stufe={lernstand.stufe}
+              jahrgang={lernstand.jahrgang}
+              onJahrgangWechseln={setzeJahrgang}
+              onErgebnis={meldeErgebnis}
+            />
           )}
           {ansicht === 'lehrkraft' && <Lehrkraft modul={modul} lernstand={lernstand} />}
         </Fehlergrenze>
@@ -163,6 +188,16 @@ export default function App(): ReactElement {
           <main id="inhalt" className="hauptbereich inhalt">
             <Start module={MODULE} onModulStarten={starteModul} />
           </main>
+          {/* Nur der Hinweis, ohne Schalter: Auf der Startseite gibt es noch
+              keinen Lernstand zu speichern oder zu loeschen - die Zusage
+              "keine Daten, kein Konto, keine Cookies" gehoert aber genau
+              hierher, wo man zuerst landet. */}
+          <Fusszeile
+            nurHinweis
+            speichernAktiv={false}
+            onSpeichernUmschalten={() => undefined}
+            onLernstandLoeschen={() => undefined}
+          />
         </>
       ) : (
         <ModulSitzung key={modul.id} modul={modul} ansicht={ansicht} onAnsichtWechseln={setAnsicht} />

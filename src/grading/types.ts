@@ -13,18 +13,24 @@
  * async waere sonst ein Umbau durch die gesamte Komponentenschicht.
  */
 
-import type { Aufgabe, AufgabenTyp, Niveaustufe } from '@/content/types'
+import type { Aufgabe, AufgabenTyp, Modul, Niveaustufe } from '@/content/types'
 
 // ---------------------------------------------------------------------------
 // Ergebnis
 // ---------------------------------------------------------------------------
 
 /**
- * Dreistufig, nicht zweistufig. "fast" ist der paedagogisch wichtigste Zustand:
- * Das Kind hat die Sache verstanden und nur die Schreibung verfehlt. Das als
- * "falsch" zu werten waere fachlich falsch und demotivierend.
+ * Vier Zustaende, nicht zwei.
+ *
+ * "fast" ist der paedagogisch wichtigste davon: Das Kind hat die Sache
+ * verstanden und nur die Schreibung verfehlt. Das als "falsch" zu werten waere
+ * fachlich falsch und demotivierend.
+ *
+ * "offen" ist der ehrlichste: Bei Schreibauftraegen ins Heft WEISS die App
+ * nicht, ob die Antwort stimmt - sie hat sie nie gesehen. Statt sich eine
+ * Bewertung auszudenken, sagt sie das. Korrigiert wird von einem Menschen.
  */
-export type Bewertung = 'richtig' | 'fast' | 'falsch'
+export type Bewertung = 'richtig' | 'fast' | 'falsch' | 'offen'
 
 /**
  * Fehlerarten. Das ist die diagnostische Waehrung der Plattform: Der
@@ -37,6 +43,8 @@ export type Fehlerart =
   | 'rechtschreibung'
   /** Nomen richtig, Artikel falsch - der DaZ-Kernfehler. */
   | 'genus'
+  /** Nomen richtig, aber Einzahl statt Mehrzahl (oder umgekehrt). */
+  | 'numerus'
   /** Nomen kleingeschrieben. Hinweis, nicht Fehler. */
   | 'grossschreibung'
   /** Ein anderes existierendes Wort aus der Wortbank gewaehlt. */
@@ -105,6 +113,15 @@ export interface GraderKontext {
   /** Ab hier wird die Loesung aufgedeckt. */
   maxVersuche: number
   stufe: Niveaustufe
+  /**
+   * Das Modul, zu dem die Aufgabe gehoert.
+   *
+   * Noetig, weil Aufgaben auf den Wortschatz VERWEISEN statt ihn zu
+   * wiederholen (`artikel.woerter`, `menge.runden[].wortId`). Ohne diesen
+   * Bezug muesste ein Grader raten, in welchem Modul er nachschlagen soll -
+   * und laege bei jedem Modul ausser dem ersten falsch.
+   */
+  modul: Modul
 }
 
 // ---------------------------------------------------------------------------
@@ -120,7 +137,7 @@ export interface Grader {
   bewerte(antwort: Antwort, aufgabe: Aufgabe, ctx: GraderKontext): Promise<GraderErgebnis>
 }
 
-export const STANDARD_KONTEXT: Omit<GraderKontext, 'stufe'> = {
+export const STANDARD_KONTEXT: Omit<GraderKontext, 'stufe' | 'modul'> = {
   versuch: 1,
   maxVersuche: 3,
 }

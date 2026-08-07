@@ -285,12 +285,7 @@ export const modulWochenmarkt: Modul = {
         ],
       },
     ],
-    kennzahlen: {
-      woerter: 156,
-      saetze: 26,
-      woerterProSatzDurchschnitt: 6.0,
-      langstesWort: 'Wochenmarkt',
-    },
+    kennzahlen: { woerter: 161, saetze: 27, woerterProSatzDurchschnitt: 6, langstesWort: 'verkauft' },
   },
 
   // -------------------------------------------------------------------------
@@ -380,7 +375,7 @@ export const modulWochenmarkt: Modul = {
       ebene: 'literal',
       abStufe: 'standard',
       belegAbsatz: 'a3',
-      akzeptiert: ['der Korb', 'Korb', 'in den Korb', 'den Korb'],
+      akzeptiert: ['der Korb', 'in den Korb', 'den Korb'],
       artikelPflicht: true,
       platzhalter: 'zum Beispiel: die Tasche',
       hilfen: [
